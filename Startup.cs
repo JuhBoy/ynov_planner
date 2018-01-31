@@ -9,8 +9,10 @@ using Microsoft.Extensions.Options;
 using System.IO;
 using Microsoft.EntityFrameworkCore;
 
+using events_planner;
 using events_planner.Models;
-using Swashbuckle.AspNetCore.Swagger; 
+using Swashbuckle.AspNetCore.Swagger;
+using events_planner.Services;
 
 namespace events_planner {
     public partial class Startup {
@@ -30,6 +32,12 @@ namespace events_planner {
             services.AddMvc();
             services.AddRouting(option => option.LowercaseUrls = true);
 
+            // Enable JWT Authentication
+            useJwtAuthentication(services);
+
+            // Add user controller services
+            services.AddScoped<IUserServices, UserServices>();
+
             AddSwagger(services);
         }
 
@@ -37,9 +45,12 @@ namespace events_planner {
         public void Configure(IApplicationBuilder app, IHostingEnvironment env) {
             Env = env;
 
-            if (env.IsDevelopment())
-            {
+            app.UseAuthentication();
+            if (env.IsDevelopment()) {
                 app.UseDeveloperExceptionPage();
+            } else {
+                // Enable the authentication
+                app.UseAuthentication();
             }
             
             swaggerConfigure(app);
