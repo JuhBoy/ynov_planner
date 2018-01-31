@@ -13,7 +13,7 @@ using events_planner.Models;
 using Swashbuckle.AspNetCore.Swagger; 
 
 namespace events_planner {
-    public class Startup {
+    public partial class Startup {
 
         public IConfiguration Configuration { get; }
         public IHostingEnvironment Env { get; set; }
@@ -44,26 +44,6 @@ namespace events_planner {
             
             swaggerConfigure(app);
             app.UseMvc();
-        }
-
-        private void AddSwagger(IServiceCollection services) {
-            services.AddSwaggerGen(c => {
-               c.SwaggerDoc("v1.0", new Info {
-                   Title = "Event planner Ynov",
-                   Version = "v1.0"
-                });
-
-                var basePath = AppContext.BaseDirectory;
-                var xmlPath = Path.Combine(basePath, "events_planner.xml"); 
-                c.IncludeXmlComments(xmlPath);
-            }); 
-        }
-
-        private void swaggerConfigure(IApplicationBuilder application) {
-            application.UseSwagger();
-            application.UseSwaggerUI(c => {
-                c.SwaggerEndpoint("/swagger/v1.0/swagger.json", "Ynov Events Planner v1.0");
-            });
         }
     }
 }
