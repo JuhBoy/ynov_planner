@@ -19,5 +19,9 @@ namespace events_planner.Models
         [MinLength(3, ErrorMessage = "Name's Role must be at least 3 characters")]
         [Required]
         public string Name { get; set; }
+
+        public ICollection<User> Users { get; set; }
+
+        public ICollection<Price> Prices { get; set; }
     }
 }

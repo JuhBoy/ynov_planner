@@ -6,6 +6,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace events_planner.Models
 {
+    public enum Status {
+        DRAFT,
+        ONGOING,
+        DONE
+    }
+
     [Table("event")]
     public class Event
     {
@@ -28,13 +34,11 @@ namespace events_planner.Models
         public int SubscribeNumber { get; set; }
 
         [Column("status")]
-        [StringLength(30, MinimumLength = 3)]
-        [ConcurrencyCheck]
         [Required]
-        public string Status { get; set; }
+        public Status Status { get; set; }
 
-        [Column("location")]
-        public JSON DateOfBirth { get; set; }
+        [Column("location", TypeName="BLOB")]
+        public string Location { get; set; }
 
         [Column("created_at")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -53,5 +57,10 @@ namespace events_planner.Models
 
         [Column("end_at")]
         public DateTime EndAt { get; set; }
+
+        public ICollection<Booking> Bookings { get; set; }
+
+        public ICollection<Price> Prices { get; set; }
+
     }
 }

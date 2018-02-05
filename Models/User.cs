@@ -54,10 +54,29 @@ namespace events_planner.Models
 
         [Column("created_at")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public DateTime Created { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         [Column("updated_at")]
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-        public DateTime Updated { get; set; }
+        public DateTime UpdatedAt { get; set; }
+
+        public ICollection<Booking> Bookings { get; set; }
+
+        public ICollection<Subscribe> SubscribeTo { get; set; }
+
+        [Column("promotion_id")]
+        [ForeignKey("promotion_id")]
+        public int PromotionId { get; set; }
+
+        public Promotion Promotion { get; set; }
+
+        [Column("role_id")]
+        [ForeignKey("role_id")]
+        public int RoleId { get; set; }
+
+        public Role Role { get; set; }
+
+        [ForeignKey("recovery_id")]
+        public virtual Recovery Recovery { get; set; };
     }
 }

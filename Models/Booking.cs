@@ -24,5 +24,17 @@ namespace events_planner.Models
         [Column("updated_at")]
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime UpdatedAt { get; set; }
+
+        [Column("user_id")]
+        [ForeignKey("user_id")]
+        public int UserId { get; set; }
+
+        public User User { get; set; }
+
+        [Column("event_id")]
+        [ForeignKey("event_id")]
+        public int EventId { get; set; }
+
+        public Event Event { get; set; }
     }
 }

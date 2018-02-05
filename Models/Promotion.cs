@@ -34,5 +34,8 @@ namespace events_planner.Models
         [Column("updated_at")]
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime UpdatedAt { get; set; }
+
+        public ICollection<User> Users { get; set; }
+
     }
 }

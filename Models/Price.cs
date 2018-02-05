@@ -15,14 +15,26 @@ namespace events_planner.Models
 
         [Column("price")]
         [Required]
-        public int Price { get; set; }
+        public int Amount { get; set; }
 
         [Column("created_at")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public DateTime Created { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         [Column("updated_at")]
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-        public DateTime Updated { get; set; }
+        public DateTime UpdatedAt { get; set; }
+
+        [Column("event_id")]
+        [ForeignKey("event_id")]
+        public int EventId { get; set; }
+
+        public Event Event { get; set; }
+
+        [Column("role_id")]
+        [ForeignKey("role_id")]
+        public int RoleId { get; set; }
+
+        public Role Role { get; set; }
     }
 }

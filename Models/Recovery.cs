@@ -19,10 +19,12 @@ namespace events_planner.Models
 
         [Column("created_at")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public DateTime Created { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         [Column("updated_at")]
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-        public DateTime Updated { get; set; }
+        public DateTime UpdatedAt { get; set; }
+
+        public virtual User User { get; set; }
     }
 }
