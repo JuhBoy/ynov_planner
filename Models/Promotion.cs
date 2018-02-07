@@ -37,5 +37,6 @@ namespace events_planner.Models
 
         public ICollection<User> Users { get; set; }
 
+        public IList<EventPromotion> EventPromotion { get; set; }
     }
 }

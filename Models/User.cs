@@ -77,6 +77,8 @@ namespace events_planner.Models
         public Role Role { get; set; }
 
         [ForeignKey("recovery_id")]
-        public virtual Recovery Recovery { get; set; };
+        public virtual Recovery Recovery { get; set; }
+
+        public IList<EventUser> EventUser { get; set; }
     }
 }

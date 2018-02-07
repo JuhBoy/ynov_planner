@@ -34,5 +34,7 @@ namespace events_planner.Models
         public Category SubCategory { get; set; }
 
         public ICollection<Subscribe> Subscribers { get; set; }
+
+        public IList<EventCategory> EventCategory { get; set; }
     }
 }

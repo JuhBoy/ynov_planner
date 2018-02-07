@@ -62,5 +62,9 @@ namespace events_planner.Models
 
         public ICollection<Price> Prices { get; set; }
 
+//[NotMapped]
+        public IList<EventCategory> EventCategory { get; set; }
+        public IList<EventPromotion> EventPromotion { get; set; }
+        public IList<EventUser> EventUser { get; set; }
     }
 }
