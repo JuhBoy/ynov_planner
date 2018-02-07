@@ -50,13 +50,13 @@ namespace events_planner.Models
 
         [Column("start_at")]
         [Required]
-        public DateTime StartAt { get; set; }
+        public DateTime? StartAt { get; set; }
 
         [Column("open_at")]
-        public DateTime OpenAt { get; set; }
+        public DateTime? OpenAt { get; set; }
 
         [Column("end_at")]
-        public DateTime EndAt { get; set; }
+        public DateTime? EndAt { get; set; }
 
         /***********************
             RELATIONS

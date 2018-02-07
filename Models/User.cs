@@ -40,7 +40,7 @@ namespace events_planner.Models
         public string Email { get; set; }
 
         [Column("date_of_birth")]
-        public DateTime DateOfBirth { get; set; }
+        public DateTime? DateOfBirth { get; set; }
 
         [Column("password")]
         [MinLength(8, ErrorMessage = "Password must be at least 8 characters")]
