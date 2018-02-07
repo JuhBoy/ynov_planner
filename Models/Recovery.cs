@@ -25,6 +25,11 @@ namespace events_planner.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime UpdatedAt { get; set; }
 
+        /***********************
+            RELATIONS
+        ************************/
+
+        /// <summary> relation with User (One to One) </summary>
         public virtual User User { get; set; }
     }
 }

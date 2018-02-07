@@ -27,14 +27,20 @@ namespace events_planner.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime UpdatedAt { get; set; }
 
+        /***********************
+            RELATIONS
+        ************************/
+
+        /// <summary> relation with category - self loop ! (One to One) </summary>
         [Column("sub_category_id")]
         [ForeignKey("sub_category_id")]
         public int SubCategoryId { get; set; }
-
         public Category SubCategory { get; set; }
 
+        /// <summary> relation with subcriber (One to Many) </summary>
         public ICollection<Subscribe> Subscribers { get; set; }
 
+        /// <summary> relation with Event (Many to Many) </summary>
         public IList<EventCategory> EventCategory { get; set; }
     }
 }

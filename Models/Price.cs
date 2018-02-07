@@ -25,12 +25,17 @@ namespace events_planner.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime UpdatedAt { get; set; }
 
+        /***********************
+            RELATIONS
+        ************************/
+
+        /// <summary> relation with Event (Many to One) </summary>
         [Column("event_id")]
         [ForeignKey("event_id")]
         public int EventId { get; set; }
-
         public Event Event { get; set; }
 
+        /// <summary> relation with Role (Many to Many) </summary>
         [Column("role_id")]
         [ForeignKey("role_id")]
         public int RoleId { get; set; }

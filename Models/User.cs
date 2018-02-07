@@ -60,25 +60,33 @@ namespace events_planner.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime UpdatedAt { get; set; }
 
+        /***********************
+            RELATIONS
+        ************************/
+
+        /// <summary> relation with Booking (One to Many) </summary>
         public ICollection<Booking> Bookings { get; set; }
 
+        /// <summary> relation with Subcribe (One to Many) </summary>
         public ICollection<Subscribe> SubscribeTo { get; set; }
 
+        /// <summary> relation with Promotion (Many to One) </summary>
         [Column("promotion_id")]
         [ForeignKey("promotion_id")]
         public int PromotionId { get; set; }
-
         public Promotion Promotion { get; set; }
 
+        /// <summary> relation with Role (Many to One) </summary>
         [Column("role_id")]
         [ForeignKey("role_id")]
         public int RoleId { get; set; }
 
+        /// <summary> relation with Recovery (One to One) </summary>
         public Role Role { get; set; }
-
         [ForeignKey("recovery_id")]
         public virtual Recovery Recovery { get; set; }
 
+        /// <summary> relation with Event (Many to Many) </summary>
         public IList<EventUser> EventUser { get; set; }
     }
 }

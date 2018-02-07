@@ -58,13 +58,23 @@ namespace events_planner.Models
         [Column("end_at")]
         public DateTime EndAt { get; set; }
 
+        /***********************
+            RELATIONS
+        ************************/
+
+        /// <summary> relation with Bookings (One to Many) </summary>
         public ICollection<Booking> Bookings { get; set; }
 
+        /// <summary> relation with Prices (One to Many) </summary>
         public ICollection<Price> Prices { get; set; }
 
-//[NotMapped]
+        /// <summary> relation with Category (Many to Many) </summary>
         public IList<EventCategory> EventCategory { get; set; }
+
+        /// <summary> relation with Promotion (Many to Many) </summary>
         public IList<EventPromotion> EventPromotion { get; set; }
+
+        /// <summary> relation with User (Many to Many) </summary>
         public IList<EventUser> EventUser { get; set; }
     }
 }

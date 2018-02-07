@@ -18,8 +18,14 @@ namespace events_planner.Models {
         public DbSet<EventUser> EventUser { get; set; }
         
         
+        /// <summary>
+        /// This line is added to sync the database with migration file 
+        /// </summary>
         public PlannerContext(DbContextOptions options) : base(options) {}        
 
+        /// <summary>
+        /// Build the many to many relations
+        /// </summary>
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
             //EVENT PROMOTION
             modelBuilder.Entity<EventPromotion>().HasKey(ep => new { ep.PromotionId, ep.EventId });

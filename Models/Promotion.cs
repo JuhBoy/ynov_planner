@@ -35,8 +35,14 @@ namespace events_planner.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime UpdatedAt { get; set; }
 
+        /***********************
+            RELATIONS
+        ************************/
+
+        /// <summary> relation with User (One to Many) </summary>
         public ICollection<User> Users { get; set; }
 
+        /// <summary> relation with Event (Many to Many) </summary>
         public IList<EventPromotion> EventPromotion { get; set; }
     }
 }

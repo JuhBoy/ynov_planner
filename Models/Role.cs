@@ -20,8 +20,14 @@ namespace events_planner.Models
         [Required]
         public string Name { get; set; }
 
+        /***********************
+            RELATIONS
+        ************************/
+
+        /// <summary> relation with User (One to Many) </summary>
         public ICollection<User> Users { get; set; }
 
+        /// <summary> relation with Price (One to Many) </summary>
         public ICollection<Price> Prices { get; set; }
     }
 }
