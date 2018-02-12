@@ -18,8 +18,10 @@ namespace events_planner
         }
 
         public static IWebHost BuildWebHost(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>()
-                .Build();
+            CreateWebHostbuilder(args).Build();
+
+        public static IWebHostBuilder CreateWebHostbuilder(string[] args) =>
+                WebHost.CreateDefaultBuilder(args)
+                       .UseStartup<Startup>();
     }
 }

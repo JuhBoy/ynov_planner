@@ -1,0 +1,24 @@
+﻿<Properties StartupConfiguration="{7E3B97E8-2A3D-4639-A034-95A6A6E3DD1F}|Default">
+  <MonoDevelop.Ide.Workbench ActiveDocument="PlannerApi.Tests/UserServices.cs">
+    <Files>
+      <File FileName="PlannerApi.Tests/UserServices.cs" Line="24" Column="13" />
+      <File FileName="PlannerApi.Tests/Fixtures/ServerFixture.cs" Line="17" Column="43" />
+      <File FileName="PlannerApi/Program.cs" Line="26" Column="6" />
+      <File FileName="PlannerApi/Controllers/UserController.cs" Line="21" Column="26" />
+    </Files>
+    <Pads>
+      <Pad Id="MonoDevelop.UnitTesting.TestPad">
+        <State name="__root__">
+          <Node name="ynov_planner" expanded="True" selected="True" />
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MultiItemStartupConfigurations />
+  <MonoDevelop.Ide.ItemProperties.events__planner PreferredExecutionTarget="MonoDevelop.Default" />
+</Properties>
