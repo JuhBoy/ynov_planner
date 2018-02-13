@@ -1,10 +1,26 @@
 ﻿<Properties StartupConfiguration="{7E3B97E8-2A3D-4639-A034-95A6A6E3DD1F}|Default">
-  <MonoDevelop.Ide.Workbench ActiveDocument="PlannerApi/Controllers/UserController.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="PlannerApi.Tests/UnitTests/UserServicesTests.cs">
     <Files>
-      <File FileName="PlannerApi/Controllers/UserController.cs" Line="16" Column="9" />
-      <File FileName="PlannerApi.Tests/UserServices.cs" Line="17" Column="10" />
-      <File FileName="PlannerApi/Services/UserServices.cs" Line="40" Column="184" />
+      <File FileName="PlannerApi/Controllers/UserController.cs" Line="22" Column="56" />
+      <File FileName="PlannerApi.Tests/DummyTest.cs" Line="29" Column="40" />
+      <File FileName="PlannerApi.Tests/UnitTests/UserServicesTests.cs" Line="30" Column="13" />
+      <File FileName="PlannerApi/Startup.cs" Line="28" Column="47" />
     </Files>
+    <Pads>
+      <Pad Id="MonoDevelop.UnitTesting.TestPad">
+        <State name="__root__">
+          <Node name="ynov_planner" expanded="True">
+            <Node name="PlannerApi.Tests" expanded="True">
+              <Node name="PlannerApi" expanded="True">
+                <Node name="Tests" expanded="True">
+                  <Node name="UnitTests" expanded="True" />
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

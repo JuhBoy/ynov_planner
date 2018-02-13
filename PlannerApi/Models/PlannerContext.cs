@@ -21,7 +21,8 @@ namespace events_planner.Models {
         /// <summary>
         /// This line is added to sync the database with migration file 
         /// </summary>
-        public PlannerContext(DbContextOptions options) : base(options) {}        
+        public PlannerContext(DbContextOptions options) : base(options) {}
+        public PlannerContext() {}
 
         /// <summary>
         /// Build the many to many relations

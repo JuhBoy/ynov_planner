@@ -9,11 +9,11 @@ using System.Collections.Generic;
 
 namespace PlannerApi.Tests
 {
-    public class UserServices
+    public class DummyTest
     {
 
         [Fact]
-        public async Task DummyTest()
+        public async Task DummyTestWithServer()
         {
             // Arrange
             HttpClient client = ServerFixtures.GetClient();

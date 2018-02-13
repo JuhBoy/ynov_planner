@@ -1,11 +1,8 @@
 using System;
 using System.Net.Http;
 using System.IO;
-using events_planner;
-using System.Threading.Tasks;  
-using Microsoft.AspNetCore.Builder;  
-using Microsoft.AspNetCore.Hosting;  
-using Microsoft.AspNetCore.Http;
+using events_planner;  
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 
 namespace PlannerApi.Tests.Fixtures {

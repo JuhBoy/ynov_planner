@@ -1,7 +1,6 @@
 using System;
 using System.Threading.Tasks;
 using events_planner.Services;
-using Microsoft.EntityFrameworkCore;
 using events_planner.Models;
 
 // JWT GENERATING ENGINE
@@ -21,7 +20,6 @@ namespace Microsoft.Extensions.DependencyInjection
         public UserServices(PlannerContext context, IConfiguration configuration) {
             _context = context;
             Configuration = configuration;
-
         }
 
         public async Task<object> GetToken(string login, string password) {

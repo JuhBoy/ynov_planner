@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using events_planner.Deserializers;
 using events_planner.Services;
-using Microsoft.AspNetCore.Authorization;
 
 namespace events_planner.Controllers
 {
