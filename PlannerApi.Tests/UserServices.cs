@@ -11,7 +11,7 @@ namespace PlannerApi.Tests
 {
     public class UserServices
     {
-        
+
         [Fact]
         public async Task DummyTest()
         {

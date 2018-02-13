@@ -20,5 +20,8 @@
 
   <ItemGroup>
     <Folder Include="Fixtures\" />
+    <Folder Include="UnitTests\" />
+    <Folder Include="FunctionalTests\" />
+    <Folder Include="IntegrationTests\" />
   </ItemGroup>
 </Project>
