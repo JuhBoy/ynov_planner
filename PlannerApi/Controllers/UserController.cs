@@ -30,12 +30,12 @@ namespace events_planner.Controllers
         }
 
         // POST api/values
-        [HttpPost]
+        [HttpPost("token")]
         public async Task<IActionResult> GetToken([FromBody] UserConnectionDeserializer userCredential) {
             if (!ModelState.IsValid) return BadRequest();
             
             // Access to the user's token
-            object token = await services.GetToken(userCredential.login, userCredential.password);
+            object token = await services.GetToken(userCredential.Login, userCredential.Password);
 
             return new ObjectResult(token);
         }

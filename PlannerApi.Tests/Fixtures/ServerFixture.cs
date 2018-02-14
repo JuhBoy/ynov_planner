@@ -7,18 +7,21 @@ using Microsoft.AspNetCore.TestHost;
 
 namespace PlannerApi.Tests.Fixtures {
 
-    public class ServerFixtures {
+    public class ServerFixtures : IDisposable {
 
-        public static HttpClient Client { get; set; }
+        public HttpClient Client { get; set; }
 
-        public static HttpClient GetClient() {
-            if (Client != null) return Client;
-
+        public ServerFixtures() {
             IWebHostBuilder builder = Program.CreateWebHostbuilder(Array.Empty<string>())
-                                 .UseContentRoot(Path.GetFullPath("../../../../PlannerApi"));
+                                             .UseContentRoot(Path.GetFullPath("../../../../PlannerApi"));
 
             TestServer Server = new TestServer(builder);
-            return Client = Server.CreateClient();
-        }   
+            Client = Server.CreateClient();
+        }
+
+        public void Dispose()
+        {
+            Client = null; 
+        }
     }
 }

@@ -29,3 +29,9 @@ Units tests are localized in the PlannerApi.Tests folder from the base solution.
  2. dotnet xunit
 
 Running on mac or windows with visual studio, you can run the tests directly from the UI of your IDE.
+
+### Design New Tests
+
+If you are planning to create new tests, make sure to use the nested class pattern. Its better for visibilty and architecturing.
+However for Integration tests, It's needed to keep a lone instance of fixtures. Use the classic schema One File, One Test Class.
+Implentation of IClassFixture<T> Generic Interface is required to use dependency injection.

@@ -1,11 +1,15 @@
 ﻿<Properties StartupConfiguration="{7E3B97E8-2A3D-4639-A034-95A6A6E3DD1F}|Default">
-  <MonoDevelop.Ide.Workbench ActiveDocument="PlannerApi.Tests/DummyTest.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="PlannerApi/Controllers/UserController.cs">
     <Files>
-      <File FileName="PlannerApi/Controllers/UserController.cs" Line="22" Column="56" />
-      <File FileName="PlannerApi.Tests/DummyTest.cs" Line="26" Column="22" />
-      <File FileName="PlannerApi.Tests/UnitTests/UserServicesTests.cs" Line="21" Column="60" />
-      <File FileName="PlannerApi/Startup.cs" Line="28" Column="47" />
+      <File FileName="PlannerApi/Controllers/UserController.cs" Line="6" Column="1" />
     </Files>
+    <Pads>
+      <Pad Id="MonoDevelop.UnitTesting.TestPad">
+        <State name="__root__">
+          <Node name="ynov_planner" expanded="True" />
+        </State>
+      </Pad>
+    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

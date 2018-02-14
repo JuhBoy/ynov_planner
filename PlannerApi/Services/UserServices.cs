@@ -39,7 +39,7 @@ namespace Microsoft.Extensions.DependencyInjection
             );
 
             return new {
-                Token = new JwtSecurityTokenHandler().WriteToken(token) 
+                Token = new JwtSecurityTokenHandler().WriteToken(token)
             };
         }
     }

@@ -10,22 +10,34 @@ namespace PlannerApi.Tests.UnitTests
 {
     public partial class UserServicesTests
     {
-        public partial class GetToken {
-            [Theory]
-            [InlineData("localhost:5000", "localhost:5000", "MySecretkeymustbesuperhotstobeacceptedbythehash")]
-            public async Task ShouldReturnToken(string Audience, string Issuer, string Secret)
+
+        public partial class GetToken : IDisposable {
+
+            Mock<IConfiguration> Configuration { get; set; }
+            Mock<PlannerContext> PlannerContext { get; set; }
+
+            public GetToken() {
+                Configuration = new Mock<IConfiguration>();
+                PlannerContext = new Mock<PlannerContext>();
+
+                Configuration.Setup(conf => conf["TokenAuthentication:Audience"])
+                             .Returns("localhost:5000");
+                Configuration.Setup(conf => conf["TokenAuthentication:Issuer"])
+                             .Returns("localhost:5000");
+                Configuration.Setup(conf => conf["TokenAuthentication:Secret"])
+                             .Returns("MySecretkeymustbesuperhotstobeacceptedbythehash");
+            }
+
+            public void Dispose()
             {
-                var plannerContext = new Mock<PlannerContext>();
-                var config = new Mock<IConfiguration>();
+                Configuration = null;
+                PlannerContext = null;
+            }
 
-                config.Setup(conf => conf["TokenAuthentication:Audience"])
-                      .Returns(Audience);
-                config.Setup(conf => conf["TokenAuthentication:Issuer"])
-                      .Returns(Issuer);
-                config.Setup(conf => conf["TokenAuthentication:Secret"])
-                      .Returns(Secret);
-
-                var services = new UserServices(plannerContext.Object, config.Object);
+            [Fact]
+            public async Task ShouldReturnToken()
+            {
+                var services = new UserServices(PlannerContext.Object, Configuration.Object);
 
                 var objectResult = await services.GetToken("myLogin", "MyPassword");
                 Type type = objectResult.GetType();
