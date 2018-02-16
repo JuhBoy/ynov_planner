@@ -69,6 +69,18 @@ namespace events_planner.Models {
                 .HasOne<Category>(ec => ec.Category)
                 .WithMany(c => c.EventCategory)
                 .HasForeignKey(ec => ec.CategoryId);
+
+            //==================================
+            //          DEFAULT VALUE
+            //==================================
+
+            modelBuilder.Entity<User>()
+                        .Property(p => p.CreatedAt)
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            modelBuilder.Entity<User>()
+                        .Property(p => p.UpdatedAt)
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
         }
 
         /*protected override void Seed(PlannerContext context)
