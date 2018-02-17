@@ -76,8 +76,9 @@ namespace events_planner.Models {
 
             modelBuilder.Entity<User>((obj) =>
             {
-                   obj.Property(p => p.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
-                   obj.Property(p => p.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+                obj.Property(p => p.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+                obj.Property(p => p.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+                obj.HasIndex(i => new {i.Username, i.Email}).IsUnique(true);
             });
 
             modelBuilder.Entity<Promotion>((obj) =>
