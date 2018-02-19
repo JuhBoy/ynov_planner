@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Newtonsoft.Json;
 
 namespace events_planner.Models
 {
@@ -23,11 +24,12 @@ namespace events_planner.Models
         /***********************
             RELATIONS
         ************************/
-
         /// <summary> relation with User (One to Many) </summary>
+        [JsonIgnore]
         public ICollection<User> Users { get; set; }
 
         /// <summary> relation with Price (One to Many) </summary>
+        [JsonIgnore]
         public ICollection<Price> Prices { get; set; }
     }
 }

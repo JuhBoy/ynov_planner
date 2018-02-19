@@ -1,0 +1,13 @@
+[
+
+  {
+    "Name": "ForeignersStudents",
+    "Description": "Not From School",
+    "Year": "N/A"
+  },
+  {
+    "Name": "STAFF",
+    "Description": "Part of the School's Staff",
+    "Year":  "N/A"
+  }
+]

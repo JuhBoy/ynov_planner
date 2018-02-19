@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -49,7 +48,7 @@ namespace events_planner.Models
 
         [Column("phone_number")]
         [MinLength(8, ErrorMessage = "Password must be at least 8 characters")]
-        [Required]
+        [Required, Phone]
         public int PhoneNumber { get; set; }
 
         [Column("created_at")]

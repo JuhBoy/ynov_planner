@@ -1,17 +1,11 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using System.IO;
 using Microsoft.EntityFrameworkCore;
+using System;
 
-using events_planner;
 using events_planner.Models;
-using Swashbuckle.AspNetCore.Swagger;
 using events_planner.Services;
 
 namespace events_planner {
@@ -20,14 +14,20 @@ namespace events_planner {
         public IConfiguration Configuration { get; }
         public IHostingEnvironment Env { get; set; }
 
-        public Startup(IConfiguration configuration) {
+        public Startup(IConfiguration configuration, IHostingEnvironment env) {
             Configuration = configuration;
+            Env = env;
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services) {
             // Mysql Database Context
-            services.AddDbContext<PlannerContext>(options => options.UseMySQL(Configuration.GetConnectionString("Mysql")));
+            if (Env.IsProduction() || Env.IsDevelopment()) {
+                services.AddDbContext<PlannerContext>(options => options.UseMySQL(Configuration.GetConnectionString("Mysql")));    
+            } else if (Env.IsEnvironment("test")) {
+                services.AddDbContext<PlannerContext>(options => options.UseMySQL(Configuration.GetConnectionString("MysqlTests")));    
+            }
+
 
             services.AddMvc();
             services.AddRouting(option => option.LowercaseUrls = true);
@@ -37,14 +37,14 @@ namespace events_planner {
 
             // Add user controller services
             services.AddScoped<IUserServices, UserServices>();
+            services.AddScoped<IPromotionServices, PromotionServices>();
+            services.AddScoped<IRoleServices, RoleServices>();
 
             AddSwagger(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env) {
-            Env = env;
-
             app.UseAuthentication();
             if (env.IsDevelopment()) {
                 app.UseDeveloperExceptionPage();

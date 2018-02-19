@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using events_planner.Data;
+using events_planner.Models;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace events_planner
 {
@@ -14,7 +12,23 @@ namespace events_planner
     {
         public static void Main(string[] args)
         {
-            BuildWebHost(args).Run();
+            IWebHost host = BuildWebHost(args);
+            using (var scope = host.Services.CreateScope())
+            {
+                IServiceProvider services = scope.ServiceProvider;
+                try
+                {
+                    DbSeeder.Initialize(
+                        services.GetRequiredService<PlannerContext>()
+                    );
+                }
+                catch (Exception ex)
+                {
+                    ILogger<Program> logger = services.GetRequiredService<ILogger<Program>>();
+                    logger.LogError(ex, "An error occurred while seeding the database.");
+                }
+            }
+            host.Run();
         }
 
         public static IWebHost BuildWebHost(string[] args) =>

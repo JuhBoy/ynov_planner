@@ -1,8 +1,12 @@
 ﻿using System.Collections.Generic;
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using events_planner.Deserializers;
 using events_planner.Services;
+using events_planner.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace events_planner.Controllers
 {
@@ -10,46 +14,74 @@ namespace events_planner.Controllers
     public class UserController : Controller
     {
         public IUserServices services;
+        public PlannerContext Context;
 
-        public UserController(IUserServices service) {
+        public UserController(IUserServices service, PlannerContext context)
+        {
+            Context = context;
             services = service;
         }
 
-        // GET api/values
-        [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
-
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
-
-        // POST api/values
         [HttpPost("token")]
-        public async Task<IActionResult> GetToken([FromBody] UserConnectionDeserializer userCredential) {
+        public async Task<IActionResult> GetToken([FromBody] UserConnectionDeserializer userCredential)
+        {
             if (!ModelState.IsValid) return BadRequest();
-            
-            // Access to the user's token
-            object token = await services.GetToken(userCredential.Login, userCredential.Password);
+
+            User m_user = await Context.User
+                                       .FirstOrDefaultAsync((User user) => user.Password == userCredential.Password && user.Username == userCredential.Login);
+
+            if (m_user == null) { return NotFound(userCredential); }
+
+            string token = services.GenerateToken(ref m_user);
 
             return new ObjectResult(token);
         }
 
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
+        // ===============================
+        //          User CRUD
+        //===============================
+
+        [HttpPost]
+        public IActionResult Create([FromBody] UserCreationDeserializer userFromRequest)
         {
+            if (!ModelState.IsValid) { return BadRequest(ModelState); };
+            User userFromModel;
+
+            try {
+              userFromModel = services.CreateUser(userFromRequest);
+            } catch (DbUpdateException e) {
+                string message = e.InnerException.Message;
+                return new ObjectResult(message);
+            }
+
+            if (userFromModel == null) return BadRequest("Error");
+
+            return new CreatedAtRouteResult(null, userFromModel);
         }
 
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        [HttpGet, Authorize]
+        public async Task<IActionResult> Read()
         {
+            return new ObjectResult("authorized");
         }
+
+        [HttpPatch]
+        public async Task<IActionResult> PartialUpdate() {
+            return new ObjectResult(new { token = "lala" });
+        }
+
+        [HttpPatch]
+        public async Task<IActionResult> FullUpdate()
+        {
+            return new ObjectResult(new { token = "lala" });
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> Delete()
+        {
+            return new ObjectResult(new { token = "lala" });
+        }
+
     }
+
 }

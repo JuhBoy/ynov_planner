@@ -1,0 +1,18 @@
+[
+  {
+    "firstName":  "Julien",
+    "lastName":  "Boyer",
+    "email":  "julien@gmail.com",
+    "password":  "123456789",
+    "phoneNumber":  "0625791823",
+    "username":  "Student"
+  },
+  {
+    "firstName": "MyAdmin",
+    "lastName": "AdminLastName",
+    "email": "email@admin.com",
+    "password": "123456789",
+    "phoneNumber": "0625791823",
+    "username": "Admin"
+  }
+]

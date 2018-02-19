@@ -25,4 +25,7 @@
     <Folder Include="FunctionalTests\" />
     <Folder Include="IntegrationTests\" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PlannerApi.Tests.csproj" />
+  </ItemGroup>
 </Project>

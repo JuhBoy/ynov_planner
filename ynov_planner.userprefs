@@ -1,12 +1,22 @@
 ﻿<Properties StartupConfiguration="{7E3B97E8-2A3D-4639-A034-95A6A6E3DD1F}|Default">
-  <MonoDevelop.Ide.Workbench ActiveDocument="PlannerApi/Controllers/UserController.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="PlannerApi/Services/UserServices.cs">
     <Files>
-      <File FileName="PlannerApi/Controllers/UserController.cs" Line="6" Column="1" />
+      <File FileName="PlannerApi/Controllers/UserController.cs" Line="47" Column="66" />
+      <File FileName="PlannerApi/Services/UserServices.cs" Line="33" Column="10" />
     </Files>
     <Pads>
       <Pad Id="MonoDevelop.UnitTesting.TestPad">
         <State name="__root__">
-          <Node name="ynov_planner" expanded="True" />
+          <Node name="ynov_planner" expanded="True">
+            <Node name="PlannerApi.Tests" expanded="True">
+              <Node name="PlannerApi" expanded="True">
+                <Node name="Tests" expanded="True" selected="True">
+                  <Node name="IntegrationTests" expanded="True" />
+                  <Node name="UnitTests" expanded="True" />
+                </Node>
+              </Node>
+            </Node>
+          </Node>
         </State>
       </Pad>
     </Pads>
@@ -17,5 +27,6 @@
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <MultiItemStartupConfigurations />
+  <MonoDevelop.Ide.ItemProperties.PlannerApi.Tests PreferredExecutionTarget="MonoDevelop.Default" />
   <MonoDevelop.Ide.ItemProperties.events__planner PreferredExecutionTarget="MonoDevelop.Default" />
 </Properties>

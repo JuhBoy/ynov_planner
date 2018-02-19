@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Linq;
 using Xunit;
 using Moq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using events_planner.Models;
 using Microsoft.Extensions.DependencyInjection;
+using events_planner.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace PlannerApi.Tests.UnitTests
 {
@@ -15,10 +18,14 @@ namespace PlannerApi.Tests.UnitTests
 
             Mock<IConfiguration> Configuration { get; set; }
             Mock<PlannerContext> PlannerContext { get; set; }
+            Mock<IRoleServices> RoleServices { get; set; }
+            Mock<IPromotionServices> PromotionServices { get; set; }
 
             public GetToken() {
                 Configuration = new Mock<IConfiguration>();
                 PlannerContext = new Mock<PlannerContext>();
+                RoleServices = new Mock<IRoleServices>();
+                PromotionServices = new Mock<IPromotionServices>();
 
                 Configuration.Setup(conf => conf["TokenAuthentication:Audience"])
                              .Returns("localhost:5000");
@@ -35,14 +42,12 @@ namespace PlannerApi.Tests.UnitTests
             }
 
             [Fact]
-            public async Task ShouldReturnToken()
+            public void ShouldReturnToken()
             {
-                var services = new UserServices(PlannerContext.Object, Configuration.Object);
+                var services = new UserServices(PlannerContext.Object, Configuration.Object, PromotionServices.Object, RoleServices.Object);
 
-                var objectResult = await services.GetToken("myLogin", "MyPassword");
-                Type type = objectResult.GetType();
-
-                string token = type.GetProperty("Token").GetValue(objectResult, null) as string;
+                User user = new User() { LastName = "dupon", FirstName = "George", Password = "My_passwonrd", Email = "email@dqsd.fr" };
+                string token = services.GenerateToken(ref user);
                 string[] slicedToken = token.Split('.', StringSplitOptions.RemoveEmptyEntries);
 
                 Assert.NotNull(token);
