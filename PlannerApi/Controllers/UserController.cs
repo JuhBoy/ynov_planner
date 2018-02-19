@@ -62,7 +62,22 @@ namespace events_planner.Controllers
         [HttpGet, Authorize]
         public async Task<IActionResult> Read()
         {
-            return new ObjectResult("authorized");
+            string token = Request.Headers["Authorization"];
+            string email = services.ReadJwtTokenClaims(token);
+
+            User user = await Context.User.Include(inc => inc.Role).FirstOrDefaultAsync((User u) => u.Email == email);
+
+            if (user == null) { return NotFound(email); }
+
+            return new ObjectResult(new {
+                user.Email,
+                user.FirstName,
+                user.LastName,
+                user.PhoneNumber,
+                user.Username,
+                user.DateOfBirth,
+                user.Role.Name
+            });
         }
 
         [HttpPatch]

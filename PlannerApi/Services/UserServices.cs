@@ -5,6 +5,7 @@ using events_planner.Services;
 using events_planner.Models;
 using Microsoft.EntityFrameworkCore;
 using events_planner.Deserializers;
+using events_planner.Constants.Services;
 
 // JWT GENERATING ENGINE
 using System.Security.Claims;
@@ -12,6 +13,8 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -50,6 +53,57 @@ namespace Microsoft.Extensions.DependencyInjection
                 )
             );
             return new JwtSecurityTokenHandler().WriteToken(jwt);
+        }
+
+        public string ReadJwtTokenClaims(string bearerToken, JwtSelector extractor = JwtSelector.EMAIL) {
+            string pattern = @"([A-Za-z0-9-_]+)";
+            Regex rgx = new Regex(pattern, RegexOptions.IgnoreCase);
+            MatchCollection matches = rgx.Matches(bearerToken);
+            string payload;
+
+            if (matches.Count != 4) { return null; }
+
+            payload = matches[2].Value;
+            JwtHeader jwt = JwtHeader.Base64UrlDeserialize(payload);
+            object valueObject;
+
+            switch (extractor)
+            {
+                case (JwtSelector.EMAIL):
+                    jwt.TryGetValue("email", out valueObject);
+                    break;
+                case(JwtSelector.ALG):
+                    jwt.TryGetValue("alg", out valueObject);
+                    break;
+                case (JwtSelector.AUD):
+                    jwt.TryGetValue("aud", out valueObject);
+                    break;
+                case (JwtSelector.EXP):
+                    jwt.TryGetValue("exp", out valueObject);
+                    break;
+                case (JwtSelector.GIVEN_NAME):
+                    jwt.TryGetValue("given_name", out valueObject);
+                    break;
+                case (JwtSelector.ISS):
+                    jwt.TryGetValue("iss", out valueObject);
+                    break;
+                case (JwtSelector.JTI):
+                    jwt.TryGetValue("jti", out valueObject);
+                    break;
+                case (JwtSelector.NBF):
+                    jwt.TryGetValue("nbf", out valueObject);
+                    break;
+                case (JwtSelector.SUB):
+                    jwt.TryGetValue("sub", out valueObject);
+                    break;
+                case (JwtSelector.TYP):
+                    jwt.TryGetValue("typ", out valueObject);
+                    break;
+                default:
+                    jwt.TryGetValue("email", out valueObject);
+                    break;
+            }
+            return (string)valueObject;
         }
         
         public User CreateUser(UserCreationDeserializer userFromRequest) {

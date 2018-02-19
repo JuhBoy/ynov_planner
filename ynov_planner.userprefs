@@ -1,8 +1,11 @@
 ﻿<Properties StartupConfiguration="{7E3B97E8-2A3D-4639-A034-95A6A6E3DD1F}|Default">
-  <MonoDevelop.Ide.Workbench ActiveDocument="PlannerApi/Services/UserServices.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="PlannerApi/Services/IUserServices.cs">
     <Files>
-      <File FileName="PlannerApi/Controllers/UserController.cs" Line="47" Column="66" />
-      <File FileName="PlannerApi/Services/UserServices.cs" Line="33" Column="10" />
+      <File FileName="PlannerApi/Controllers/UserController.cs" Line="70" Column="45" />
+      <File FileName="PlannerApi/Services/UserServices.cs" Line="20" Column="39" />
+      <File FileName="PlannerApi/Models/User.cs" Line="30" Column="49" />
+      <File FileName="PlannerApi/Services/Constants/Jwt.Constants.cs" Line="5" Column="17" />
+      <File FileName="PlannerApi/Services/IUserServices.cs" Line="11" Column="70" />
     </Files>
     <Pads>
       <Pad Id="MonoDevelop.UnitTesting.TestPad">
@@ -23,7 +26,9 @@
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
+    <BreakpointStore>
+      <Breakpoint file="/Users/juh/Documents/lab/ynov_planner/PlannerApi/Services/UserServices.cs" relfile="PlannerApi/Services/UserServices.cs" line="63" column="1" />
+    </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <MultiItemStartupConfigurations />

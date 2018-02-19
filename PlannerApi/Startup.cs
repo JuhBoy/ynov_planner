@@ -28,7 +28,6 @@ namespace events_planner {
                 services.AddDbContext<PlannerContext>(options => options.UseMySQL(Configuration.GetConnectionString("MysqlTests")));    
             }
 
-
             services.AddMvc();
             services.AddRouting(option => option.LowercaseUrls = true);
 
