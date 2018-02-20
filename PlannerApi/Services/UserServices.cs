@@ -113,8 +113,6 @@ namespace Microsoft.Extensions.DependencyInjection
             Promotion promotion;
             GetPromotion(userFromRequest.Promotion, out promotion);
 
-            Console.WriteLine(promotion);Console.WriteLine(promotion);Console.WriteLine(promotion);Console.WriteLine(promotion);Console.WriteLine(promotion);
-
             Role role;
             GetRole(userFromRequest.RoleName, out role);
                                 
