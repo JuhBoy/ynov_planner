@@ -102,8 +102,16 @@ namespace events_planner.Controllers
             return Ok();
         }
 
-        [HttpDelete]
+        [HttpDelete, Authorize]
         public async Task<IActionResult> Delete() {
+            string email = services.ReadJwtTokenClaims(Request.Headers["Authorization"]);
+            User user = await Context.User.FirstOrDefaultAsync((User u) => u.Email == email);
+
+            if (user == null) { return NotFound(); }
+
+            Context.User.Remove(user);
+            Context.SaveChanges();
+
             return new ObjectResult(new { token = "No Delete Implemented" });
         }
     }
