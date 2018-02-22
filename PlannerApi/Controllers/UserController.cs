@@ -7,6 +7,8 @@ using events_planner.Services;
 using events_planner.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+using System.Reflection;
+using System.ComponentModel.DataAnnotations;
 
 namespace events_planner.Controllers
 {
@@ -80,23 +82,30 @@ namespace events_planner.Controllers
             });
         }
 
-        [HttpPatch]
-        public async Task<IActionResult> PartialUpdate() {
-            return new ObjectResult(new { token = "lala" });
-        }
+        [HttpPatch("Update"), Authorize]
+        public async Task<IActionResult> Update([FromBody] UserUpdatableDeserializer userFromRequest) {
+            string email = services.ReadJwtTokenClaims(Request.Headers["Authorization"]);
+            User user = await Context.User.FirstOrDefaultAsync((User u) => u.Email == email);
 
-        [HttpPatch]
-        public async Task<IActionResult> FullUpdate()
-        {
-            return new ObjectResult(new { token = "lala" });
+            if (user == null) { return NotFound(); }
+
+            try {
+                userFromRequest.BindWithUser(ref user);    
+                Context.Update(user);
+                Context.SaveChanges();
+            } catch (DbUpdateException update) {
+                return BadRequest(update.Message);
+            } catch (ValidationException e) {
+                return BadRequest(e.Message);
+            }
+
+            return Ok();
         }
 
         [HttpDelete]
-        public async Task<IActionResult> Delete()
-        {
-            return new ObjectResult(new { token = "lala" });
+        public async Task<IActionResult> Delete() {
+            return new ObjectResult(new { token = "No Delete Implemented" });
         }
-
     }
 
 }

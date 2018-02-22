@@ -28,5 +28,7 @@
   
   <ItemGroup>
     <Compile Remove="Deserializers\IUser.cs" />
+    <Compile Remove="Deserializers\IDeserializer\IUserPartialUpdate.cs" />
+    <Compile Remove="Deserializers\IDeserializers\IUserBaseModel.cs" />
   </ItemGroup>
 </Project>
