@@ -44,7 +44,8 @@ namespace Microsoft.Extensions.DependencyInjection
                                     new Claim(JwtRegisteredClaimNames.Sub, m_user.FirstName),
                                     new Claim(JwtRegisteredClaimNames.GivenName, m_user.LastName),
                                     new Claim(JwtRegisteredClaimNames.Email, m_user.Email),
-                                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                                    new Claim("roles", m_user.Role.Name)
                 },
                 expires: DateTime.UtcNow.AddDays(2),
                 notBefore: DateTime.UtcNow,

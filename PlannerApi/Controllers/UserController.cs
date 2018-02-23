@@ -24,12 +24,13 @@ namespace events_planner.Controllers
             services = service;
         }
 
-        [HttpPost("token")]
+        [HttpPost("token"), AllowAnonymous]
         public async Task<IActionResult> GetToken([FromBody] UserConnectionDeserializer userCredential)
         {
             if (!ModelState.IsValid) return BadRequest();
 
             User m_user = await Context.User
+                                       .Include(user => user.Role)
                                        .FirstOrDefaultAsync((User user) => user.Password == userCredential.Password && user.Username == userCredential.Login);
 
             if (m_user == null) { return NotFound(userCredential); }
@@ -43,7 +44,7 @@ namespace events_planner.Controllers
         //          User CRUD
         //===============================
 
-        [HttpPost]
+        [HttpPost, AllowAnonymous]
         public IActionResult Create([FromBody] UserCreationDeserializer userFromRequest)
         {
             if (!ModelState.IsValid) { return BadRequest(ModelState); };
@@ -61,7 +62,7 @@ namespace events_planner.Controllers
             return new CreatedAtRouteResult(null, userFromModel);
         }
 
-        [HttpGet, Authorize]
+        [HttpGet, Authorize(Roles = "Student, Admin")]
         public async Task<IActionResult> Read()
         {
             string token = Request.Headers["Authorization"];
@@ -82,7 +83,7 @@ namespace events_planner.Controllers
             });
         }
 
-        [HttpPatch("Update"), Authorize]
+        [HttpPatch("Update"), Authorize(Roles = "Student, Admin")]
         public async Task<IActionResult> Update([FromBody] UserUpdatableDeserializer userFromRequest) {
             string email = services.ReadJwtTokenClaims(Request.Headers["Authorization"]);
             User user = await Context.User.FirstOrDefaultAsync((User u) => u.Email == email);
@@ -102,7 +103,7 @@ namespace events_planner.Controllers
             return Ok();
         }
 
-        [HttpDelete, Authorize]
+        [HttpDelete("delete"), Authorize(Roles = "Student, Admin")]
         public async Task<IActionResult> Delete() {
             string email = services.ReadJwtTokenClaims(Request.Headers["Authorization"]);
             User user = await Context.User.FirstOrDefaultAsync((User u) => u.Email == email);
