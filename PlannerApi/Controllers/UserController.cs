@@ -1,13 +1,10 @@
-﻿using System.Collections.Generic;
-using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using events_planner.Deserializers;
 using events_planner.Services;
 using events_planner.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
-using System.Reflection;
 using System.ComponentModel.DataAnnotations;
 
 namespace events_planner.Controllers
@@ -54,7 +51,7 @@ namespace events_planner.Controllers
               userFromModel = services.CreateUser(userFromRequest);
             } catch (DbUpdateException e) {
                 string message = e.InnerException.Message;
-                return new ObjectResult(message);
+                return BadRequest(message);
             }
 
             if (userFromModel == null) return BadRequest("Error");
