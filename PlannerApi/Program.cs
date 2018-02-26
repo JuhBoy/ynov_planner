@@ -10,6 +10,8 @@ namespace events_planner
 {
     public class Program
     {
+        private const string ENV = "Development";
+
         public static void Main(string[] args)
         {
             IWebHost host = BuildWebHost(args);
@@ -19,7 +21,8 @@ namespace events_planner
                 try
                 {
                     DbSeeder.Initialize(
-                        services.GetRequiredService<PlannerContext>()
+                        services.GetRequiredService<PlannerContext>(),
+                        ENV
                     );
                 }
                 catch (Exception ex)
@@ -36,6 +39,7 @@ namespace events_planner
 
         public static IWebHostBuilder CreateWebHostbuilder(string[] args) =>
                 WebHost.CreateDefaultBuilder(args)
+                       .UseEnvironment(ENV)
                        .UseStartup<Startup>();
     }
 }

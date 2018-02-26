@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Newtonsoft.Json;
 
 namespace events_planner.Models
 {
     public enum Status {
-        DRAFT,
-        ONGOING,
-        DONE
+        DRAFT = 1,
+        ONGOING = 2,
+        DONE = 3
     }
 
     [Table("event")]
@@ -17,6 +18,7 @@ namespace events_planner.Models
     {
         [Column("event_id")]
         [Key]
+        [JsonIgnore]
         public int Id { get; set; }
 
         [Column("title")]
@@ -42,10 +44,12 @@ namespace events_planner.Models
 
         [Column("created_at")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [JsonIgnore]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         [Column("updated_at")]
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        [JsonIgnore]
         public DateTime UpdatedAt { get; set; }
 
         [Column("start_at")]
@@ -67,18 +71,18 @@ namespace events_planner.Models
         ************************/
 
         /// <summary> relation with Bookings (One to Many) </summary>
-        public ICollection<Booking> Bookings { get; set; }
+        [JsonIgnore] public ICollection<Booking> Bookings { get; set; }
 
         /// <summary> relation with Prices (One to Many) </summary>
-        public ICollection<Price> Prices { get; set; }
+        [JsonIgnore] public ICollection<Price> Prices { get; set; }
 
         /// <summary> relation with Category (Many to Many) </summary>
-        public IList<EventCategory> EventCategory { get; set; }
+        [JsonIgnore] public IList<EventCategory> EventCategory { get; set; }
 
         /// <summary> relation with Promotion (Many to Many) </summary>
-        public IList<EventPromotion> EventPromotion { get; set; }
+        [JsonIgnore] public IList<EventPromotion> EventPromotion { get; set; }
 
         /// <summary> relation with User (Many to Many) </summary>
-        public IList<EventUser> EventUser { get; set; }
+        [JsonIgnore] public IList<EventUser> EventUser { get; set; }
     }
 }

@@ -11,4 +11,9 @@ namespace events_planner.Constants.Services {
         ISS,
         AUD
     }
+
+    public enum OrderBy {
+        ASC = 0,
+        DESC = 1
+    }
 }

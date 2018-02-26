@@ -1,17 +1,13 @@
 ﻿<Properties StartupConfiguration="{7E3B97E8-2A3D-4639-A034-95A6A6E3DD1F}|Default">
-  <MonoDevelop.Ide.Workbench ActiveDocument="PlannerApi.Tests/IntegrationTests/UserControllerTests.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="PlannerApi/Program.cs">
     <Files>
-      <File FileName="PlannerApi/Services/UserServices.cs" Line="49" Column="19" />
-      <File FileName="PlannerApi.Tests/IntegrationTests/UserControllerTests.cs" Line="76" Column="137" />
-      <File FileName="PlannerApi/Controllers/UserController.cs" Line="73" Column="28" />
+      <File FileName="PlannerApi/Controllers/EventController.cs" Line="94" Column="13" />
+      <File FileName="PlannerApi/Deserializers/EventUpdatableDeserializer.cs" Line="47" Column="43" />
+      <File FileName="PlannerApi/Models/Event.cs" Line="42" Column="46" />
+      <File FileName="PlannerApi/Data/DbSeeder.cs" Line="39" Column="68" />
+      <File FileName="PlannerApi/Data/Events.json" Line="15" Column="43" />
+      <File FileName="PlannerApi/Program.cs" Line="26" Column="23" />
     </Files>
-    <Pads>
-      <Pad Id="MonoDevelop.UnitTesting.TestPad">
-        <State name="__root__">
-          <Node name="ynov_planner" expanded="True" selected="True" />
-        </State>
-      </Pad>
-    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

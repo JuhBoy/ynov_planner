@@ -19,7 +19,9 @@ namespace events_planner.Data {
         public const string PROMOTIONS_TEST_PATH = "../../../../PlannerApi/Data/Promotions.json";
         public const string ROLE_TEST_PARH = "../../../../PlannerApi/Data/Roles.json";
 
-        public static void Initialize(PlannerContext context) {
+        public const string EVENTS_PATH = "../../../../PlannerApi/Data/Events.json";
+
+        public static void Initialize(PlannerContext context, string ENV) {
             lock (safeThreadObject) {
             context.Database.Migrate();
 
@@ -32,6 +34,11 @@ namespace events_planner.Data {
                 if (!context.Role.Any()) {
                     List<Role> roles = JsonConvert.DeserializeObject<List<Role>>(File.ReadAllText(ROLE_PARH));
                     context.Role.AddRange(roles);
+                }
+
+                if (ENV == "Development" && !context.Event.Any()) {
+                    List<Event> events = JsonConvert.DeserializeObject<List<Event>>(File.ReadAllText(EVENTS_PATH));
+                    context.Event.AddRange(events);
                 }
 
                 context.SaveChanges();

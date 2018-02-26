@@ -38,6 +38,7 @@ namespace events_planner {
             services.AddScoped<IUserServices, UserServices>();
             services.AddScoped<IPromotionServices, PromotionServices>();
             services.AddScoped<IRoleServices, RoleServices>();
+            services.AddScoped<IEventServices, EventServices>();
 
             AddSwagger(services);
         }
