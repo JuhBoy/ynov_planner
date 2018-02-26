@@ -142,7 +142,7 @@ namespace Microsoft.Extensions.DependencyInjection
         private void GetPromotion(int? promotionId, out Promotion promotion) {
             if (promotionId == null)
             {
-                promotion = PromotionServices.GetStaffPromotion();
+                promotion = PromotionServices.GetForeignPromotion();
             }
             else
             {

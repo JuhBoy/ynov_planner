@@ -39,7 +39,7 @@ namespace events_planner.Controllers
 
         // ===============================
         //          User CRUD
-        //===============================
+        //================================
 
         [HttpPost, AllowAnonymous]
         public IActionResult Create([FromBody] UserCreationDeserializer userFromRequest)

@@ -1,11 +1,17 @@
 ﻿<Properties StartupConfiguration="{7E3B97E8-2A3D-4639-A034-95A6A6E3DD1F}|Default">
-  <MonoDevelop.Ide.Workbench ActiveDocument="PlannerApi/Services/UserServices.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="PlannerApi.Tests/IntegrationTests/UserControllerTests.cs">
     <Files>
-      <File FileName="PlannerApi/Controllers/UserController.cs" Line="103" Column="10" />
-      <File FileName="PlannerApi/Services/UserServices.cs" Line="117" Column="17" />
-      <File FileName="PlannerApi/Deserializers/UserUpdatableDeserializer.cs" Line="46" Column="34" />
-      <File FileName="PlannerApi/Models/User.cs" Line="1" Column="1" />
+      <File FileName="PlannerApi/Services/UserServices.cs" Line="49" Column="19" />
+      <File FileName="PlannerApi.Tests/IntegrationTests/UserControllerTests.cs" Line="76" Column="137" />
+      <File FileName="PlannerApi/Controllers/UserController.cs" Line="73" Column="28" />
     </Files>
+    <Pads>
+      <Pad Id="MonoDevelop.UnitTesting.TestPad">
+        <State name="__root__">
+          <Node name="ynov_planner" expanded="True" selected="True" />
+        </State>
+      </Pad>
+    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

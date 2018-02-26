@@ -47,6 +47,7 @@ namespace PlannerApi.Tests.UnitTests
                 var services = new UserServices(PlannerContext.Object, Configuration.Object, PromotionServices.Object, RoleServices.Object);
 
                 User user = new User() { LastName = "dupon", FirstName = "George", Password = "My_passwonrd", Email = "email@dqsd.fr" };
+                user.Role = new Role() { Name = "Student" };
                 string token = services.GenerateToken(ref user);
                 string[] slicedToken = token.Split('.', StringSplitOptions.RemoveEmptyEntries);
 

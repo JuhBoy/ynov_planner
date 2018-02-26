@@ -8,10 +8,10 @@ namespace Microsoft.Extensions.DependencyInjection {
         private PlannerContext Context { get; set; }
 
         public PromotionServices(PlannerContext context) {
-            Context = context;    
+            Context = context;
         }
 
-        public Promotion GetStaffPromotion() {
+        public Promotion GetForeignPromotion() {
             return Context.Promotion
                           .FirstOrDefault((Promotion arg) => arg.Name == "ForeignersStudents");
         }
