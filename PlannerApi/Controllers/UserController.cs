@@ -110,7 +110,7 @@ namespace events_planner.Controllers
             Context.User.Remove(user);
             Context.SaveChanges();
 
-            return new ObjectResult(new { token = "No Delete Implemented" });
+            return new ObjectResult("User Removed");
         }
     }
 
