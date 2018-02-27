@@ -86,11 +86,12 @@ namespace events_planner.Models {
                 obj.Property(p => p.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 obj.Property(p => p.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
-        }
 
-        /*protected override void Seed(PlannerContext context)
-        {
-            base.Seed(context);
-        }*/
+            modelBuilder.Entity<Event>((obj) => 
+            {
+                obj.Property(p => p.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+                obj.Property(p => p.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            });
+        }
     }
 }
