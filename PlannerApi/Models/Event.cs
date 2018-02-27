@@ -52,6 +52,10 @@ namespace events_planner.Models
         [Required]
         public DateTime? StartAt { get; set; }
 
+        [Column("close_at")]
+        [Required]
+        public DateTime? CloseAt { get; set; }
+
         [Column("open_at")]
         public DateTime? OpenAt { get; set; }
 
