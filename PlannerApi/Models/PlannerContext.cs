@@ -92,6 +92,12 @@ namespace events_planner.Models {
                 obj.Property(p => p.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 obj.Property(p => p.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
+
+            modelBuilder.Entity<Category>((obj) => {
+                obj.Property(p => p.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+                obj.Property(p => p.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+                obj.HasIndex(i => i.Name).IsUnique(true);
+            });
         }
     }
 }
