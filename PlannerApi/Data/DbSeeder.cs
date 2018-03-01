@@ -6,38 +6,41 @@ using Microsoft.EntityFrameworkCore;
 using System.IO;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace events_planner.Data {
     public static class DbSeeder {
 
         public static Object safeThreadObject = new Object();
 
-        public const string PROMOTIONS_PATH = "Data/Promotions.json";
-        public const string ROLE_PARH = "Data/Roles.json";
+        public const string PROMOTIONS_PATH = "/Data/Promotions.json";
+        public const string ROLE_PARH = "/Data/Roles.json";
 
-        public const string USERS_TEST_PARTH = "../../../../PlannerApi/Data/UsersTest.json";
-        public const string PROMOTIONS_TEST_PATH = "../../../../PlannerApi/Data/Promotions.json";
-        public const string ROLE_TEST_PARH = "../../../../PlannerApi/Data/Roles.json";
+        public const string USERS_TEST_PARTH = "/Data/UsersTest.json";
+        public const string PROMOTIONS_TEST_PATH = "/Data/Promotions.json";
+        public const string ROLE_TEST_PARH = "/Data/Roles.json";
 
-        public const string EVENTS_PATH = "../../../../PlannerApi/Data/Events.json";
+        public const string EVENTS_PATH = "/Data/Events.json";
 
         public static void Initialize(PlannerContext context, string ENV) {
             lock (safeThreadObject) {
             context.Database.Migrate();
 
+                string currentDirectory = Directory.GetCurrentDirectory();
+
                 if (!context.Promotion.Any())
                 {
-                    List<Promotion> promotions = JsonConvert.DeserializeObject<List<Promotion>>(File.ReadAllText(PROMOTIONS_PATH));
+                    List<Promotion> promotions = JsonConvert.DeserializeObject<List<Promotion>>(File.ReadAllText(currentDirectory + PROMOTIONS_PATH));
                     context.Promotion.AddRange(promotions);
                 }
 
                 if (!context.Role.Any()) {
-                    List<Role> roles = JsonConvert.DeserializeObject<List<Role>>(File.ReadAllText(ROLE_PARH));
+                    List<Role> roles = JsonConvert.DeserializeObject<List<Role>>(File.ReadAllText(currentDirectory + ROLE_PARH));
                     context.Role.AddRange(roles);
                 }
 
                 if (ENV == "Development" && !context.Event.Any()) {
-                    List<Event> events = JsonConvert.DeserializeObject<List<Event>>(File.ReadAllText(EVENTS_PATH));
+                    List<Event> events = JsonConvert.DeserializeObject<List<Event>>(File.ReadAllText(currentDirectory + EVENTS_PATH));
                     context.Event.AddRange(events);
                 }
 

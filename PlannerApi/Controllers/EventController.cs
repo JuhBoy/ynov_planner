@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Authorization;
 using events_planner.Deserializers;
 using events_planner.Constants.Services;
 using System.Linq;
-using System.Collections.Generic;
 
 namespace events_planner.Controllers
 {
