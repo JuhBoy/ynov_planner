@@ -95,5 +95,29 @@ namespace events_planner.Controllers
 
             return new ObjectResult(events);
         }
+
+        [HttpGet("{eventId}/category/{categoryId}"), Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AddCategory(int eventId, int categoryId) {
+            Category category = await Context.Category
+                                             .FirstOrDefaultAsync((Category arg) => arg.Id == categoryId);
+            
+            Event eventModel = await Context.Event
+                                            .Include(o => o.EventCategory)
+                                            .FirstOrDefaultAsync((Event arg) => arg.Id == eventId);
+
+            if (eventModel == null || category == null) { return NotFound(); }
+
+            EventCategory eventCategory = new EventCategory() { Category = category, Event = eventModel };
+            eventModel.EventCategory.Add(eventCategory);
+
+            try {
+                Context.Update(eventModel);
+                await Context.SaveChangesAsync();
+            } catch (DbUpdateException e) {
+                return BadRequest(e.InnerException.Message);
+            }
+
+            return NoContent();
+         }
     }
 }
