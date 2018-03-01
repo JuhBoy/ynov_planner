@@ -38,7 +38,6 @@ namespace PlannerApi.Tests.Fixtures {
                 }
             }
 
-
             Client = Server.CreateClient();
         }
 

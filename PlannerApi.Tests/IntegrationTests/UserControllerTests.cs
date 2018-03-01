@@ -71,7 +71,7 @@ namespace PlannerApi.Tests.IntegrationTests
 
             [Fact]
             public async Task ShouldReturnTheUser() {
-                string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJKdWxpZW4iLCJnaXZlbl9uYW1lIjoiQm95ZXIiLCJlbWFpbCI6Imp1bGllbkBnbWFpbC5jb20iLCJqdGkiOiI2ODc0MDkwMC01YmRmLTQyNDUtYjBjZC1mYzhmNzhiYThjMjkiLCJyb2xlcyI6IlN0dWRlbnQiLCJuYmYiOjE1MTk2NjU4NDQsImV4cCI6MTUxOTgzODY0NCwiaXNzIjoibG9jYWxob3N0OjUwMDAiLCJhdWQiOiJsb2NhbGhvc3Q6NTAwMCJ9.AVKp-3LhwcmvbBQ73LHQ3uy2ss0lvmuwCw9pgsZ9dk8";
+                string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJKdWxpZW4iLCJnaXZlbl9uYW1lIjoiQm95ZXIiLCJlbWFpbCI6Imp1bGllbkBnbWFpbC5jb20iLCJqdGkiOiIyODU0NDM4YS00MWFlLTQyNjUtYjVkMC02ZjlhN2IxNjY5MWYiLCJyb2xlcyI6IlN0dWRlbnQiLCJuYmYiOjE1MTk5MjQyNjcsImV4cCI6MTUyMDA5NzA2NywiaXNzIjoibG9jYWxob3N0OjUwMDAiLCJhdWQiOiJsb2NhbGhvc3Q6NTAwMCJ9.uw0srGJvXpTnCdbZeMy2DyoJkp5TuLDXnOqErwnI2s4";
 
                 HttpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                 HttpResponseMessage response = await HttpClient.GetAsync("api/user", HttpCompletionOption.ResponseContentRead);
