@@ -39,7 +39,7 @@ namespace events_planner.Models
         [Required]
         public Status Status { get; set; }
 
-        [Column("location", TypeName="BLOB")]
+        [Column("location")]
         public string Location { get; set; }
 
         [Column("created_at")]

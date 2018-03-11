@@ -1,10 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using System;
 using System.Collections.Generic;
 
 namespace events_planner.Migrations
 {
-    public partial class AddBdd : Migration
+    public partial class InitProject : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -13,11 +14,11 @@ namespace events_planner.Migrations
                 columns: table => new
                 {
                     category_id = table.Column<int>(nullable: false)
-                        .Annotation("MySQL:AutoIncrement", true),
-                    created_at = table.Column<DateTime>(nullable: false),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    created_at = table.Column<DateTime>(nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
                     name = table.Column<string>(maxLength: 20, nullable: true),
-                    sub_category_id = table.Column<int>(nullable: false),
-                    updated_at = table.Column<DateTime>(nullable: false)
+                    sub_category_id = table.Column<int>(nullable: true),
+                    updated_at = table.Column<DateTime>(nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)")
                 },
                 constraints: table =>
                 {
@@ -27,7 +28,7 @@ namespace events_planner.Migrations
                         column: x => x.sub_category_id,
                         principalTable: "category",
                         principalColumn: "category_id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -35,8 +36,9 @@ namespace events_planner.Migrations
                 columns: table => new
                 {
                     event_id = table.Column<int>(nullable: false)
-                        .Annotation("MySQL:AutoIncrement", true),
-                    created_at = table.Column<DateTime>(nullable: false),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    close_at = table.Column<DateTime>(nullable: false),
+                    created_at = table.Column<DateTime>(nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
                     description = table.Column<string>(nullable: false),
                     end_at = table.Column<DateTime>(nullable: true),
                     location = table.Column<string>(type: "BLOB", nullable: true),
@@ -45,7 +47,7 @@ namespace events_planner.Migrations
                     status = table.Column<int>(nullable: false),
                     subscribe_number = table.Column<int>(nullable: false),
                     title = table.Column<string>(maxLength: 255, nullable: true),
-                    updated_at = table.Column<DateTime>(nullable: false)
+                    updated_at = table.Column<DateTime>(nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)")
                 },
                 constraints: table =>
                 {
@@ -57,11 +59,11 @@ namespace events_planner.Migrations
                 columns: table => new
                 {
                     promotion_id = table.Column<int>(nullable: false)
-                        .Annotation("MySQL:AutoIncrement", true),
-                    created_at = table.Column<DateTime>(nullable: false),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    created_at = table.Column<DateTime>(nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
                     description = table.Column<string>(nullable: true),
                     name = table.Column<string>(maxLength: 40, nullable: false),
-                    updated_at = table.Column<DateTime>(nullable: false),
+                    updated_at = table.Column<DateTime>(nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
                     year = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
@@ -74,10 +76,12 @@ namespace events_planner.Migrations
                 columns: table => new
                 {
                     recovery_id = table.Column<int>(nullable: false)
-                        .Annotation("MySQL:AutoIncrement", true),
-                    created_at = table.Column<DateTime>(nullable: false),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    created_at = table.Column<DateTime>(nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     token = table.Column<string>(maxLength: 200, nullable: true),
                     updated_at = table.Column<DateTime>(nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.ComputedColumn)
                 },
                 constraints: table =>
                 {
@@ -89,7 +93,7 @@ namespace events_planner.Migrations
                 columns: table => new
                 {
                     role_id = table.Column<int>(nullable: false)
-                        .Annotation("MySQL:AutoIncrement", true),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     name = table.Column<string>(maxLength: 30, nullable: false)
                 },
                 constraints: table =>
@@ -150,12 +154,14 @@ namespace events_planner.Migrations
                 columns: table => new
                 {
                     price_id = table.Column<int>(nullable: false)
-                        .Annotation("MySQL:AutoIncrement", true),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     price = table.Column<int>(nullable: false),
-                    created_at = table.Column<DateTime>(nullable: false),
+                    created_at = table.Column<DateTime>(nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     event_id = table.Column<int>(nullable: false),
                     role_id = table.Column<int>(nullable: false),
                     updated_at = table.Column<DateTime>(nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.ComputedColumn)
                 },
                 constraints: table =>
                 {
@@ -179,8 +185,8 @@ namespace events_planner.Migrations
                 columns: table => new
                 {
                     user_id = table.Column<int>(nullable: false)
-                        .Annotation("MySQL:AutoIncrement", true),
-                    created_at = table.Column<DateTime>(nullable: false),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    created_at = table.Column<DateTime>(nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
                     date_of_birth = table.Column<DateTime>(nullable: true),
                     email = table.Column<string>(maxLength: 30, nullable: false),
                     first_name = table.Column<string>(maxLength: 20, nullable: false),
@@ -189,7 +195,7 @@ namespace events_planner.Migrations
                     phone_number = table.Column<int>(nullable: false),
                     promotion_id = table.Column<int>(nullable: false),
                     role_id = table.Column<int>(nullable: false),
-                    updated_at = table.Column<DateTime>(nullable: false),
+                    updated_at = table.Column<DateTime>(nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
                     username = table.Column<string>(maxLength: 20, nullable: true),
                     recovery_id = table.Column<int>(nullable: true)
                 },
@@ -221,11 +227,13 @@ namespace events_planner.Migrations
                 columns: table => new
                 {
                     booking_id = table.Column<int>(nullable: false)
-                        .Annotation("MySQL:AutoIncrement", true),
-                    created_at = table.Column<DateTime>(nullable: false),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    created_at = table.Column<DateTime>(nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     event_id = table.Column<int>(nullable: false),
                     present = table.Column<bool>(nullable: false),
-                    updated_at = table.Column<DateTime>(nullable: false),
+                    updated_at = table.Column<DateTime>(nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.ComputedColumn),
                     user_id = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
@@ -274,10 +282,11 @@ namespace events_planner.Migrations
                 columns: table => new
                 {
                     subcribe_id = table.Column<int>(nullable: false)
-                        .Annotation("MySQL:AutoIncrement", true),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     category_id = table.Column<int>(nullable: false),
                     CreatedAt = table.Column<DateTime>(nullable: false),
-                    updated_at = table.Column<DateTime>(nullable: false),
+                    updated_at = table.Column<DateTime>(nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.ComputedColumn),
                     user_id = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
@@ -306,6 +315,12 @@ namespace events_planner.Migrations
                 name: "IX_booking_user_id",
                 table: "booking",
                 column: "user_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_category_name",
+                table: "category",
+                column: "name",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_category_sub_category_id",
@@ -361,6 +376,12 @@ namespace events_planner.Migrations
                 name: "IX_user_recovery_id",
                 table: "user",
                 column: "recovery_id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_user_username_email",
+                table: "user",
+                columns: new[] { "username", "email" },
                 unique: true);
         }
 

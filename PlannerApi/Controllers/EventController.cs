@@ -43,7 +43,7 @@ namespace events_planner.Controllers
 
         [HttpGet("{id}"), Authorize(Roles = "Admin, Student")]
         public async Task<IActionResult> Read(int id) {
-            Event eventModel = await Context.Event.FirstOrDefaultAsync(o => o.Id == id);
+            Event eventModel = await Context.Event.FirstOrDefaultAsync(e => e.Id == id);
 
             if (eventModel == null) { return NotFound(id); }
 
