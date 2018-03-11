@@ -5,16 +5,20 @@ using events_planner.Deserializers;
 using events_planner.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using events_planner.Services;
+using System.Linq;
 
 namespace events_planner.Controllers {
 
     [Route("api/[controller]")]
     public class CategoryController : Controller {
 
-        public PlannerContext Context { get; set; }
+        private PlannerContext Context { get; set; }
+        private ICategoryServices Services { get; set; }
 
-        public CategoryController(PlannerContext context) {
-            Context = context;    
+        public CategoryController(PlannerContext context, ICategoryServices categoryServices) {
+            Context = context;
+            Services = categoryServices;
         }
 
         [HttpPost, Authorize(Roles = "Admin")]
@@ -22,6 +26,9 @@ namespace events_planner.Controllers {
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
 
             Category category = new Category() { Name = categoryFromRequest.Name };
+
+            if (categoryFromRequest.subCategoryId.HasValue)
+                Services.bindSubCategoryFromDb(ref category, (int) categoryFromRequest.subCategoryId);
 
             try {
                 Context.Category.Add(category);

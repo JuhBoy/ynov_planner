@@ -5,8 +5,9 @@ namespace events_planner.Deserializers {
     public class CategoryDeserializer {
         [Required]
         [StringLength(20, MinimumLength = 2)]
-        [MaxLength(20, ErrorMessage = "Username must be under 20 characters")]
-        [MinLength(2, ErrorMessage = "Username must be at least 2 characters")]
+        [MinLength(2, ErrorMessage = "Name must be at least 2 characters")]
         public string Name { get; set; }
+
+        public int? subCategoryId { get; set; }
     }
 }
