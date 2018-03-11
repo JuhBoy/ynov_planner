@@ -36,7 +36,7 @@ namespace events_planner.Models
         [Column("sub_category_id"), JsonIgnore]
         [ForeignKey("sub_category_id")]
         public int? SubCategoryId { get; set; }
-        public Category SubCategory { get; set; }
+        [JsonIgnore] public Category SubCategory { get; set; }
 
         /// <summary> relation with subcriber (One to Many) </summary>
         [JsonIgnore]

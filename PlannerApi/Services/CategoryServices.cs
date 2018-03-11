@@ -1,6 +1,9 @@
 using events_planner.Services;
 using events_planner.Models;
 using System.Linq;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -23,6 +26,19 @@ namespace Microsoft.Extensions.DependencyInjection
             }
 
             category.SubCategory = sub;
+        }
+
+        public Category[] GetAllSubs() {
+            string subDistinctIds = "SELECT sub.sub_category_id FROM (SELECT DISTINCT sub_category_id FROM category WHERE sub_category_id IS NOT NULL) as sub";
+            string sqlForSubs = string.Format("SELECT * FROM category WHERE category_id IN ({0})", subDistinctIds);
+
+            Category[] category = Context.Category.FromSql(sqlForSubs).ToArray();
+
+            return category;
+        }
+
+        public Category[] GetAllParents() {
+            return Context.Category.Where(s => s.SubCategoryId != null).ToArray();
         }
     }
 }

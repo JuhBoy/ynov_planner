@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using events_planner.Services;
 using System.Linq;
+using events_planner.Services.Constants;
 
 namespace events_planner.Controllers {
 
@@ -40,9 +41,24 @@ namespace events_planner.Controllers {
             return new OkObjectResult(category);
         }
 
-        [HttpGet, Authorize(Roles = "Student,Admin")]
-        public async Task<IActionResult> ReadAll() {
-            Category[] categories = await Context.Category.ToArrayAsync();
+        [HttpGet("all/{type}"), Authorize(Roles = "Student,Admin")]
+        public async Task<IActionResult> ReadAll(int type) {
+            Category[] categories = new Category[0];
+
+            switch ((CategoryListType) type) {
+                case(CategoryListType.ALL):
+                    categories = await Context.Category.ToArrayAsync();
+                    break;
+                case (CategoryListType.SUBS):
+                    categories = Services.GetAllSubs();
+                    break;
+                case(CategoryListType.PARENTS):
+                    categories = Services.GetAllParents();
+                    break;
+                default:
+                    categories = await Context.Category.ToArrayAsync();
+                    break;
+            }
 
             if (categories.Length <= 0) { return NoContent(); }
 
