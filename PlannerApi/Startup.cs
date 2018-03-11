@@ -23,9 +23,9 @@ namespace events_planner {
         public void ConfigureServices(IServiceCollection services) {
             // Mysql Database Context
             if (Env.IsProduction() || Env.IsDevelopment()) {
-                services.AddDbContext<PlannerContext>(options => options.UseMySQL(Configuration.GetConnectionString("Mysql")));    
+                services.AddDbContext<PlannerContext>(options => options.UseMySql(Configuration.GetConnectionString("Mysql")));    
             } else if (Env.IsEnvironment("test")) {
-                services.AddDbContext<PlannerContext>(options => options.UseMySQL(Configuration.GetConnectionString("MysqlTests")));    
+                services.AddDbContext<PlannerContext>(options => options.UseMySql(Configuration.GetConnectionString("MysqlTests")));    
             }
 
             services.AddMvc();

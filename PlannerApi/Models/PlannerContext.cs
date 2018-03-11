@@ -76,26 +76,26 @@ namespace events_planner.Models {
 
             modelBuilder.Entity<User>((obj) =>
             {
-                obj.Property(p => p.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
-                obj.Property(p => p.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+                obj.Property(p => p.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                obj.Property(p => p.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
                 obj.HasIndex(i => new {i.Username, i.Email}).IsUnique(true);
             });
 
             modelBuilder.Entity<Promotion>((obj) =>
             {
-                obj.Property(p => p.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
-                obj.Property(p => p.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+                obj.Property(p => p.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                obj.Property(p => p.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             });
 
             modelBuilder.Entity<Event>((obj) => 
             {
-                obj.Property(p => p.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
-                obj.Property(p => p.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+                obj.Property(p => p.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                obj.Property(p => p.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             });
 
             modelBuilder.Entity<Category>((obj) => {
-                obj.Property(p => p.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
-                obj.Property(p => p.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+                obj.Property(p => p.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                obj.Property(p => p.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
                 obj.HasIndex(i => i.Name).IsUnique(true);
             });
         }

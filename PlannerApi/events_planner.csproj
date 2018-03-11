@@ -8,6 +8,7 @@
     <Folder Include="wwwroot\" />
     <Folder Include="Data\" />
     <Folder Include="Services\Constants\" />
+    <Folder Include="Migrations\" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -17,7 +18,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="1.1.0" />
-    <PackageReference Include="MySql.Data.EntityFrameworkCore" Version="*" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" version="2.0.1" Version="2.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="2.0.1" />
   </ItemGroup>
 
@@ -30,5 +31,6 @@
     <Compile Remove="Deserializers\IUser.cs" />
     <Compile Remove="Deserializers\IDeserializer\IUserPartialUpdate.cs" />
     <Compile Remove="Deserializers\IDeserializers\IUserBaseModel.cs" />
+    <Compile Remove="Migrations\20180213173310_AddBdd.cs" />
   </ItemGroup>
 </Project>

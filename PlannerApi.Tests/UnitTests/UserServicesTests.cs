@@ -7,7 +7,6 @@ using Microsoft.Extensions.Configuration;
 using events_planner.Models;
 using Microsoft.Extensions.DependencyInjection;
 using events_planner.Services;
-using Microsoft.EntityFrameworkCore;
 
 namespace PlannerApi.Tests.UnitTests
 {
