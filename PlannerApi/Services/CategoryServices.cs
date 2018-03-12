@@ -1,9 +1,8 @@
 using events_planner.Services;
 using events_planner.Models;
 using System.Linq;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using events_planner.Deserializers;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -44,6 +43,21 @@ namespace Microsoft.Extensions.DependencyInjection
         public void DeleteCircular(int categoryId) {
             string sql = string.Format("DELETE FROM category WHERE category_id = {0}", categoryId);
             Context.Database.ExecuteSqlCommand(sql);
+        }
+
+        public void UpdateFromDeserializer(ref CategoryDeserializerUpdate categoryDeserializer, ref Category category) {
+            Category sub;
+
+            if (categoryDeserializer.subCategoryId.HasValue && (sub = Context.Category.Find(categoryDeserializer.subCategoryId)) != null)
+                category.SubCategory = sub;
+            else if (categoryDeserializer.subCategoryId.HasValue)
+                throw new DbUpdateException("", new System.Exception("Sub Category Not found"));
+
+            if (categoryDeserializer.Name != null)
+                category.Name = categoryDeserializer.Name;
+
+            Context.Category.Update(category);
+            Context.SaveChanges();
         }
     }
 }

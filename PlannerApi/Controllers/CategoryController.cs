@@ -46,13 +46,13 @@ namespace events_planner.Controllers {
             Category[] categories = new Category[0];
 
             switch ((CategoryListType) type) {
-                case(CategoryListType.ALL):
+                case (CategoryListType.ALL):
                     categories = await Context.Category.ToArrayAsync();
                     break;
                 case (CategoryListType.SUBS):
                     categories = Services.GetAllSubs();
                     break;
-                case(CategoryListType.PARENTS):
+                case (CategoryListType.PARENTS):
                     categories = Services.GetAllParents();
                     break;
                 default:
@@ -63,6 +63,21 @@ namespace events_planner.Controllers {
             if (categories.Length <= 0) { return NoContent(); }
 
             return new OkObjectResult(categories);
+        }
+
+        [HttpPut("{id}"), Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Update(int id, [FromBody] CategoryDeserializerUpdate categoryFromRequest) {
+            Category category = await Context.FindAsync<Category>(id);
+
+            if (category == null) { return NotFound(); }
+
+            try {
+                Services.UpdateFromDeserializer(ref categoryFromRequest, ref category);
+            } catch (DbUpdateException db) {
+                return BadRequest(db.InnerException.Message);
+            }
+
+            return new OkObjectResult(category);
         }
 
         [HttpDelete("{id}"), Authorize(Roles = "Admin")]
