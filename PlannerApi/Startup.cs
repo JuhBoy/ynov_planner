@@ -2,10 +2,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.EntityFrameworkCore;
-using System;
-
-using events_planner.Models;
 using events_planner.Services;
 
 namespace events_planner {
@@ -22,11 +18,7 @@ namespace events_planner {
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services) {
             // Mysql Database Context
-            if (Env.IsProduction() || Env.IsDevelopment()) {
-                services.AddDbContext<PlannerContext>(options => options.UseMySql(Configuration.GetConnectionString("Mysql")));    
-            } else if (Env.IsEnvironment("test")) {
-                services.AddDbContext<PlannerContext>(options => options.UseMySql(Configuration.GetConnectionString("MysqlTests")));    
-            }
+            SetDatabaseContext(services);
 
             services.AddMvc();
             services.AddRouting(option => option.LowercaseUrls = true);
