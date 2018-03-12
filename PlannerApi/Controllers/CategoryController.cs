@@ -64,5 +64,20 @@ namespace events_planner.Controllers {
 
             return new OkObjectResult(categories);
         }
+
+        [HttpDelete("{id}"), Authorize(Roles = "Admin")]
+        public IActionResult Delete(int id) {
+            Category category = Context.Category.Include(inc => inc.SubCategory).FirstOrDefault<Category>(cat => cat.Id == id);
+
+            if (category == null) { return NotFound(); }
+
+            try {
+                Services.DeleteCircular(category.Id);
+            } catch (Exception e) {
+                return BadRequest(e.InnerException.Message);
+            }
+
+            return NoContent();
+        }
     }
 }

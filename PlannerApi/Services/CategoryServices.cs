@@ -40,5 +40,10 @@ namespace Microsoft.Extensions.DependencyInjection
         public Category[] GetAllParents() {
             return Context.Category.Where(s => s.SubCategoryId != null).ToArray();
         }
+
+        public void DeleteCircular(int categoryId) {
+            string sql = string.Format("DELETE FROM category WHERE category_id = {0}", categoryId);
+            Context.Database.ExecuteSqlCommand(sql);
+        }
     }
 }

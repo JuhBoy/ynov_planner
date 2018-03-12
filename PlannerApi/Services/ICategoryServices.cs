@@ -8,5 +8,6 @@ namespace events_planner.Services
         void bindSubCategoryFromDb(ref Category category, int subId);
         Category[] GetAllSubs();
         Category[] GetAllParents();
+        void DeleteCircular(int categoryId);
     }
 }
