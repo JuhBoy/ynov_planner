@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using events_planner.Deserializers;
 using events_planner.Constants.Services;
 using System.Linq;
+using System;
 
 namespace events_planner.Controllers
 {
@@ -77,6 +78,10 @@ namespace events_planner.Controllers
             return NoContent();
         }
 
+        // =============================
+        //          Specific
+        // =============================
+
         [HttpGet("list/{order}"), Authorize(Roles = "Student, Admin")]
         public async Task<IActionResult> GetList(int order) {
             IOrderedQueryable<Event> query;
@@ -98,20 +103,25 @@ namespace events_planner.Controllers
 
         [HttpGet("{eventId}/category/{categoryId}"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddCategory(int eventId, int categoryId) {
-            Category category = await Context.Category
-                                             .FirstOrDefaultAsync((Category arg) => arg.Id == categoryId);
             
+            if (Context.EventCategory.Any((EventCategory ec) => ec.CategoryId == categoryId && ec.EventId == eventId)) {
+                return BadRequest("Bind already exist");
+            }
+
             Event eventModel = await Context.Event
-                                            .Include(o => o.EventCategory)
+                                            .AsNoTracking()
                                             .FirstOrDefaultAsync((Event arg) => arg.Id == eventId);
+
+            Category category = await Context.Category
+                                             .AsNoTracking()
+                                             .FirstOrDefaultAsync((Category arg) => arg.Id == categoryId);
 
             if (eventModel == null || category == null) { return NotFound(); }
 
             EventCategory eventCategory = new EventCategory() { Category = category, Event = eventModel };
-            eventModel.EventCategory.Add(eventCategory);
 
             try {
-                Context.Update(eventModel);
+                Context.EventCategory.Update(eventCategory);
                 await Context.SaveChangesAsync();
             } catch (DbUpdateException e) {
                 return BadRequest(e.InnerException.Message);
@@ -119,5 +129,26 @@ namespace events_planner.Controllers
 
             return NoContent();
          }
+
+        [HttpDelete("{eventId}/category/{categoryId}")]
+        public async Task<IActionResult> DeleteCategory(int eventId, int categoryId) {
+            Event eventModel = await Context.Event.Include(inc => inc.EventCategory)
+                                            .FirstOrDefaultAsync((Event ev) => ev.Id == eventId);
+            
+            if (eventModel == null ||
+                eventModel.EventCategory == null ||
+                !eventModel.EventCategory.Any(cc => cc.CategoryId == categoryId)) { return NotFound(); }
+            
+            EventCategory category = eventModel.EventCategory.FirstOrDefault(cc => cc.CategoryId == categoryId);
+
+            try {
+                Context.EventCategory.Remove(category);
+                await Context.SaveChangesAsync();
+            } catch (DbUpdateException e) {
+                return BadRequest(e.InnerException.Message);
+            }
+    
+            return new OkObjectResult("Category removed");
+        }
     }
 }
