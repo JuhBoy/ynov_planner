@@ -27,6 +27,7 @@ namespace events_planner.Controllers
             if (!ModelState.IsValid) return BadRequest();
 
             User m_user = await Context.User
+                                       .AsNoTracking()
                                        .Include(user => user.Role)
                                        .FirstOrDefaultAsync((User user) => user.Password == userCredential.Password && user.Username == userCredential.Login);
 
@@ -65,7 +66,10 @@ namespace events_planner.Controllers
             string token = Request.Headers["Authorization"];
             string email = services.ReadJwtTokenClaims(token);
 
-            User user = await Context.User.Include(inc => inc.Role).FirstOrDefaultAsync((User u) => u.Email == email);
+            User user = await Context.User
+                                     .AsNoTracking()
+                                     .Include(inc => inc.Role)
+                                     .FirstOrDefaultAsync((User u) => u.Email == email);
 
             if (user == null) { return NotFound(email); }
 

@@ -47,7 +47,7 @@ namespace events_planner.Controllers {
 
             switch ((CategoryListType) type) {
                 case (CategoryListType.ALL):
-                    categories = await Context.Category.ToArrayAsync();
+                    categories = await Context.Category.AsNoTracking().ToArrayAsync();
                     break;
                 case (CategoryListType.SUBS):
                     categories = Services.GetAllSubs();
@@ -56,7 +56,7 @@ namespace events_planner.Controllers {
                     categories = Services.GetAllParents();
                     break;
                 default:
-                    categories = await Context.Category.ToArrayAsync();
+                    categories = await Context.Category.AsNoTracking().ToArrayAsync();
                     break;
             }
 
