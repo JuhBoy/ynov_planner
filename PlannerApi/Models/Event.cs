@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
@@ -65,6 +64,9 @@ namespace events_planner.Models
 
         [Column("end_at")]
         public DateTime? EndAt { get; set; }
+
+        [Column("image_url"), Url]
+        public string Image { get; set; }
 
         /***********************
             RELATIONS

@@ -1,14 +1,7 @@
 using System;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using System.IO;
-using Microsoft.EntityFrameworkCore;
-using events_planner.Models;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace events_planner
@@ -32,8 +25,7 @@ namespace events_planner
                     In = "header",
                     Type = "apiKey"
                 });
-            }); 
-
+            });
         }
 
         private void swaggerConfigure(IApplicationBuilder application) {

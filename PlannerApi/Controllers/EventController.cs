@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Authorization;
 using events_planner.Deserializers;
 using events_planner.Constants.Services;
 using System.Linq;
-using System;
 
 namespace events_planner.Controllers
 {
@@ -22,9 +21,7 @@ namespace events_planner.Controllers
             Services = services;
         }
 
-        //=========================
-        //         CRUD
-        //=========================
+        #region User CRUD
 
         [HttpPost, Authorize(Roles = "Admin")]
         public IActionResult Create([FromBody] EventDeserializer eventFromRequest) {
@@ -80,9 +77,9 @@ namespace events_planner.Controllers
             return NoContent();
         }
 
-        // =============================
-        //          Specific
-        // =============================
+        #endregion
+
+        #region Get Sub Operations
 
         [HttpGet("list/{order}"), Authorize(Roles = "Student, Admin")]
         public async Task<IActionResult> GetList(int order) {
@@ -102,6 +99,10 @@ namespace events_planner.Controllers
 
             return new ObjectResult(events);
         }
+
+        #endregion
+
+        #region Set Sub Operation 
 
         [HttpGet("{eventId}/category/{categoryId}"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddCategory(int eventId, int categoryId) {
@@ -152,5 +153,7 @@ namespace events_planner.Controllers
     
             return new OkObjectResult("Category removed");
         }
+
+        #endregion
     }
 }

@@ -33,6 +33,8 @@ namespace events_planner.Deserializers {
         [Required]
         public DateTime EndAt { get; set; }
 
+        public string Image { get; set; }
+
         public void BindWithEventModel<T>(out T model) where T: Event {
             Event modelEvent = new Event()
             {
@@ -44,7 +46,8 @@ namespace events_planner.Deserializers {
                 StartAt = this.StartAt,
                 CloseAt = this.CloseAt,
                 OpenAt = this.OpenAt,
-                EndAt = this.EndAt
+                EndAt = this.EndAt,
+                Image = this.Image
             };
 
             model = modelEvent as T;
