@@ -82,7 +82,7 @@ namespace events_planner.Controllers {
 
         [HttpDelete("{id}"), Authorize(Roles = "Admin")]
         public IActionResult Delete(int id) {
-            Category category = Context.Category.Include(inc => inc.SubCategory).FirstOrDefault<Category>(cat => cat.Id == id);
+            Category category = Context.Category.FirstOrDefault<Category>(cat => cat.Id == id);
 
             if (category == null) { return NotFound(); }
 

@@ -4,15 +4,17 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using events_planner.Deserializers;
 
-namespace Microsoft.Extensions.DependencyInjection
-{
-    public class CategoryServices : ICategoryServices
-    {
+namespace Microsoft.Extensions.DependencyInjection {
+    public class CategoryServices : ICategoryServices {
         private PlannerContext Context { get; set; }
+        private IEventServices EventServices { get; set; }
 
-        public CategoryServices(PlannerContext context) {
-            Context = context;    
+        public CategoryServices(PlannerContext context, IEventServices eventServices) {
+            Context = context;
+            EventServices = eventServices;
         }
+
+        #region Interface ICategory
 
         public void bindSubCategoryFromDb(ref Category category, int subId) {
             Category sub = Context.Category.FirstOrDefault<Category>(cat => cat.Id == subId);
@@ -41,8 +43,13 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         public void DeleteCircular(int categoryId) {
-            string sql = string.Format("DELETE FROM category WHERE category_id = {0}", categoryId);
-            Context.Database.ExecuteSqlCommand(sql);
+            using (var DbTransaction = Context.Database.BeginTransaction()) {
+                DropSubReferencesFromParents(categoryId);
+                EventServices.RemoveAllEventCategoryReferencesFor(categoryId);
+                DeleteCategory(categoryId);
+
+                DbTransaction.Commit();
+            }
         }
 
         public void UpdateFromDeserializer(ref CategoryDeserializerUpdate categoryDeserializer, ref Category category) {
@@ -59,5 +66,34 @@ namespace Microsoft.Extensions.DependencyInjection
             Context.Category.Update(category);
             Context.SaveChanges();
         }
+
+        #endregion
+
+        #region Private
+
+        private void DropSubReferencesFromParents(int id) {
+            Category[] categories = GetParentsForSubId(id);
+
+            if (categories == null) { return; }
+
+            foreach (Category category in categories) {
+                category.SubCategoryId = null;
+                category.SubCategory = null;
+            }
+
+            Context.Category.UpdateRange(categories);
+            Context.SaveChanges();
+        }
+
+        private Category[] GetParentsForSubId(int subId) {
+            return Context.Category.Where((Category cat) => cat.SubCategoryId == subId).ToArray();
+        }
+
+        private void DeleteCategory(int id) {
+            string sql = string.Format("DELETE FROM category WHERE category_id = {0}", id);
+            Context.Database.ExecuteSqlCommand(sql);
+        }
+
+        #endregion
     }
 }
