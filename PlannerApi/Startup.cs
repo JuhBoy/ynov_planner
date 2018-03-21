@@ -20,6 +20,16 @@ namespace events_planner {
             // Mysql Database Context
             SetDatabaseContext(services);
 
+            // Add cross origins
+            services.AddCors(o => {
+                if (Env.IsDevelopment() || Env.IsEnvironment("test"))
+                    o.AddPolicy("CrossOrigins", builder => {
+                        builder.AllowAnyOrigin();
+                        builder.AllowAnyMethod();
+                        builder.AllowAnyHeader();
+                    });
+            });
+
             services.AddMvc();
             services.AddRouting(option => option.LowercaseUrls = true);
 
