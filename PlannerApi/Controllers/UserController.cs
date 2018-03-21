@@ -21,6 +21,11 @@ namespace events_planner.Controllers
             services = service;
         }
 
+        /// <summary>
+        /// Return a JWT token that match the current logs for a User
+        /// </summary>
+        /// <response code="404">User not found</response>
+        /// <response code="500">if the credential given is not valid</response>
         [HttpPost("token"), AllowAnonymous]
         public async Task<IActionResult> GetToken([FromBody] UserConnectionDeserializer userCredential)
         {
@@ -42,6 +47,11 @@ namespace events_planner.Controllers
         //          User CRUD
         //================================
 
+        /// <summary>
+        /// Create a User
+        /// </summary>
+        /// <remarks>Create a new user using a given credential</remarks>
+        /// <response code="500">if the credential given is not valid or the database is unreachable</response>
         [HttpPost, AllowAnonymous]
         public IActionResult Create([FromBody] UserCreationDeserializer userFromRequest)
         {
@@ -60,6 +70,11 @@ namespace events_planner.Controllers
             return new CreatedAtRouteResult(null, userFromModel);
         }
 
+        /// <summary>
+        /// Return the User model
+        /// </summary>
+        /// <remarks>return a set of informations about the user</remarks>
+        /// <response code="404">User not found</response>
         [HttpGet, Authorize(Roles = "Student, Admin")]
         public async Task<IActionResult> Read()
         {
@@ -84,6 +99,12 @@ namespace events_planner.Controllers
             });
         }
 
+        /// <summary>
+        /// Update a User using its credential
+        /// </summary>
+        /// <remarks>A user can be updated partialy</remarks>
+        /// <response code="404">User not found</response>
+        /// <response code="500">if the credential given is not valid</response>
         [HttpPatch("Update"), Authorize(Roles = "Student, Admin")]
         public async Task<IActionResult> Update([FromBody] UserUpdatableDeserializer userFromRequest) {
             string email = services.ReadJwtTokenClaims(Request.Headers["Authorization"]);
@@ -104,6 +125,13 @@ namespace events_planner.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Delete User
+        /// </summary>
+        /// <remarks>Only User himself can delete it's account</remarks>
+        /// <response code="200">User removed</response>
+        /// <response code="404">User not found</response>
+        /// <response code="500">Db update exception, database is down</response>
         [HttpDelete("delete"), Authorize(Roles = "Student, Admin")]
         public async Task<IActionResult> Delete() {
             string email = services.ReadJwtTokenClaims(Request.Headers["Authorization"]);
