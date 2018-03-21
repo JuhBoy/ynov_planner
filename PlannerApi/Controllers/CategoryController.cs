@@ -22,6 +22,12 @@ namespace events_planner.Controllers {
             Services = categoryServices;
         }
 
+        /// <summary>
+        /// Create a new category
+        /// </summary>
+        /// <response code="401">Admin token is not permitted</response>
+        /// <response code="500">if the credential given is not valid or DB update failed</response>
+        /// <response code="200">If category has been Added to the database</response>
         [HttpPost, Authorize(Roles = "Admin")]
         public IActionResult Create([FromBody] CategoryDeserializer categoryFromRequest) {
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
@@ -41,6 +47,14 @@ namespace events_planner.Controllers {
             return new OkObjectResult(category);
         }
 
+        /// <summary>
+        /// Get all categories
+        /// </summary>
+        /// <param name="type">0 = All, 1 = SUBS, 2 = PARENTS</param>
+        /// <remarks>All = All categories are returned, SUBS return only sub cateogir and parent so .. </remarks>
+        /// <response code="401">Admin token is not permitted</response>
+        /// <response code="500">if the credential given is not valid or DB update failed</response>
+        /// <response code="200">If category has been Added to the database</response>
         [HttpGet("all/{type}"), Authorize(Roles = "Student,Admin")]
         public async Task<IActionResult> ReadAll(int type) {
             Category[] categories = new Category[0];
@@ -65,6 +79,12 @@ namespace events_planner.Controllers {
             return new OkObjectResult(categories);
         }
 
+        /// <summary>
+        /// Update a category
+        /// </summary>
+        /// <response code="401">Admin token is not permitted</response>
+        /// <response code="500">if the credential given is not valid or DB update failed</response>
+        /// <response code="200">If category has been Updated to the database</response>
         [HttpPut("{id}"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update(int id, [FromBody] CategoryDeserializerUpdate categoryFromRequest) {
             Category category = await Context.FindAsync<Category>(id);
@@ -80,6 +100,12 @@ namespace events_planner.Controllers {
             return new OkObjectResult(category);
         }
 
+        /// <summary>
+        /// Delete a category
+        /// </summary>
+        /// <response code="401">Admin token is not permitted</response>
+        /// <response code="500">if the credential given is not valid or DB update failed</response>
+        /// <response code="201">If category has been Removed from the database</response>
         [HttpDelete("{id}"), Authorize(Roles = "Admin")]
         public IActionResult Delete(int id) {
             Category category = Context.Category.FirstOrDefault<Category>(cat => cat.Id == id);
