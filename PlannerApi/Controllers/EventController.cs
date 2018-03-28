@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using events_planner.Deserializers;
 using events_planner.Constants.Services;
 using System.Linq;
+using System;
 
 namespace events_planner.Controllers {
     [Route("api/[controller]")]
@@ -100,14 +101,18 @@ namespace events_planner.Controllers {
         #region Get Sub Operations
 
         /// <summary>
-        /// Return a list of Events
+        /// Return a list of Events, parameters from and to can be used to select an interval of events
         /// </summary>
         /// <param name="order">0 = ASC, 1 = DESC</param>
         /// <response code="401">User/Admin token is not permitted</response>
         /// <response code="500">if the credential given is not valid or DB update failed</response>
         [HttpGet("list/{order}"), Authorize(Roles = "Student, Admin")]
         public async Task<IActionResult> GetList(int order) {
-            IOrderedQueryable<Event> query;
+            IQueryable<Event> query;
+            Event[] events;
+
+            string from = HttpContext.Request.Query["from"];
+            string to = HttpContext.Request.Query["to"];
 
             switch ((OrderBy)order) {
                 case (OrderBy.ASC):
@@ -119,7 +124,16 @@ namespace events_planner.Controllers {
                     break;
             }
 
-            Event[] events = await query.AsNoTracking().ToArrayAsync();
+            if (from != null)
+                query = query.Where(cc => cc.OpenAt >= DateTime.Parse(from));
+            if (to != null)
+                query = query.Where(cc => cc.EndAt <= DateTime.Parse(to));
+            
+            try {
+                events = await query.AsNoTracking().ToArrayAsync();
+            } catch (Exception e) {
+                return BadRequest(e.InnerException.Message);
+            }
 
             return new ObjectResult(events);
         }
