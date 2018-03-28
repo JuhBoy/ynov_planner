@@ -8,6 +8,7 @@ using events_planner.Deserializers;
 using events_planner.Constants.Services;
 using System.Linq;
 using System;
+using System.Text.RegularExpressions;
 
 namespace events_planner.Controllers {
     [Route("api/[controller]")]
@@ -113,6 +114,7 @@ namespace events_planner.Controllers {
 
             string from = HttpContext.Request.Query["from"];
             string to = HttpContext.Request.Query["to"];
+            string limit = HttpContext.Request.Query["limit"];
 
             switch ((OrderBy)order) {
                 case (OrderBy.ASC):
@@ -128,7 +130,12 @@ namespace events_planner.Controllers {
                 query = query.Where(cc => cc.OpenAt >= DateTime.Parse(from));
             if (to != null)
                 query = query.Where(cc => cc.EndAt <= DateTime.Parse(to));
-            
+            if (limit != null) {
+                Match match = (new Regex("[0-9]+")).Match(limit);
+                if (!String.IsNullOrEmpty(match.Value))
+                    query = query.Take(int.Parse(match.Value));
+            } 
+
             try {
                 events = await query.AsNoTracking().ToArrayAsync();
             } catch (Exception e) {
