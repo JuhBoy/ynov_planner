@@ -12,8 +12,7 @@ using System.Text.RegularExpressions;
 
 namespace events_planner.Controllers {
     [Route("api/[controller]")]
-    public class EventController : Controller {
-        private PlannerContext Context { get; set; }
+    public class EventController : BaseController {
         private IEventServices Services { get; set; }
 
         public EventController(PlannerContext context, IEventServices services) {
@@ -54,10 +53,13 @@ namespace events_planner.Controllers {
             Event eventModel = await Context.Event
                                             .AsNoTracking()
                                             .FirstOrDefaultAsync(e => e.Id == id);
+            
+            Price price = await Context.Price
+                                       .FirstOrDefaultAsync(p => p.EventId == id && p.RoleId == CurrentUser.Role.Id);
 
             if (eventModel == null) { return NotFound(id); }
 
-            return new ObjectResult(eventModel);
+            return new ObjectResult(new { Event = eventModel, Price = price });
         }
 
         /// <summary>

@@ -7,16 +7,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using System.ComponentModel.DataAnnotations;
 
-namespace events_planner.Controllers
-{
+namespace events_planner.Controllers {
     [Route("api/[controller]")]
-    public class UserController : Controller
-    {
+    public class UserController : BaseController {
         public IUserServices services;
-        public PlannerContext Context;
 
-        public UserController(IUserServices service, PlannerContext context)
-        {
+        public UserController(IUserServices service, PlannerContext context) {
             Context = context;
             services = service;
         }
@@ -27,8 +23,7 @@ namespace events_planner.Controllers
         /// <response code="404">User not found</response>
         /// <response code="500">if the credential given is not valid</response>
         [HttpPost("token"), AllowAnonymous]
-        public async Task<IActionResult> GetToken([FromBody] UserConnectionDeserializer userCredential)
-        {
+        public async Task<IActionResult> GetToken([FromBody] UserConnectionDeserializer userCredential) {
             if (!ModelState.IsValid) return BadRequest();
 
             User m_user = await Context.User
@@ -53,13 +48,12 @@ namespace events_planner.Controllers
         /// <remarks>Create a new user using a given credential</remarks>
         /// <response code="500">if the credential given is not valid or the database is unreachable</response>
         [HttpPost, AllowAnonymous]
-        public IActionResult Create([FromBody] UserCreationDeserializer userFromRequest)
-        {
+        public IActionResult Create([FromBody] UserCreationDeserializer userFromRequest) {
             if (!ModelState.IsValid) { return BadRequest(ModelState); };
             User userFromModel;
 
             try {
-              userFromModel = services.CreateUser(userFromRequest);
+                userFromModel = services.CreateUser(userFromRequest);
             } catch (DbUpdateException e) {
                 string message = e.InnerException.Message;
                 return BadRequest(message);
@@ -76,8 +70,7 @@ namespace events_planner.Controllers
         /// <remarks>return a set of informations about the user</remarks>
         /// <response code="404">User not found</response>
         [HttpGet, Authorize(Roles = "Student, Admin")]
-        public async Task<IActionResult> Read()
-        {
+        public async Task<IActionResult> Read() {
             string token = Request.Headers["Authorization"];
             string email = services.ReadJwtTokenClaims(token);
 
@@ -113,7 +106,7 @@ namespace events_planner.Controllers
             if (user == null) { return NotFound(); }
 
             try {
-                userFromRequest.BindWithUser(ref user);    
+                userFromRequest.BindWithUser(ref user);
                 Context.Update(user);
                 Context.SaveChanges();
             } catch (DbUpdateException update) {

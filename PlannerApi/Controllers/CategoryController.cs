@@ -12,9 +12,8 @@ using events_planner.Services.Constants;
 namespace events_planner.Controllers {
 
     [Route("api/[controller]")]
-    public class CategoryController : Controller {
-
-        private PlannerContext Context { get; set; }
+    public class CategoryController : BaseController {
+        
         private ICategoryServices Services { get; set; }
 
         public CategoryController(PlannerContext context, ICategoryServices categoryServices) {
