@@ -109,7 +109,7 @@ namespace events_planner.Controllers {
         /// <param name="order">0 = ASC, 1 = DESC</param>
         /// <response code="401">User/Admin token is not permitted</response>
         /// <response code="500">if the credential given is not valid or DB update failed</response>
-        [HttpGet("list/{order}"), Authorize(Roles = "Student, Admin")]
+        [HttpGet("list/{order}"), AllowAnonymous]
         public async Task<IActionResult> GetList(int order) {
             IQueryable<Event> query;
             Event[] events;

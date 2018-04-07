@@ -17,7 +17,6 @@ namespace events_planner.Models
     {
         [Column("event_id")]
         [Key]
-        [JsonIgnore]
         public int Id { get; set; }
 
         [Column("title")]
