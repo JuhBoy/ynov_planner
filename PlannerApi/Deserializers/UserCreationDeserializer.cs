@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace events_planner.Deserializers
@@ -31,6 +32,8 @@ namespace events_planner.Deserializers
         public string Email { get; set; }
 
         [Required]
+        public DateTime? DateOfBirth { get; set; }
+
         public string RoleName { get; set; }
 
         public int? Promotion { get; set; }

@@ -16,10 +16,8 @@ using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace Microsoft.Extensions.DependencyInjection
-{
-    public class UserServices : IUserServices
-    {
+namespace Microsoft.Extensions.DependencyInjection {
+    public class UserServices : IUserServices {
         public PlannerContext Context { get; set; }
         public IConfiguration Configuration { get; set; }
         public IPromotionServices PromotionServices { get; set; }
@@ -35,8 +33,7 @@ namespace Microsoft.Extensions.DependencyInjection
             RoleServices = roleServices;
         }
 
-        public string GenerateToken(ref User m_user)
-        {
+        public string GenerateToken(ref User m_user) {
             var jwt = new JwtSecurityToken(
                 audience: Configuration["TokenAuthentication:Audience"],
                 issuer: Configuration["TokenAuthentication:Issuer"],
@@ -68,12 +65,11 @@ namespace Microsoft.Extensions.DependencyInjection
             JwtHeader jwt = JwtHeader.Base64UrlDeserialize(payload);
             object valueObject;
 
-            switch (extractor)
-            {
+            switch (extractor) {
                 case (JwtSelector.EMAIL):
                     jwt.TryGetValue("email", out valueObject);
                     break;
-                case(JwtSelector.ALG):
+                case (JwtSelector.ALG):
                     jwt.TryGetValue("alg", out valueObject);
                     break;
                 case (JwtSelector.AUD):
@@ -106,7 +102,7 @@ namespace Microsoft.Extensions.DependencyInjection
             }
             return (string)valueObject;
         }
-        
+
         public User CreateUser(UserCreationDeserializer userFromRequest) {
             int phone;
             int.TryParse(userFromRequest.PhoneNumber, out phone);
@@ -116,7 +112,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             Role role;
             GetRole(userFromRequest.RoleName, out role);
-                                
+
             User user = Context.User.Add(new User() {
                 FirstName = userFromRequest.FirstName,
                 LastName = userFromRequest.LastName,
@@ -125,6 +121,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 Password = userFromRequest.Password,
                 PhoneNumber = phone,
                 Promotion = promotion,
+                DateOfBirth = userFromRequest.DateOfBirth,
                 Role = role
             }).Entity;
             Context.SaveChanges();
@@ -133,20 +130,16 @@ namespace Microsoft.Extensions.DependencyInjection
 
         private void GetRole(string roleName, out Role role) {
             role = RoleServices.GetRoleByName(roleName);
-            if (role == null)
-            {
+            if (role == null) {
                 role = RoleServices.GetStudentRole();
             }
         }
 
         private void GetPromotion(int? promotionId, out Promotion promotion) {
-            if (promotionId == null)
-            {
+            if (promotionId == null) {
                 promotion = PromotionServices.GetForeignPromotion();
-            }
-            else
-            {
-                promotion = PromotionServices.GetPromotionById((int) promotionId);
+            } else {
+                promotion = PromotionServices.GetPromotionById((int)promotionId);
             }
         }
     }
