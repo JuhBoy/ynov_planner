@@ -30,5 +30,9 @@ namespace Microsoft.Extensions.DependencyInjection
         public async Task<Event[]> GetEVentsFromIds(int[] ids) {
             return await Context.Event.Where((arg) => ids.Contains(arg.Id)).ToArrayAsync();
         }
+
+        public async Task<Event> GetEventByIdAsync(int id) {
+            return await Context.Event.FirstOrDefaultAsync<Event>((Event @event) => @event.Id == id);
+        }
     }
 }

@@ -6,5 +6,6 @@ namespace events_planner.Services {
     public interface IEventServices {
         void RemoveAllEventCategoryReferencesFor(int categoryId);
         Task<Event[]> GetEVentsFromIds(int[] ids);
+        Task<Event> GetEventByIdAsync(int id);
     }
 }

@@ -106,7 +106,7 @@ namespace events_planner.Models {
             });
 
             modelBuilder.Entity<TopEvents>((obj) => {
-                obj.HasIndex(i => i.Indexe).IsUnique(true);
+                obj.HasIndex(i => i.Index).IsUnique(true);
             });
         }
     }
