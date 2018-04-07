@@ -1,7 +1,10 @@
 using System;
 using events_planner.Services;
 using events_planner.Models;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -22,6 +25,10 @@ namespace Microsoft.Extensions.DependencyInjection
 
             Context.EventCategory.RemoveRange(categories);
             Context.SaveChanges();
+        }
+
+        public async Task<Event[]> GetEVentsFromIds(int[] ids) {
+            return await Context.Event.Where((arg) => ids.Contains(arg.Id)).ToArrayAsync();
         }
     }
 }

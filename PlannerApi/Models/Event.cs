@@ -71,6 +71,12 @@ namespace events_planner.Models
             RELATIONS
         ************************/
 
+        [ForeignKey("top_events_id"), JsonIgnore, Column("top_events_id")]
+        public int? TopEventsId { get; set; }
+
+        [JsonIgnore]
+        public TopEvents TopEvents { get; set; }
+
         /// <summary> relation with Bookings (One to Many) </summary>
         [JsonIgnore] public ICollection<Booking> Bookings { get; set; }
 

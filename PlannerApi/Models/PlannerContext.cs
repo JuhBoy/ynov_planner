@@ -12,6 +12,7 @@ namespace events_planner.Models {
         public DbSet<Role> Role { get; set; }
         public DbSet<Subscribe> Subscribe { get; set; }
         public DbSet<User> User { get; set; }
+        public DbSet<TopEvents> Tops { get; set; }
 
         //JOINTS
         public DbSet<EventCategory> EventCategory { get; set; }
@@ -92,12 +93,20 @@ namespace events_planner.Models {
             {
                 obj.Property(p => p.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
                 obj.Property(p => p.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                obj.HasOne<TopEvents>(ev => ev.TopEvents)
+                   .WithOne(ev => ev.Event)
+                   .HasForeignKey<Event>(top => top.TopEventsId)
+                   .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<Category>((obj) => {
                 obj.Property(p => p.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
                 obj.Property(p => p.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
                 obj.HasIndex(i => i.Name).IsUnique(true);
+            });
+
+            modelBuilder.Entity<TopEvents>((obj) => {
+                obj.HasIndex(i => i.Indexe).IsUnique(true);
             });
         }
     }
