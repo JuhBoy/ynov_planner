@@ -88,7 +88,7 @@ namespace events_planner.Controllers {
                 user.PhoneNumber,
                 user.Username,
                 user.DateOfBirth,
-                user.Role.Name
+                user.Role
             });
         }
 
