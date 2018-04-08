@@ -95,7 +95,7 @@ namespace events_planner.Models {
                 obj.Property(p => p.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
                 obj.HasOne<TopEvents>(ev => ev.TopEvents)
                    .WithOne(ev => ev.Event)
-                   .HasForeignKey<Event>(top => top.TopEventsId)
+                   .HasForeignKey<TopEvents>(top => top.EventId)
                    .OnDelete(DeleteBehavior.Cascade);
             });
 
@@ -103,10 +103,6 @@ namespace events_planner.Models {
                 obj.Property(p => p.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
                 obj.Property(p => p.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
                 obj.HasIndex(i => i.Name).IsUnique(true);
-            });
-
-            modelBuilder.Entity<TopEvents>((obj) => {
-                obj.HasIndex(i => i.Index).IsUnique(true);
             });
         }
     }

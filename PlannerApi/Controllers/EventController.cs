@@ -93,6 +93,8 @@ namespace events_planner.Controllers {
         [HttpDelete("{id}"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id) {
             Event eventModel = await Context.Event.FirstOrDefaultAsync((obj) => obj.Id == id);
+            if (eventModel == null) return NotFound("Event Not Found");
+
             Context.Event.Remove(eventModel);
             await Context.SaveChangesAsync();
 
