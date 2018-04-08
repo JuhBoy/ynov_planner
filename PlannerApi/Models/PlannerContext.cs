@@ -13,6 +13,7 @@ namespace events_planner.Models {
         public DbSet<Subscribe> Subscribe { get; set; }
         public DbSet<User> User { get; set; }
         public DbSet<TopEvents> Tops { get; set; }
+        public DbSet<Image> Images { get; set; }
 
         //JOINTS
         public DbSet<EventCategory> EventCategory { get; set; }
@@ -97,9 +98,15 @@ namespace events_planner.Models {
                    .WithOne(ev => ev.Event)
                    .HasForeignKey<TopEvents>(top => top.EventId)
                    .OnDelete(DeleteBehavior.Cascade);
+
+                obj.HasMany<Image>(ev => ev.Images)
+                   .WithOne(ev => ev.Event)
+                   .HasForeignKey(arg => arg.EventId)
+                   .OnDelete(DeleteBehavior.Cascade);
             });
 
-            modelBuilder.Entity<Category>((obj) => {
+            modelBuilder.Entity<Category>((obj) => 
+            {
                 obj.Property(p => p.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
                 obj.Property(p => p.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
                 obj.HasIndex(i => i.Name).IsUnique(true);

@@ -1,10 +1,11 @@
 using events_planner.Models;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System;
 
 namespace events_planner.Deserializers {
     public class EventDeserializer {
-        
+
         [StringLength(255, MinimumLength = 3)]
         [MaxLength(255, ErrorMessage = "Username must be under 255 characters")]
         [MinLength(3, ErrorMessage = "Username must be at least 3 characters")]
@@ -33,11 +34,10 @@ namespace events_planner.Deserializers {
         [Required]
         public DateTime EndAt { get; set; }
 
-        public string Image { get; set; }
+        public ICollection<Image> Image { get; set; }
 
-        public void BindWithEventModel<T>(out T model) where T: Event {
-            Event modelEvent = new Event()
-            {
+        public void BindWithEventModel<T>(out T model) where T : Event {
+            Event modelEvent = new Event() {
                 Title = this.Title,
                 Description = this.Description,
                 SubscribeNumber = this.SubscribeNumber,
@@ -47,7 +47,7 @@ namespace events_planner.Deserializers {
                 CloseAt = this.CloseAt,
                 OpenAt = this.OpenAt,
                 EndAt = this.EndAt,
-                Image = this.Image
+                Images = this.Image
             };
 
             model = modelEvent as T;

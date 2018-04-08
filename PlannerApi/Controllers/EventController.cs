@@ -51,10 +51,12 @@ namespace events_planner.Controllers {
         [HttpGet("{id}"), Authorize(Roles = "Admin, Student")]
         public async Task<IActionResult> Read(int id) {
             Event eventModel = await Context.Event
+                                            .Include(ev => ev.Images)
                                             .AsNoTracking()
                                             .FirstOrDefaultAsync(e => e.Id == id);
             
             Price price = await Context.Price
+                                       .AsNoTracking()
                                        .FirstOrDefaultAsync(p => p.EventId == id && p.RoleId == CurrentUser.Role.Id);
 
             if (eventModel == null) { return NotFound(id); }
@@ -119,6 +121,7 @@ namespace events_planner.Controllers {
             string from = HttpContext.Request.Query["from"];
             string to = HttpContext.Request.Query["to"];
             string limit = HttpContext.Request.Query["limit"];
+            bool loadImage = HttpContext.Request.Query["images"] == bool.TrueString;
 
             switch ((OrderBy)order) {
                 case (OrderBy.ASC):
@@ -134,11 +137,13 @@ namespace events_planner.Controllers {
                 query = query.Where(cc => cc.OpenAt >= DateTime.Parse(from));
             if (to != null)
                 query = query.Where(cc => cc.EndAt <= DateTime.Parse(to));
+            if (loadImage)
+                query = query.Include(ev => ev.Images);
             if (limit != null) {
                 Match match = (new Regex("[0-9]+")).Match(limit);
                 if (!String.IsNullOrEmpty(match.Value))
                     query = query.Take(int.Parse(match.Value));
-            } 
+            }
 
             try {
                 events = await query.AsNoTracking().ToArrayAsync();

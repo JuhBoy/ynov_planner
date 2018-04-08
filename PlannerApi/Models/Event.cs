@@ -64,9 +64,6 @@ namespace events_planner.Models
         [Column("end_at")]
         public DateTime? EndAt { get; set; }
 
-        [Column("image_url"), Url]
-        public string Image { get; set; }
-
         /***********************
             RELATIONS
         ************************/
@@ -76,6 +73,9 @@ namespace events_planner.Models
 
         [JsonIgnore]
         public TopEvents TopEvents { get; set; }
+
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public ICollection<Image> Images { get; set; }
 
         /// <summary> relation with Bookings (One to Many) </summary>
         [JsonIgnore] public ICollection<Booking> Bookings { get; set; }

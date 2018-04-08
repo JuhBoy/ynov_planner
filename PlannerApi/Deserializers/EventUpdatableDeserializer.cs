@@ -1,6 +1,7 @@
 using events_planner.Models;
 using System.ComponentModel.DataAnnotations;
 using System;
+using System.Linq;
 
 namespace events_planner.Deserializers
 {
@@ -30,17 +31,12 @@ namespace events_planner.Deserializers
 
         public DateTime? EndAt { get; set; }
 
-        public string Image { get; set; }
-
         public void BindWithModel(ref Event model) {
             if (Title != null)
                 model.Title = Title;
 
             if (Description != null)
                 model.Description = Description;
-            
-            if (Image != null)
-                model.Image = Image;
             
             if (SubscribeNumber.HasValue)
                 model.SubscribeNumber = (int) SubscribeNumber;
