@@ -15,8 +15,7 @@ namespace events_planner.Models
     [Table("event")]
     public class Event
     {
-        [Column("event_id")]
-        [Key]
+        [Column("event_id"), Key]
         public int Id { get; set; }
 
         [Column("title")]
@@ -25,16 +24,17 @@ namespace events_planner.Models
         [MinLength(3, ErrorMessage = "Username must be at least 3 characters")]
         public string Title { get; set; }
 
-        [Column("description")]
-        [Required]
+        [Column("description"), Required]
         public string Description { get; set; }
 
-        [Column("subscribe_number")]
-        [Required]
+        [Column("subscribe_number"), Required]
         public int SubscribeNumber { get; set; }
 
-        [Column("status")]
-        [Required]
+        [Column("subscribed_number"),
+        JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public int SubscribedNumber { get; set; } = 0;
+
+        [Column("status"), Required]
         public Status Status { get; set; }
 
         [Column("location")]
