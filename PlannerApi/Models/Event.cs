@@ -4,8 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
 
-namespace events_planner.Models
-{
+namespace events_planner.Models {
     public enum Status {
         DRAFT = 1,
         ONGOING = 2,
@@ -13,8 +12,7 @@ namespace events_planner.Models
     }
 
     [Table("event")]
-    public class Event
-    {
+    public class Event {
         [Column("event_id"), Key]
         public int Id { get; set; }
 
@@ -91,5 +89,13 @@ namespace events_planner.Models
 
         /// <summary> relation with User (Many to Many) </summary>
         [JsonIgnore] public IList<EventUser> EventUser { get; set; }
+
+        /// <summary> Is Event expired ? </summary>
+        public bool Expired() {
+            int from = DateTime.Compare(DateTime.UtcNow, (DateTime)OpenAt);
+            int to = DateTime.Compare(DateTime.UtcNow, (DateTime)CloseAt);
+
+            return !(CloseAt == null || (from >= 0 && to < 0));
+        }
     }
 }
