@@ -91,5 +91,15 @@ namespace events_planner.Models
 
         /// <summary> relation with User (Many to Many) </summary>
         [JsonIgnore] public IList<EventUser> EventUser { get; set; }
+
+        /// <summary> Is Event expired ? </summary>
+        public bool Expired() {
+            Console.WriteLine("----------------------------");
+            Console.WriteLine(DateTime.UtcNow > OpenAt);
+            Console.WriteLine(DateTime.UtcNow > CloseAt);
+            Console.WriteLine("----------------------------");
+            return (CloseAt == null || (DateTime.Compare(DateTime.UtcNow, (DateTime) OpenAt) >= 0 &&
+                    DateTime.Compare(DateTime.UtcNow, (DateTime) CloseAt) < 0));
+        }
     }
 }
