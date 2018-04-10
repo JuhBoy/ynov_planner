@@ -97,5 +97,9 @@ namespace events_planner.Models {
 
             return !(CloseAt == null || (from >= 0 && to < 0));
         }
+
+        public bool Forward() {
+            return DateTime.Compare(DateTime.UtcNow, (DateTime)EndAt) >= 0;
+        }
     }
 }

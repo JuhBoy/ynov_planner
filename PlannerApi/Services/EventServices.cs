@@ -2,14 +2,14 @@ using System;
 using events_planner.Services;
 using events_planner.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
 
-namespace Microsoft.Extensions.DependencyInjection
-{
-    public class EventServices : IEventServices
-    {
+namespace Microsoft.Extensions.DependencyInjection {
+    
+    public class EventServices : IEventServices {
+        
         private PlannerContext Context { get; set; }
 
         public EventServices(PlannerContext context) {

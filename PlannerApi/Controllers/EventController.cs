@@ -54,7 +54,7 @@ namespace events_planner.Controllers {
                                             .Include(ev => ev.Images)
                                             .AsNoTracking()
                                             .FirstOrDefaultAsync(e => e.Id == id);
-            
+
             Price price = await Context.Price
                                        .AsNoTracking()
                                        .FirstOrDefaultAsync(p => p.EventId == id && p.RoleId == CurrentUser.Role.Id);
@@ -72,14 +72,18 @@ namespace events_planner.Controllers {
         [HttpPatch("{id}"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update([FromBody] EventUpdatableDeserializer eventFromRequest, int id) {
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
-            Event eventModel = await Context.Event.FirstOrDefaultAsync((obj) => obj.Id == id);
+            Event eventModel = await Context.Event
+                                            .FirstOrDefaultAsync((obj) => obj.Id == id);
+
+            if (eventModel == null) return NotFound("Event not found");
 
             try {
                 eventFromRequest.BindWithModel(ref eventModel);
                 Context.Event.Update(eventModel);
                 int i = await Context.SaveChangesAsync();
                 if (i < 1)
-                    throw new DbUpdateException("Nothing has been updated", innerException: new System.Exception());
+                    throw new DbUpdateException("Nothing has been updated",
+                                                innerException: new System.Exception());
             } catch (DbUpdateException e) {
                 return BadRequest(e.InnerException.Message);
             }
