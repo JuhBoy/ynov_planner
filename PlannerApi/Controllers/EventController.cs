@@ -10,7 +10,6 @@ using System.Linq;
 using System;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Hosting;
 using System.IO;
 using System.Collections.Generic;
 
@@ -64,9 +63,14 @@ namespace events_planner.Controllers {
                                        .AsNoTracking()
                                        .FirstOrDefaultAsync(p => p.EventId == id && p.RoleId == CurrentUser.Role.Id);
 
-            if (eventModel == null) { return NotFound(id); }
+            Booking booking = await Context.Booking
+                                           .AsNoTracking()
+                                           .FirstOrDefaultAsync(prop => prop.EventId == id &&
+                                                                CurrentUser.Id == prop.UserId);
 
-            return new ObjectResult(new { Event = eventModel, Price = price });
+            if (eventModel == null) { return NotFound(); }
+
+            return new ObjectResult(new { Event = eventModel, Price = price, Booked = (booking != null) });
         }
 
         /// <summary>
@@ -120,7 +124,7 @@ namespace events_planner.Controllers {
         /// Return a list of Events, parameters from and to can be used to select an interval of events
         /// </summary>
         /// <param name="order">0 = ASC, 1 = DESC</param>
-        /// <response code="401">User/Admin token is not permitted</response>
+        /// <response code="200">Event + is Booked data</response>
         /// <response code="500">if the credential given is not valid or DB update failed</response>
         [HttpGet("list/{order}"), AllowAnonymous]
         public async Task<IActionResult> GetList(int order) {
@@ -131,6 +135,7 @@ namespace events_planner.Controllers {
             string to = HttpContext.Request.Query["to"];
             string limit = HttpContext.Request.Query["limit"];
             bool loadImage = HttpContext.Request.Query["images"] == bool.TrueString;
+            bool obsolete = HttpContext.Request.Query["obsolete"] == bool.TrueString;
 
             switch ((OrderBy)order) {
                 case (OrderBy.ASC):
@@ -153,6 +158,8 @@ namespace events_planner.Controllers {
                 if (!String.IsNullOrEmpty(match.Value))
                     query = query.Take(int.Parse(match.Value));
             }
+            if (!obsolete)
+                query = query.Where((arg) => arg.EndAt >= DateTime.Now);
 
             try {
                 events = await query.AsNoTracking().ToArrayAsync();

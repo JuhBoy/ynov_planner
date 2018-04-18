@@ -9,9 +9,15 @@ namespace events_planner.Controllers {
     public abstract class BaseController : Controller {
         protected PlannerContext Context { get; set; }
 
+        private User _currentUser;
+
         protected User CurrentUser {
             get {
-                return Context.User
+                if (_currentUser != null) {
+                    return _currentUser;
+                }
+
+                return _currentUser = Context.User
                               .Include(inc => inc.Role)
                               .FirstOrDefault(user => user.Email == HttpContext.User.FindFirstValue(ClaimTypes.Email));
             }
