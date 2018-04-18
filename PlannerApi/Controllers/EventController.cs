@@ -9,13 +9,18 @@ using events_planner.Constants.Services;
 using System.Linq;
 using System;
 using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Hosting;
+using System.IO;
+using System.Collections.Generic;
 
 namespace events_planner.Controllers {
     [Route("api/[controller]")]
     public class EventController : BaseController {
         private IEventServices Services { get; set; }
 
-        public EventController(PlannerContext context, IEventServices services) {
+        public EventController(PlannerContext context,
+                               IEventServices services) {
             Context = context;
             Services = services;
         }
@@ -226,6 +231,73 @@ namespace events_planner.Controllers {
             }
 
             return new OkObjectResult("Category removed");
+        }
+
+        /// <summary>
+        /// Add images to the server.
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     POST
+        ///     imagesData = [{
+        ///         "fileName": "chaton-diarrhee.jpg",
+        ///         "title": "mytitle",
+        ///         "alt": "myalt"
+        ///         },
+        ///         {
+        ///             "fileName": "myfilename",
+        ///             "title": "mytitle",
+        ///             "alt": "myalt"
+        ///         }]
+        ///
+        /// </remarks>
+        /// <param name="eventId"></param>
+        /// <returns>200</returns>
+        [HttpPost("{eventId}/upload/images"), Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UploadImages(int eventId,
+                                                      [FromServices] IImageServices imageServices,
+                                                      [FromForm] ImageUploadDeserializer imageCore) {
+            if (!ModelState.IsValid) {
+                return BadRequest(ModelState);
+            }
+
+            var imagesData = imageCore.GetImagesData();
+
+            Event @event = await Services.GetEventByIdAsync(eventId);
+            if (@event == null) return NotFound("Event Not Found");
+
+            IFormFileCollection files = HttpContext.Request.Form.Files;
+
+            string baseFileName = @event.Id.ToString() + "_" +
+                                        @event.CreatedAt.ToString("yyyyMMdd");
+
+            try {
+                Dictionary<string, string> urls = await imageServices.UploadImageAsync(files, baseFileName);
+                List<Image> rangeUpdate = new List<Image>();
+
+                foreach (var pair in urls) {
+                    Image image = new Image() { Url = pair.Key, EventId = @event.Id };
+                    var current = imagesData.FirstOrDefault((arg) => arg.FileName == pair.Value);
+
+                    if (current != null) {
+                        image.Alt = current.Alt;
+                        image.Title = current.Title;
+                    }
+
+                    rangeUpdate.Add(image);
+                }
+
+                Context.Images.UpdateRange(rangeUpdate);
+                await Context.SaveChangesAsync();
+            } catch (Exception e) when (e is IOException ||
+                                        e is DbUpdateException) {
+                string message = (e.InnerException != null) ? e.InnerException.Message :
+                                                               e.Message;
+                return BadRequest(message);
+            };
+
+            return Ok();
         }
 
         #endregion

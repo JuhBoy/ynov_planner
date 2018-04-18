@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using events_planner.Services;
+using Microsoft.AspNetCore.Http.Features;
 
 namespace events_planner {
     public partial class Startup {
@@ -24,6 +25,7 @@ namespace events_planner {
             services.AddCors(o => {
                 if (Env.IsDevelopment() || Env.IsEnvironment("test"))
                     o.AddPolicy("CrossOrigins", builder => {
+                        builder.AllowCredentials();
                         builder.AllowAnyOrigin();
                         builder.AllowAnyMethod();
                         builder.AllowAnyHeader();
@@ -43,12 +45,17 @@ namespace events_planner {
             services.AddScoped<IEventServices, EventServices>();
             services.AddScoped<ICategoryServices, CategoryServices>();
 
+            services.AddTransient<IImageServices, ImageServices>();
+
             AddSwagger(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env) {
+            app.UseCors("CrossOrigins");
             app.UseAuthentication();
+            app.UseStaticFiles();
+
             if (env.IsDevelopment()) {
                 app.UseDeveloperExceptionPage();
             } else {
