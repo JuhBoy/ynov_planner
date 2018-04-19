@@ -10,5 +10,6 @@ namespace events_planner.Services
         void bindSubCategoryFromDb(ref Category category, int subId);
         void DeleteCircular(int categoryId);
         void UpdateFromDeserializer(ref CategoryDeserializerUpdate categoryDeserializer, ref Category category);
+        EventCategory[] GetCategoriesFromString(string categories);
     }
 }

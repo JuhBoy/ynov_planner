@@ -127,7 +127,8 @@ namespace events_planner.Controllers {
         /// <response code="200">Event + is Booked data</response>
         /// <response code="500">if the credential given is not valid or DB update failed</response>
         [HttpGet("list/{order}"), AllowAnonymous]
-        public async Task<IActionResult> GetList(int order) {
+        public async Task<IActionResult> GetList(int order,
+                                                 [FromServices] ICategoryServices categoryServices) {
             IQueryable<Event> query;
             Event[] events;
 
@@ -136,6 +137,7 @@ namespace events_planner.Controllers {
             string limit = HttpContext.Request.Query["limit"];
             bool loadImage = HttpContext.Request.Query["images"] == bool.TrueString;
             bool obsolete = HttpContext.Request.Query["obsolete"] == bool.TrueString;
+            string filters = HttpContext.Request.Query["filter"];
 
             switch ((OrderBy)order) {
                 case (OrderBy.ASC):
@@ -148,20 +150,35 @@ namespace events_planner.Controllers {
             }
 
             if (from != null)
-                query = query.Where(cc => cc.OpenAt >= DateTime.Parse(from));
+                Services.FromDate(ref query, from);
             if (to != null)
-                query = query.Where(cc => cc.EndAt <= DateTime.Parse(to));
+                Services.ToDate(ref query, to);
             if (loadImage)
-                query = query.Include(ev => ev.Images);
+                Services.IncludeImages(ref query);
             if (limit != null) {
                 Match match = (new Regex("[0-9]+")).Match(limit);
                 if (!String.IsNullOrEmpty(match.Value))
                     query = query.Take(int.Parse(match.Value));
             }
             if (!obsolete)
-                query = query.Where((arg) => arg.EndAt >= DateTime.Now);
+                Services.EndAfterToday(ref query);
 
             try {
+                if (filters != null) {
+                    int[] eventsIdsFromCategories = categoryServices.GetCategoriesFromString(filters)
+                                                               .Select((arg) => arg.EventId)
+                                                               .ToArray();
+                    query = query.Where((arg) => eventsIdsFromCategories.Contains(arg.Id))
+                                 .Include(arg => arg.EventCategory)
+                                 .ThenInclude(arg => arg.Category);
+                    events = await query.AsNoTracking().ToArrayAsync();
+
+                    return new ObjectResult(events.Select((arg) => new {
+                        Event = arg,
+                        Categories = arg.EventCategory.Select((uu) => uu.Category).ToArray()
+                    }));
+                }
+
                 events = await query.AsNoTracking().ToArrayAsync();
             } catch (Exception e) {
                 return BadRequest(e.InnerException.Message);

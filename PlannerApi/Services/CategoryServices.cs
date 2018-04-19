@@ -3,6 +3,7 @@ using events_planner.Models;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using events_planner.Deserializers;
+using System.Collections.Generic;
 
 namespace Microsoft.Extensions.DependencyInjection {
     public class CategoryServices : ICategoryServices {
@@ -65,6 +66,18 @@ namespace Microsoft.Extensions.DependencyInjection {
 
             Context.Category.Update(category);
             Context.SaveChanges();
+        }
+
+        public EventCategory[] GetCategoriesFromString(string categories) {
+            if (categories == null) return null;
+            string[] splited = categories.Split(',');
+
+            return Context.EventCategory
+                          .Include(inc => inc.Category)
+                          .Include(inc => inc.Event)
+                          .AsNoTracking()
+                          .Where((arg) => splited.Contains(arg.Category.Name))
+                          .ToArray();
         }
 
         #endregion
