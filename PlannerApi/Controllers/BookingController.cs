@@ -93,6 +93,7 @@ namespace events_planner.Controllers {
             [FromBody] BookingValidationDeserializer bookingValidation) {
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
 
+            // RETRIEVE THE BOOKING CORRESPONDIG TO USER + EVENT
             Expression<Func<Booking, bool>> action = 
                 (Booking arg) => arg.UserId == bookingValidation.UserId &&
                                  arg.EventId == bookingValidation.EventId;
@@ -110,7 +111,17 @@ namespace events_planner.Controllers {
             else if (book.Present)
                 return BadRequest("Presence Already validated");
 
+            // VALIDATE THE PRESENCE
             book.Present = true;
+
+            // CREATE THE PointJury ASSOCIATED
+            if (book.Event.JuryPoint != null) {
+                JuryPoint juryPoint = new JuryPoint() {
+                    Points = (int)book.Event.JuryPoint,
+                    UserId = bookingValidation.UserId
+                };
+                Context.JuryPoints.Update(juryPoint);
+            }
 
             try {
                 Context.Booking.Update(book);

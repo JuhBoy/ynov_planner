@@ -51,19 +51,35 @@ namespace events_planner.Models {
         [JsonIgnore]
         public DateTime UpdatedAt { get; set; }
 
+        /// <summary>
+        /// Gets or sets the start at.
+        /// </summary>
+        /// <value>When the subscriptions start.</value>
         [Column("start_at")]
         [Required]
         public DateTime? StartAt { get; set; }
 
-        [Column("close_at")]
-        [Required]
-        public DateTime? CloseAt { get; set; }
+        /// <summary>
+        /// Gets or sets the end at.
+        /// </summary>
+        /// <value>When the subscription ends</value>
+        [Column("end_at")]
+        public DateTime? EndAt { get; set; }
 
+        /// <summary>
+        /// Gets or sets the open at.
+        /// </summary>
+        /// <value>When the event start</value>
         [Column("open_at")]
         public DateTime? OpenAt { get; set; }
 
-        [Column("end_at")]
-        public DateTime? EndAt { get; set; }
+        /// <summary>
+        /// Gets or sets the close at.
+        /// </summary>
+        /// <value>When the event ends</value>
+        [Column("close_at")]
+        [Required]
+        public DateTime? CloseAt { get; set; }
 
         /***********************
             RELATIONS
@@ -102,7 +118,7 @@ namespace events_planner.Models {
         }
 
         public bool Forward() {
-            return DateTime.Compare(DateTime.UtcNow, (DateTime)EndAt) >= 0;
+            return DateTime.Compare(DateTime.UtcNow, (DateTime)CloseAt) >= 0;
         }
     }
 }
