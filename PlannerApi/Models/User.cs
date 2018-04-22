@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Newtonsoft.Json;
 
 namespace events_planner.Models
 {
@@ -87,5 +88,9 @@ namespace events_planner.Models
 
         /// <summary> relation with Event (Many to Many) </summary>
         public IList<EventUser> EventUser { get; set; }
+
+        /// <summary> Cumulated jury points </summary>
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public IList<JuryPoint> JuryPoint { get; set; }
     }
 }
