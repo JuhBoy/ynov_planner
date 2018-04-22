@@ -97,6 +97,14 @@ namespace events_planner.Services {
             return resultFromIOThread.UrlsName;
         }
 
+        public async Task RemoveImages(string path) {
+            string fullPath = Path.Combine(Environment.WebRootPath, path);
+            if (!File.Exists(fullPath)) {
+                throw new FileNotFoundException(string.Format("File not found at path {0}", fullPath));
+            }
+            await Task.Run(() => File.Delete(fullPath));
+        }
+
         private struct ThreadResponse {
             public IOException Exception { get; set; }
             public Dictionary<string, string> UrlsName { get; set; }

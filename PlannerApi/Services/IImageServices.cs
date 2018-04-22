@@ -11,5 +11,6 @@ namespace events_planner.Services {
         Task<Dictionary<string, string>> UploadImageAsync(IFormFileCollection files,
                                                           string baseFileName,
                                                           string folder = "images");
+        Task RemoveImages(string path);
     }
 }

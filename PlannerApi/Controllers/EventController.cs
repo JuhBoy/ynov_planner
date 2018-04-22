@@ -324,6 +324,26 @@ namespace events_planner.Controllers {
             return Ok();
         }
 
+        [HttpDelete("{eventId}/delete/image/{imageId}")]
+        public async Task<IActionResult> DeleteImage(int eventId,
+                                                     int imageId,
+                                                     [FromServices] IImageServices imageServices) {
+            if (!Context.Event.Any((arg) => arg.Id == eventId) ||
+                !Context.Images.Any((arg) => arg.ImageId == imageId)) {
+                return BadRequest("Item Not Found");
+            }
+
+            try {
+                Image image = Context.Images
+                                     .FirstOrDefault((arg) => arg.ImageId == imageId);
+                await imageServices.RemoveImages(image.Url);    
+            } catch (FileNotFoundException e) {
+                return BadRequest(e.Message);
+            }
+
+            return Ok();
+        }
+
         #endregion
     }
 }
