@@ -51,6 +51,7 @@ namespace events_planner.Controllers {
         public IActionResult GetAllTopEvents() {
             TopEvents[] events = Context.Tops
                                         .Include(args => args.Event)
+                                            .ThenInclude(ev => ev.Images)
                                         .ToArray();
             return new ObjectResult(events);
         }
