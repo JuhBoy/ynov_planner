@@ -65,28 +65,35 @@ namespace events_planner.Models
         ************************/
 
         /// <summary> relation with Booking (One to Many) </summary>
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public ICollection<Booking> Bookings { get; set; }
 
         /// <summary> relation with Subcribe (One to Many) </summary>
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public ICollection<Subscribe> SubscribeTo { get; set; }
 
         /// <summary> relation with Promotion (Many to One) </summary>
         [Column("promotion_id")]
         [ForeignKey("promotion_id")]
         public int PromotionId { get; set; }
+
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public Promotion Promotion { get; set; }
 
         /// <summary> relation with Role (Many to One) </summary>
-        [Column("role_id")]
-        [ForeignKey("role_id")]
+        [Column("role_id"), ForeignKey("role_id"), JsonIgnore]
         public int RoleId { get; set; }
 
         /// <summary> relation with Recovery (One to One) </summary>
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public Role Role { get; set; }
+
         [ForeignKey("recovery_id")]
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public virtual Recovery Recovery { get; set; }
 
         /// <summary> relation with Event (Many to Many) </summary>
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public IList<EventUser> EventUser { get; set; }
 
         /// <summary> Cumulated jury points </summary>

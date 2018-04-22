@@ -74,6 +74,10 @@ namespace events_planner.Models {
                 .WithMany(c => c.EventCategory)
                 .HasForeignKey(ec => ec.CategoryId);
 
+            modelBuilder.Entity<JuryPoint>()
+                        .HasOne<User>(user => user.User)
+                        .WithMany(e => e.JuryPoint);
+
             //==================================
             //          DEFAULT VALUE
             //==================================

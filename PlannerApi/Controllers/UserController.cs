@@ -6,6 +6,7 @@ using events_planner.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace events_planner.Controllers {
     [Route("api/[controller]")]
@@ -77,19 +78,35 @@ namespace events_planner.Controllers {
             User user = await Context.User
                                      .AsNoTracking()
                                      .Include(inc => inc.Role)
+                                     .Include(inc => inc.JuryPoint)
                                      .FirstOrDefaultAsync((User u) => u.Email == email);
 
             if (user == null) { return NotFound(email); }
 
-            return new ObjectResult(new {
-                user.Email,
-                user.FirstName,
-                user.LastName,
-                user.PhoneNumber,
-                user.Username,
-                user.DateOfBirth,
-                user.Role
-            });
+            return Ok(user);
+        }
+
+        /// <summary>
+        /// List all users for an event
+        /// </summary>
+        /// <returns>The list.</returns>
+        /// <param name="eventId">Event identifier.</param>
+        [HttpGet("event_list/{eventId}"), Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UserList(int eventId) {
+            if (!Context.Event.Any(ev => ev.Id == eventId)) {
+                return BadRequest("Event not found");    
+            }
+
+            int[] userIds = Context.Booking
+                                   .Where((arg) => arg.EventId == eventId)
+                                   .Select((arg) => arg.UserId).ToArray();
+
+            User[] users = Context.User
+                                  .Include(arg => arg.JuryPoint)
+                                  .Include(arg => arg.Promotion)
+                                  .Where((arg) => userIds.Contains(arg.Id))
+                                  .ToArray();
+            return Ok(users);
         }
 
         /// <summary>

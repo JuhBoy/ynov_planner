@@ -17,6 +17,7 @@ namespace events_planner.Models {
         [ForeignKey("user_id"), JsonIgnore]
         public int UserId { get; set; }
 
+        [JsonIgnore]
         public User User { get; set; }
     }
 }
