@@ -7,8 +7,7 @@ using Newtonsoft.Json;
 namespace events_planner.Models
 {
     [Table("user")]
-    public class User
-    {
+    public class User {
         [Column("user_id")]
         [Key]
         public int Id { get; set; }
@@ -103,5 +102,16 @@ namespace events_planner.Models
         /// <summary> Temporary roles given to not admin user </summary>
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public IList<TemporaryRole> TemporaryRoleId { get; set; }
+
+        #region Public HELPERS
+        
+        [NotMapped]
+        public string FullName {
+            get {
+                return FirstName + " " + LastName;
+            }
+        }
+
+        #endregion
     }
 }

@@ -18,7 +18,7 @@ namespace events_planner.Models {
         public int UserId { get; set; }
 
         [JsonIgnore]
-        public User User;
+        public User User { get; set; }
 
         [ForeignKey("role_id"), Column("role_id"), JsonIgnore]
         public int RoleId { get; set; }

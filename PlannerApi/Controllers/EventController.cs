@@ -59,6 +59,8 @@ namespace events_planner.Controllers {
                                             .AsNoTracking()
                                             .FirstOrDefaultAsync(e => e.Id == id);
 
+            if (eventModel == null) { return NotFound("Event Not Found"); }
+
             Price price = await Context.Price
                                        .AsNoTracking()
                                        .FirstOrDefaultAsync(p => p.EventId == id && p.RoleId == CurrentUser.Role.Id);
@@ -68,9 +70,17 @@ namespace events_planner.Controllers {
                                            .FirstOrDefaultAsync(prop => prop.EventId == id &&
                                                                 CurrentUser.Id == prop.UserId);
 
-            if (eventModel == null) { return NotFound(); }
-
-            return new ObjectResult(new { Event = eventModel, Price = price, Booked = (booking != null) });
+            User moderator = Context.temporaryRoles
+                                    .Include((arg) => arg.User)
+                                    .FirstOrDefault(arg => arg.EventId == id)
+                                    .User;
+            
+            return new ObjectResult(new {
+                Event = eventModel,
+                Price = price,
+                Booked = (booking != null),
+                Moderator = moderator?.FullName ?? "No Moderator"
+            });
         }
 
         /// <summary>

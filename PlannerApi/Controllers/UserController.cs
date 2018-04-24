@@ -7,15 +7,18 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace events_planner.Controllers {
+
     [Route("api/[controller]")]
     public class UserController : BaseController {
-        public IUserServices services;
+
+        public IUserServices UserServices;
 
         public UserController(IUserServices service, PlannerContext context) {
             Context = context;
-            services = service;
+            UserServices = service;
         }
 
         /// <summary>
@@ -34,7 +37,7 @@ namespace events_planner.Controllers {
 
             if (m_user == null) { return NotFound(userCredential); }
 
-            string token = services.GenerateToken(ref m_user);
+            string token = UserServices.GenerateToken(ref m_user);
 
             return new ObjectResult(token);
         }
@@ -54,7 +57,7 @@ namespace events_planner.Controllers {
             User userFromModel;
 
             try {
-                userFromModel = services.CreateUser(userFromRequest);
+                userFromModel = UserServices.CreateUser(userFromRequest);
             } catch (DbUpdateException e) {
                 string message = e.InnerException.Message;
                 return BadRequest(message);
@@ -73,7 +76,7 @@ namespace events_planner.Controllers {
         [HttpGet, Authorize(Roles = "Student, Admin")]
         public async Task<IActionResult> Read() {
             string token = Request.Headers["Authorization"];
-            string email = services.ReadJwtTokenClaims(token);
+            string email = UserServices.ReadJwtTokenClaims(token);
 
             User user = await Context.User
                                      .AsNoTracking()
@@ -94,7 +97,7 @@ namespace events_planner.Controllers {
         [HttpGet("event_list/{eventId}"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> UserList(int eventId) {
             if (!Context.Event.Any(ev => ev.Id == eventId)) {
-                return BadRequest("Event not found");    
+                return BadRequest("Event not found");
             }
 
             int[] userIds = Context.Booking
@@ -117,7 +120,7 @@ namespace events_planner.Controllers {
         /// <response code="500">if the credential given is not valid</response>
         [HttpPatch("Update"), Authorize(Roles = "Student, Admin")]
         public async Task<IActionResult> Update([FromBody] UserUpdatableDeserializer userFromRequest) {
-            string email = services.ReadJwtTokenClaims(Request.Headers["Authorization"]);
+            string email = UserServices.ReadJwtTokenClaims(Request.Headers["Authorization"]);
             User user = await Context.User.FirstOrDefaultAsync((User u) => u.Email == email);
 
             if (user == null) { return NotFound(); }
@@ -144,7 +147,7 @@ namespace events_planner.Controllers {
         /// <response code="500">Db update exception, database is down</response>
         [HttpDelete("delete"), Authorize(Roles = "Student, Admin")]
         public async Task<IActionResult> Delete() {
-            string email = services.ReadJwtTokenClaims(Request.Headers["Authorization"]);
+            string email = UserServices.ReadJwtTokenClaims(Request.Headers["Authorization"]);
             User user = await Context.User.FirstOrDefaultAsync((User u) => u.Email == email);
 
             if (user == null) { return NotFound(); }
@@ -154,6 +157,81 @@ namespace events_planner.Controllers {
 
             return new ObjectResult("User Removed");
         }
+
+        [HttpPost("temporary_role/{userId}/{roleId}/{eventId}"), Authorize(Roles = "Admin")]
+        public IActionResult GiveTemporaryRole(int userId,
+                                               int roleId,
+                                               int eventId) {
+            string[] errors = GetUserRoleAndEvent(userId, roleId, eventId);
+            if (errors.Length > 0)
+                return NotFound(errors);
+
+            // Is already ann event ?
+            if (Context.temporaryRoles.Any(tt => tt.EventId == eventId &&
+                                           tt.UserId == userId &&
+                                           tt.RoleId == roleId)) {
+                return BadRequest("User Already has this role");
+            }
+
+            TemporaryRole temp = new TemporaryRole() {
+                RoleId = roleId,
+                EventId = eventId,
+                UserId = userId
+            };
+
+            try {
+                Context.temporaryRoles.Add(temp);
+                Context.SaveChanges();
+            } catch (DbUpdateException e) {
+                return BadRequest(e.InnerException.Message);
+            }
+
+            return Ok();
+        }
+
+        [HttpDelete("temporary_role/{tempRoleId}"), Authorize(Roles = "Admin")]
+        public IActionResult RemoveTempRole(int tempRoleId) {
+            TemporaryRole temporary = Context.temporaryRoles
+                                             .FirstOrDefault((arg) => arg.Id == tempRoleId);
+            if (temporary == null) {
+                return NotFound("Role not Found");
+            }
+
+            try {
+                Context.temporaryRoles.Remove(temporary);
+                Context.SaveChanges();
+            } catch (DbUpdateException e) {
+                return BadRequest(e.InnerException.Message);
+            }
+
+            return Ok();
+        }
+
+        #region PRIVATE METHODS
+
+        private string[] GetUserRoleAndEvent(int userId,
+                                             int roleId,
+                                             int eventId) {
+            List<string> errors = new List<string>();
+
+            User user = Context.User.FirstOrDefault(f => f.Id == userId);
+
+            if (user == null) errors.Add("User not found");
+
+            Role role = Context.Role.FirstOrDefault(f => f.Id == roleId);
+
+            if (role == null) errors.Add("Role not found");
+
+            Event @event = Context.Event.FirstOrDefault(ff => ff.Id == eventId);
+
+            if (@event == null || @event.Expired())
+                errors.Add("Event not found or expired");
+
+            return errors.ToArray();
+        }
+
+        #endregion
+
     }
 
 }
