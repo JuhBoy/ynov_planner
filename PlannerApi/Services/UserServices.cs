@@ -34,16 +34,17 @@ namespace Microsoft.Extensions.DependencyInjection {
         }
 
         public string GenerateToken(ref User m_user) {
-            var jwt = new JwtSecurityToken(
-                audience: Configuration["TokenAuthentication:Audience"],
-                issuer: Configuration["TokenAuthentication:Issuer"],
-                claims: new Claim[] {
+            List<Claim> claims = GetRoles(m_user.Id, m_user.Role.Name);
+            claims.AddRange(new Claim[] {
                                     new Claim(JwtRegisteredClaimNames.Sub, m_user.FirstName),
                                     new Claim(JwtRegisteredClaimNames.GivenName, m_user.LastName),
                                     new Claim(JwtRegisteredClaimNames.Email, m_user.Email),
-                                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                                    new Claim("roles", m_user.Role.Name)
-                },
+                                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())});
+
+            var jwt = new JwtSecurityToken(
+                audience: Configuration["TokenAuthentication:Audience"],
+                issuer: Configuration["TokenAuthentication:Issuer"],
+                claims: claims,
                 expires: DateTime.UtcNow.AddDays(2),
                 notBefore: DateTime.UtcNow,
                 signingCredentials: new SigningCredentials(
@@ -135,12 +136,31 @@ namespace Microsoft.Extensions.DependencyInjection {
             }
         }
 
+        private List<Claim> GetRoles(int userId, string role = null) {
+            List<Claim> claims = Context.temporaryRoles
+                                 .Include(arg => arg.Role)
+                                 .Where((arg) => arg.UserId == userId)
+                                 .Select((arg) => new Claim("pk_user", arg.Role.Name))
+                                 .ToList();
+            
+            if (role != null)
+                claims.Add(new Claim("pk_user", role));
+            
+            return claims;
+        }
+
         private void GetPromotion(int? promotionId, out Promotion promotion) {
             if (promotionId == null) {
                 promotion = PromotionServices.GetForeignPromotion();
             } else {
                 promotion = PromotionServices.GetPromotionById((int)promotionId);
             }
+        }
+
+        public bool IsModeratorFor(int eventId, int userId) {
+            return Context.temporaryRoles
+                          .Any((TemporaryRole arg) => arg.EventId == eventId &&
+                                                      arg.UserId == userId);
         }
     }
 }

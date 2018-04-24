@@ -10,5 +10,6 @@ namespace events_planner.Services
         string GenerateToken(ref User m_user);
         User CreateUser(UserCreationDeserializer userFromRequest);
         string ReadJwtTokenClaims(string bearerToken, JwtSelector extractor = JwtSelector.EMAIL);
+        bool IsModeratorFor(int eventId, int userId);
     }
 }

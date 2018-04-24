@@ -11,7 +11,7 @@ using System.Linq.Expressions;
 
 namespace events_planner.Controllers {
 
-    [Route("api/[controller]"), Authorize(Roles = "Student,Admin")]
+    [Route("api/[controller]"), Authorize(Roles = "Student, Admin")]
     public class BookingController : BaseController {
 
         public IEventServices EventServices;
@@ -88,10 +88,15 @@ namespace events_planner.Controllers {
             return new ObjectResult(events.Select((arg) => arg.Event.Forward()));
         }
 
-        [HttpPost("validate"), Authorize(Roles = "Admin")]
+        [HttpPost("validate"), Authorize(Roles = "Admin, Moderator")]
         public async Task<IActionResult> ValidatePresence(
-            [FromBody] BookingValidationDeserializer bookingValidation) {
+            [FromBody] BookingValidationDeserializer bookingValidation,
+            [FromServices] IUserServices userServices) {
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
+            if (!userServices.IsModeratorFor(bookingValidation.EventId,
+                                            CurrentUser.Id)) {
+                return BadRequest("Not Allowed to moderate this event");
+            }
 
             // RETRIEVE THE BOOKING CORRESPONDIG TO USER + EVENT
             Expression<Func<Booking, bool>> action = 

@@ -1,5 +1,6 @@
 using System;
 using System.Text;
+using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -20,6 +21,8 @@ namespace events_planner
                 options.TokenValidationParameters = new TokenValidationParameters() {
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = symmertricKey,
+
+                    RoleClaimType = "pk_user",
 
                     ValidateIssuer = true,
                     ValidIssuer = Configuration["TokenAuthentication:Issuer"],

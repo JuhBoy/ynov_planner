@@ -99,5 +99,9 @@ namespace events_planner.Models
         /// <summary> Cumulated jury points </summary>
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public IList<JuryPoint> JuryPoint { get; set; }
+
+        /// <summary> Temporary roles given to not admin user </summary>
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public IList<TemporaryRole> TemporaryRoleId { get; set; }
     }
 }
