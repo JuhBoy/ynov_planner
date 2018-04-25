@@ -208,7 +208,7 @@ namespace events_planner.Controllers {
         }
 
         #region PRIVATE METHODS
-
+        // TODO: REFACTOR THIS SHIT
         private string[] GetUserRoleAndEvent(int userId,
                                              int roleId,
                                              int eventId) {

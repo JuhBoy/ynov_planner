@@ -246,7 +246,7 @@ namespace events_planner.Controllers {
         /// <response code="401">User/Admin token is not permitted</response>
         /// <response code="500">if the credential given is not valid or DB update failed</response>
         /// <response code="200">If category has been removed</response>
-        [HttpDelete("{eventId}/category/{categoryId}")]
+        [HttpDelete("{eventId}/category/{categoryId}"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteCategory(int eventId, int categoryId) {
             Event eventModel = await Context.Event.Include(inc => inc.EventCategory)
                                             .FirstOrDefaultAsync((Event ev) => ev.Id == eventId);
@@ -334,7 +334,7 @@ namespace events_planner.Controllers {
             return Ok();
         }
 
-        [HttpDelete("{eventId}/delete/image/{imageId}")]
+        [HttpDelete("{eventId}/delete/image/{imageId}"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteImage(int eventId,
                                                      int imageId,
                                                      [FromServices] IImageServices imageServices) {

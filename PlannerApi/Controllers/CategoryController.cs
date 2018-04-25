@@ -54,7 +54,7 @@ namespace events_planner.Controllers {
         /// <response code="401">Admin token is not permitted</response>
         /// <response code="500">if the credential given is not valid or DB update failed</response>
         /// <response code="200">If category has been Added to the database</response>
-        [HttpGet("all/{type}"), Authorize(Roles = "Student,Admin")]
+        [HttpGet("all/{type}"), AllowAnonymous]
         public async Task<IActionResult> ReadAll(int type) {
             Category[] categories = new Category[0];
 

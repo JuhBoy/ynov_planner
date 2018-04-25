@@ -47,7 +47,7 @@ namespace events_planner.Controllers {
             return NoContent();
         }
 
-        [HttpGet("list")]
+        [HttpGet("list"), AllowAnonymous]
         public IActionResult GetAllTopEvents() {
             TopEvents[] events = Context.Tops
                                         .Include(args => args.Event)
