@@ -71,9 +71,10 @@ namespace events_planner.Controllers {
                                                                 CurrentUser.Id == prop.UserId);
 
             User moderator = Context.temporaryRoles
+                                    .AsNoTracking()
                                     .Include((arg) => arg.User)
                                     .FirstOrDefault(arg => arg.EventId == id)
-                                    .User;
+                                    ?.User;
             
             return new ObjectResult(new {
                 Event = eventModel,
