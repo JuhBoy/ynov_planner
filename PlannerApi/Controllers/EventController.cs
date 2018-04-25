@@ -134,7 +134,20 @@ namespace events_planner.Controllers {
         /// <summary>
         /// Return a list of Events, parameters from and to can be used to select an interval of events
         /// </summary>
-        /// <param name="order">0 = ASC, 1 = DESC</param>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     POST /list/{order}
+        ///     GET params:
+        ///         - From (Date UTC)
+        ///         - To (Date UTC)
+        ///         - limit (Integer)
+        ///         - images (boolean as "true string" = True / False, respect the case)
+        ///         - obsolete (boolean as "true string")
+        ///         - filter (list of categories as a string "," as a separator)
+        ///
+        /// </remarks>
+        /// <param name="order">0 = ASC, 1 = DESC, type is int32</param>
         /// <response code="200">Event + is Booked data</response>
         /// <response code="500">if the credential given is not valid or DB update failed</response>
         [HttpGet("list/{order}"), AllowAnonymous]
