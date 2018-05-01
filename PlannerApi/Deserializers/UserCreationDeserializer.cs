@@ -16,7 +16,7 @@ namespace events_planner.Deserializers
         public string LastName { get; set; }
 
         [MinLength(8, ErrorMessage = "Password must be at least 8 characters")]
-        [Required]
+        [Required, Phone]
         public string PhoneNumber { get; set; }
 
         [MinLength(8, ErrorMessage = "Password must be at least 8 characters")]

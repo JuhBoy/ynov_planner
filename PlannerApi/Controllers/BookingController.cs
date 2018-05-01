@@ -22,6 +22,18 @@ namespace events_planner.Controllers {
             EventServices = eventServices;
         }
 
+        /// <summary>
+        /// Subscribe current user to an event by its ID
+        /// </summary>
+        /// <remarks>
+        /// Subscribe only if:
+        ///     - Event is found
+        ///     - Event hasn't reached its max subscribed number
+        ///     - Event has not expired
+        ///     - User doesn't already subsribed to this event
+        /// </remarks>
+        /// <param name="eventId">The event Id</param>
+        /// <returns>204 no Content</returns>
         [HttpGet("subscribe/{eventId}")]
         public async Task<IActionResult> Subscribe(int eventId) {
             Event @event = await EventServices.GetEventByIdAsync(eventId);
@@ -76,6 +88,11 @@ namespace events_planner.Controllers {
             return NoContent();
         }
 
+        /// <summary>
+        /// List of all events wich has been subscribed by the current user
+        /// The list doesn't contains the past events
+        /// </summary>
+        /// <returns>A list of events</returns>
         [HttpGet, Authorize(Roles = "Student, Admin")]
         public async Task<IActionResult> GetBookedEvents() {
             Booking[] events = await Context.Booking
@@ -88,6 +105,15 @@ namespace events_planner.Controllers {
             return new ObjectResult(events.Select((arg) => arg.Event.Forward()));
         }
 
+        /// <summary>
+        /// Validate the presence of a user to an event.
+        /// It ensure that :
+        ///     - User is subscribed to this event
+        ///     - Event isn't done already
+        ///     - Request is done by a moderator or an Administrator
+        ///     - It also create the jury point associated with this event
+        /// </summary>
+        /// <returns>201 No content</returns>
         [HttpPost("validate"), Authorize(Roles = "Admin, Moderator")]
         public async Task<IActionResult> ValidatePresence(
             [FromBody] BookingValidationDeserializer bookingValidation,
