@@ -158,8 +158,19 @@ namespace events_planner.Controllers {
         public IActionResult GiveTemporaryRole(int userId,
                                                int roleId,
                                                int eventId) {
-            string[] errors = GetUserRoleAndEvent(userId, roleId, eventId);
-            if (errors.Length > 0)
+            List<string> errors = new List<string>();
+            User user = Context.User.FirstOrDefault(f => f.Id == userId);
+            Role role = Context.Role.FirstOrDefault(f => f.Id == roleId);
+            Event @event = Context.Event.FirstOrDefault(ff => ff.Id == eventId);
+
+            if (role == null) 
+                errors.Add("Role not found");
+            if (user == null) 
+                errors.Add("User not found");
+            if (@event == null || @event.Expired()) 
+                errors.Add("Event not found or expired");
+            
+            if (errors.Count > 0)
                 return NotFound(errors);
 
             // Is already ann event ?
@@ -218,32 +229,6 @@ namespace events_planner.Controllers {
                 Events = events
             });
         }
-
-        #region PRIVATE METHODS
-        // TODO: REFACTOR THIS SHIT
-        private string[] GetUserRoleAndEvent(int userId,
-                                             int roleId,
-                                             int eventId) {
-            List<string> errors = new List<string>();
-
-            User user = Context.User.FirstOrDefault(f => f.Id == userId);
-
-            if (user == null) errors.Add("User not found");
-
-            Role role = Context.Role.FirstOrDefault(f => f.Id == roleId);
-
-            if (role == null) errors.Add("Role not found");
-
-            Event @event = Context.Event.FirstOrDefault(ff => ff.Id == eventId);
-
-            if (@event == null || @event.Expired())
-                errors.Add("Event not found or expired");
-
-            return errors.ToArray();
-        }
-
-        #endregion
-
     }
 
 }
