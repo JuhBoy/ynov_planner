@@ -15,8 +15,10 @@ using System.IdentityModel.Tokens.Jwt;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using Remotion.Linq.Clauses;
 
 namespace Microsoft.Extensions.DependencyInjection {
+    
     public class UserServices : IUserServices {
         public PlannerContext Context { get; set; }
         public IConfiguration Configuration { get; set; }
@@ -162,5 +164,17 @@ namespace Microsoft.Extensions.DependencyInjection {
                           .Any((TemporaryRole arg) => arg.EventId == eventId &&
                                                       arg.UserId == userId);
         }
+        
+        #region Queries
+
+        public IQueryable<User> AllForeignKeysQuery() {
+            return Context.User
+                .AsNoTracking()
+                .Include(inc => inc.Role)
+                .Include(inc => inc.Promotion)
+                .Include(inc => inc.JuryPoint);
+        }
+        
+        #endregion
     }
 }

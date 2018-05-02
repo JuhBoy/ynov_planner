@@ -79,6 +79,13 @@ namespace Microsoft.Extensions.DependencyInjection {
         public void IncludeImages<T>(ref IQueryable<T> query) where T : Event {
             query = query.Include(ev => ev.Images);
         }
+
+        public IQueryable<Event> GetParticipedEvents(int userId) {
+            return Context.Booking
+                .Include(inc => inc.Event)
+                .Where(arg => arg.UserId == userId && arg.Present == true)
+                .Select(arg => arg.Event);
+        }
     }
 
     #endregion

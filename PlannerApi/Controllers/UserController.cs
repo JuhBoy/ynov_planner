@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace events_planner.Controllers {
 
@@ -78,11 +79,8 @@ namespace events_planner.Controllers {
             string token = Request.Headers["Authorization"];
             string email = UserServices.ReadJwtTokenClaims(token);
 
-            User user = await Context.User
-                                     .AsNoTracking()
-                                     .Include(inc => inc.Role)
-                                     .Include(inc => inc.JuryPoint)
-                                     .FirstOrDefaultAsync((User u) => u.Email == email);
+            User user = await UserServices.AllForeignKeysQuery()
+                                          .FirstOrDefaultAsync((User u) => u.Email == email);
 
             if (user == null) { return NotFound(email); }
 
@@ -104,17 +102,15 @@ namespace events_planner.Controllers {
                                    .Where((arg) => arg.EventId == eventId)
                                    .Select((arg) => arg.UserId).ToArray();
 
-            User[] users = Context.User
-                                  .Include(arg => arg.JuryPoint)
-                                  .Include(arg => arg.Promotion)
-                                  .Where((arg) => userIds.Contains(arg.Id))
-                                  .ToArray();
+            User[] users = UserServices.AllForeignKeysQuery()
+                                       .Where((arg) => userIds.Contains(arg.Id))
+                                       .ToArray();
             return Ok(users);
         }
 
         /// <summary>
         /// Update a User using its credential
-        /// </summary>
+        /// </summary>?s
         /// <remarks>A user can be updated partialy</remarks>
         /// <response code="404">User not found</response>
         /// <response code="500">if the credential given is not valid</response>
@@ -205,6 +201,22 @@ namespace events_planner.Controllers {
             }
 
             return Ok();
+        }
+
+        [HttpGet("{userId}/detail"), Authorize(Roles = "Admin")]
+        public IActionResult GetUserDetail(int userId,
+                                            [FromServices] IEventServices eventServices) {
+            User user = UserServices.AllForeignKeysQuery()
+                                    .FirstOrDefault(u => u.Id == userId);
+
+            if (user == null) return NotFound("User Not Found");
+            
+            Event[] events = eventServices.GetParticipedEvents(userId).ToArray();
+
+            return Ok(new {
+                User = user,
+                Events = events
+            });
         }
 
         #region PRIVATE METHODS

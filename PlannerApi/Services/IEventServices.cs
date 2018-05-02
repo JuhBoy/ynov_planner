@@ -22,6 +22,8 @@ namespace events_planner.Services {
 
         void EndAfterToday<T>(ref IQueryable<T> query) where T : Event;
         
+        IQueryable<Event> GetParticipedEvents(int userId);
+
         #endregion
     }
 }
