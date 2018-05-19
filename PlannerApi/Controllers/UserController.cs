@@ -87,6 +87,16 @@ namespace events_planner.Controllers {
             return Ok(user);
         }
 
+        [HttpGet("all"), Authorize(Roles = "Admin")]
+        public IActionResult ReadAll() {
+            // TODO: SWITCH TO CONSTANTS
+            User[] users = UserServices.AllForeignKeysQuery()
+                                       .Where(arg => arg.Promotion.Name != "ForeignersStudents" &&
+                                                     arg.Promotion.Name != "STAFF")
+                                       .ToArray();
+            return Ok(users);
+        }
+
         /// <summary>
         /// List all users for an event
         /// </summary>
