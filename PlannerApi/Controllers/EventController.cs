@@ -80,7 +80,7 @@ namespace events_planner.Controllers {
                 Event = eventModel,
                 Price = price,
                 Booked = (booking != null),
-                Moderator = moderator?.FullName ?? "No Moderator"
+                Moderator = moderator?.FullName ?? null
             });
         }
 
