@@ -108,6 +108,10 @@ namespace events_planner.Models {
 
         /// <summary> relation with User (Many to Many) </summary>
         [JsonIgnore] public IList<EventUser> EventUser { get; set; }
+        
+        /// <summary> relation with moderators </summary>
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public IList<TemporaryRole> TemporaryRoles { get; set; }
 
         /// <summary> Is Event expired ? </summary>
         public bool Expired() {

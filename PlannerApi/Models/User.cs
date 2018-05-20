@@ -100,7 +100,7 @@ namespace events_planner.Models
         public IList<JuryPoint> JuryPoint { get; set; }
 
         /// <summary> Temporary roles given to not admin user </summary>
-        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        [JsonIgnore]
         public IList<TemporaryRole> TemporaryRoleId { get; set; }
 
         #region Public HELPERS

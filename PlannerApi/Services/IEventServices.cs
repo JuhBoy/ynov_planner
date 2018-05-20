@@ -21,6 +21,8 @@ namespace events_planner.Services {
         void IncludeImages<T>(ref IQueryable<T> query) where T : Event;
 
         void EndAfterToday<T>(ref IQueryable<T> query) where T : Event;
+
+        void IncludeModerators<T>(ref IQueryable<T> query) where T : Event;
         
         IQueryable<Event> GetParticipedEvents(int userId);
 

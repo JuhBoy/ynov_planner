@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Authorization;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Collections.Generic;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace events_planner.Controllers {
 
@@ -34,7 +33,8 @@ namespace events_planner.Controllers {
             User m_user = await Context.User
                                        .AsNoTracking()
                                        .Include(user => user.Role)
-                                       .FirstOrDefaultAsync((User user) => user.Password == userCredential.Password && user.Username == userCredential.Login);
+                                       .FirstOrDefaultAsync((User user) => user.Password == userCredential.Password 
+                                                                           && user.Username == userCredential.Login);
 
             if (m_user == null) { return NotFound(userCredential); }
 

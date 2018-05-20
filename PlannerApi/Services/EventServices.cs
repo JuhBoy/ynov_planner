@@ -80,6 +80,11 @@ namespace Microsoft.Extensions.DependencyInjection {
             query = query.Include(ev => ev.Images);
         }
 
+        public void IncludeModerators<T>(ref IQueryable<T> query) where T : Event {
+            query = query.Include(arg => arg.TemporaryRoles)
+                         .ThenInclude(arg => arg.User);
+        }
+
         public IQueryable<Event> GetParticipedEvents(int userId) {
             return Context.Booking
                 .Include(inc => inc.Event)

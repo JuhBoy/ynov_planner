@@ -12,6 +12,7 @@ using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Http;
 using System.IO;
 using System.Collections.Generic;
+using System.Net;
 
 namespace events_planner.Controllers {
     [Route("api/[controller]")]
@@ -145,6 +146,7 @@ namespace events_planner.Controllers {
         ///         - images (boolean as "true string" = True / False, respect the case)
         ///         - obsolete (boolean as "true string")
         ///         - filter (list of categories as a string "," as a separator)
+        ///         - moderators (boolean as true string) includ moderators for all events
         ///
         /// </remarks>
         /// <param name="order">0 = ASC, 1 = DESC, type is int32</param>
@@ -161,7 +163,9 @@ namespace events_planner.Controllers {
             string limit = HttpContext.Request.Query["limit"];
             bool loadImage = HttpContext.Request.Query["images"] == bool.TrueString;
             bool obsolete = HttpContext.Request.Query["obsolete"] == bool.TrueString;
+            bool includeModerators = HttpContext.Request.Query["moderators"] == bool.TrueString;
             string filters = HttpContext.Request.Query["filter"];
+            
 
             switch ((OrderBy)order) {
                 case (OrderBy.ASC):
@@ -186,6 +190,8 @@ namespace events_planner.Controllers {
             }
             if (!obsolete)
                 Services.EndAfterToday(ref query);
+            if (includeModerators)
+                Services.IncludeModerators(ref query);
 
             try {
                 if (filters != null) {
@@ -202,7 +208,7 @@ namespace events_planner.Controllers {
                         Categories = arg.EventCategory.Select((uu) => uu.Category).ToArray()
                     }));
                 }
-
+                
                 events = await query.AsNoTracking().ToArrayAsync();
             } catch (Exception e) {
                 return BadRequest(e.InnerException.Message);
