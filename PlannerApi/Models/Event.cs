@@ -101,7 +101,8 @@ namespace events_planner.Models {
         [JsonIgnore] public ICollection<Price> Prices { get; set; }
 
         /// <summary> relation with Category (Many to Many) </summary>
-        [JsonIgnore] public IList<EventCategory> EventCategory { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public IList<EventCategory> EventCategory { get; set; }
 
         /// <summary> relation with Promotion (Many to Many) </summary>
         [JsonIgnore] public IList<EventPromotion> EventPromotion { get; set; }

@@ -146,7 +146,8 @@ namespace events_planner.Controllers {
         ///         - images (boolean as "true string" = True / False, respect the case)
         ///         - obsolete (boolean as "true string")
         ///         - filter (list of categories as a string "," as a separator)
-        ///         - moderators (boolean as true string) includ moderators for all events
+        ///         - moderators (boolean as true string) include moderators for all events
+        ///         - categories (boolean as true string) include events categories
         ///
         /// </remarks>
         /// <param name="order">0 = ASC, 1 = DESC, type is int32</param>
@@ -164,6 +165,7 @@ namespace events_planner.Controllers {
             bool loadImage = HttpContext.Request.Query["images"] == bool.TrueString;
             bool obsolete = HttpContext.Request.Query["obsolete"] == bool.TrueString;
             bool includeModerators = HttpContext.Request.Query["moderators"] == bool.TrueString;
+            bool includeCategories = HttpContext.Request.Query["categories"] == bool.TrueString;
             string filters = HttpContext.Request.Query["filter"];
             
 
@@ -192,6 +194,8 @@ namespace events_planner.Controllers {
                 Services.EndAfterToday(ref query);
             if (includeModerators)
                 Services.IncludeModerators(ref query);
+            if (includeCategories)
+                Services.IncludeCategories(ref query);
 
             try {
                 if (filters != null) {

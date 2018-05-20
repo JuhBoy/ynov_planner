@@ -2,6 +2,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Newtonsoft.Json;
 
 namespace events_planner.Models
 {
@@ -15,6 +16,8 @@ namespace events_planner.Models
         public int CategoryId { get; set; }
 
         public Category Category { get; set; }
+        
+        [JsonIgnore]
         public Event Event { get; set; }
     }
 }

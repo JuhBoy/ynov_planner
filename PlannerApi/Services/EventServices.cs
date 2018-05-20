@@ -85,6 +85,11 @@ namespace Microsoft.Extensions.DependencyInjection {
                          .ThenInclude(arg => arg.User);
         }
 
+        public void IncludeCategories<T>(ref IQueryable<T> query) where T : Event {
+            query = query.Include(arg => arg.EventCategory)
+                         .ThenInclude(arg => arg.Category);
+        }
+
         public IQueryable<Event> GetParticipedEvents(int userId) {
             return Context.Booking
                 .Include(inc => inc.Event)
