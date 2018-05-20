@@ -19,6 +19,8 @@ namespace events_planner.Deserializers {
         public int SubscribeNumber { get; set; }
 
         public Status Status { get; set; } = Status.ONGOING;
+        
+        public int? JuryPoint { get; set; }
 
         public string Location { get; set; }
 
@@ -42,6 +44,7 @@ namespace events_planner.Deserializers {
                 Description = this.Description,
                 SubscribeNumber = this.SubscribeNumber,
                 Status = this.Status,
+                JuryPoint = this.JuryPoint,
                 Location = this.Location,
                 StartAt = this.StartAt,
                 CloseAt = this.CloseAt,
