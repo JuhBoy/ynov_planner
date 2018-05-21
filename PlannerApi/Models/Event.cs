@@ -32,6 +32,13 @@ namespace events_planner.Models {
         JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public int SubscribedNumber { get; set; } = 0;
 
+        [Column("validation_number"),
+         JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public int? ValidatedNumber { get; set; } = null;
+
+        [Column("validation_required")]
+        public bool ValidationRequired { get; set; } = false;
+
         [Column("jury_point"), JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public int? JuryPoint { get; set; } = null;
 

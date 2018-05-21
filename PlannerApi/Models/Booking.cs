@@ -14,7 +14,10 @@ namespace events_planner.Models
         public int Id { get; set; }
 
         [Column("present"), Required]
-        public Boolean Present { get; set; }
+        public Boolean Present { get; set; } = false;
+
+        [Column("validated")]
+        public bool? Validated { get; set; } = null;
 
         [Column("created_at")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

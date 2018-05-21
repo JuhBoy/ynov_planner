@@ -52,6 +52,7 @@ namespace events_planner.Controllers {
                 Event = @event
             };
             @event.SubscribedNumber++;
+            book.Validated &= !@event.ValidationRequired;
 
             try {
                 Context.Booking.Add(book);
@@ -76,6 +77,9 @@ namespace events_planner.Controllers {
                 return BadRequest("Event not found or Expired");
 
             @event.SubscribedNumber--;
+
+            if (@event.ValidationRequired && (bool) booking.Validated)
+                @event.ValidatedNumber--;
 
             try {
                 Context.Update(@event);
@@ -110,6 +114,7 @@ namespace events_planner.Controllers {
         /// It ensure that :
         ///     - User is subscribed to this event
         ///     - Event isn't done already
+        ///     - User has been Validated if required
         ///     - Request is done by a moderator or an Administrator
         ///     - It also create the jury point associated with this event
         /// </summary>
@@ -141,6 +146,8 @@ namespace events_planner.Controllers {
                 return BadRequest("Can't validate presence outside of open window");
             else if (book.Present)
                 return BadRequest("Presence Already validated");
+            else if (book.Event.ValidationRequired && (bool) !book.Validated)
+                return BadRequest("User hasn't been validated");
 
             // VALIDATE THE PRESENCE
             book.Present = true;
@@ -156,6 +163,37 @@ namespace events_planner.Controllers {
 
             try {
                 Context.Booking.Update(book);
+                await Context.SaveChangesAsync();
+            } catch (DbUpdateException e) {
+                return BadRequest(e.InnerException.Message);
+            }
+
+            return NoContent();
+        }
+
+        [HttpPost("confirm/{userId}/{eventId}"), Authorize(Roles = "Admin")]
+        public async Task<IActionResult> ConfirmUser(int userId, int eventId) {
+            Booking booking = await Context.Booking
+                                           .Include(arg => arg.Event)
+                                           .FirstOrDefaultAsync(arg => 
+                                                                arg.UserId == userId 
+                                                                && arg.EventId == eventId);
+
+            if (booking == null) 
+                return BadRequest("Booking Not found");
+            else if (booking.Event.Expired()) 
+                return BadRequest("Event expired");
+            else if (!booking.Event.ValidationRequired)
+                return BadRequest("Event doesn't need validation");
+            else if (booking.Validated.HasValue && (bool) booking.Validated) {
+                return BadRequest("User already Validated");
+            }
+
+            booking.Event.ValidatedNumber++;
+            booking.Validated = true;
+
+            try {
+                Context.Booking.Update(booking);
                 await Context.SaveChangesAsync();
             } catch (DbUpdateException e) {
                 return BadRequest(e.InnerException.Message);

@@ -18,6 +18,9 @@ namespace events_planner.Deserializers {
         [Required]
         public int SubscribeNumber { get; set; }
 
+        [Required]
+        public bool ValidationRequired { get; set; }
+
         public Status Status { get; set; } = Status.ONGOING;
         
         public int? JuryPoint { get; set; }
@@ -43,6 +46,7 @@ namespace events_planner.Deserializers {
                 Title = this.Title,
                 Description = this.Description,
                 SubscribeNumber = this.SubscribeNumber,
+                ValidationRequired = this.ValidationRequired,
                 Status = this.Status,
                 JuryPoint = this.JuryPoint,
                 Location = this.Location,
@@ -52,6 +56,10 @@ namespace events_planner.Deserializers {
                 EndAt = this.EndAt,
                 Images = this.Image
             };
+
+            if (modelEvent.ValidationRequired) {
+                modelEvent.ValidatedNumber = 0;
+            }
 
             model = modelEvent as T;
         }

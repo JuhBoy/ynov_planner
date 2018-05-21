@@ -21,6 +21,8 @@ namespace events_planner.Deserializers
         [Range(1, 3)]
         public int? Status { get; set; }
 
+        public bool? ValidationRequired { get; set; }
+
         public string Location { get; set; }
 
         public DateTime? StartAt { get; set; }
@@ -46,7 +48,7 @@ namespace events_planner.Deserializers
             
             if (Location != null)
                 model.Location = Location;
-
+            
             if (StartAt.HasValue)
                 model.StartAt = StartAt;
 
@@ -55,6 +57,11 @@ namespace events_planner.Deserializers
 
             if (EndAt.HasValue)
                 model.EndAt = EndAt;
+
+            if (ValidationRequired.HasValue && ValidationRequired == true) {
+                model.ValidationRequired = true;
+                model.ValidatedNumber = 0;
+            }
         }
     }
 }
