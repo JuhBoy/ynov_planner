@@ -35,8 +35,8 @@ namespace events_planner.Controllers {
             User m_user = await Context.User
                                        .AsNoTracking()
                                        .Include(user => user.Role)
-                                       .FirstOrDefaultAsync((User user) => user.Password == userCredential.Password 
-                                                                           && user.Username == userCredential.Login);
+                                       .FirstOrDefaultAsync((User user) => user.Password == userCredential.Password
+                                                                        && user.Email == userCredential.Login);
 
             if (m_user == null) { return NotFound(userCredential); }
 

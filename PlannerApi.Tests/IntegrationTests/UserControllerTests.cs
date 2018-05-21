@@ -49,7 +49,6 @@ namespace PlannerApi.Tests.IntegrationTests
                     Email = (DateTimeOffset.Now.ToUnixTimeSeconds().ToString()) + "jhon@mymail.com",
                     Password = "123456789",
                     PhoneNumber = "0619198793",
-                    UserName = "JhonSmith",
                     RoleName = "Student"
                 };
 

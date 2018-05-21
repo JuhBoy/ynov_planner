@@ -16,8 +16,8 @@ namespace events_planner.Models
 
         [Column("name")]
         [StringLength(20, MinimumLength = 2)]
-        [MaxLength(20, ErrorMessage = "Username must be under 20 characters")]
-        [MinLength(2, ErrorMessage = "Username must be at least 2 characters")]
+        [MaxLength(20, ErrorMessage = "Name must be under 20 characters")]
+        [MinLength(2, ErrorMessage = "Name must be at least 2 characters")]
         public string Name { get; set; }
 
         [Column("created_at"), JsonIgnore]

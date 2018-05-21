@@ -12,12 +12,6 @@ namespace events_planner.Models
         [Key]
         public int Id { get; set; }
 
-        [Column("username")]
-        [StringLength(20, MinimumLength = 3)]
-        [MaxLength(20, ErrorMessage = "Username must be under 20 characters")]
-        [MinLength(3, ErrorMessage = "Username must be at least 3 characters")]
-        public string Username { get; set; }
-
         [Column("first_name")]
         [StringLength(20, MinimumLength = 3)]
         [MaxLength(20, ErrorMessage = "First Name must be under 20 characters")]

@@ -120,7 +120,6 @@ namespace Microsoft.Extensions.DependencyInjection {
             User user = Context.User.Add(new User() {
                 FirstName = userFromRequest.FirstName,
                 LastName = userFromRequest.LastName,
-                Username = userFromRequest.UserName,
                 Email = userFromRequest.Email,
                 Password = userFromRequest.Password,
                 PhoneNumber = phone,

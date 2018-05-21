@@ -7,8 +7,8 @@ namespace events_planner.Deserializers {
     public class EventDeserializer {
 
         [StringLength(255, MinimumLength = 3)]
-        [MaxLength(255, ErrorMessage = "Username must be under 255 characters")]
-        [MinLength(3, ErrorMessage = "Username must be at least 3 characters")]
+        [MaxLength(255, ErrorMessage = "Title must be under 255 characters")]
+        [MinLength(3, ErrorMessage = "Title must be at least 3 characters")]
         [Required]
         public string Title { get; set; }
 
