@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using events_planner.Deserializers;
 using events_planner.Services;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Collections.Generic;
+using events_planner.PrimitiveExt;
 
 namespace events_planner.Controllers {
 
@@ -87,13 +89,44 @@ namespace events_planner.Controllers {
             return Ok(user);
         }
 
+        /// <summary>
+        /// Return Users as a list
+        /// </summary>
+        /// <remarks>
+        /// GET Params: 
+        ///     - search ([a-zA-Z]+ for Firstname and Lastname)
+        ///     - range  (Two Numbers separated by "-")
+        /// For the range param, the First number is the number of elements to skip,
+        /// the second is how many elements you take.
+        /// <br/> example : to get the elements from 7 to 13 ask for : 7-6 (skip the 7 first element then take 6) 
+        /// </remarks>
         [HttpGet("all"), Authorize(Roles = "Admin")]
         public IActionResult ReadAll() {
-            // TODO: SWITCH TO CONSTANTS
-            User[] users = UserServices.AllForeignKeysQuery()
-                                       .Where(arg => arg.Promotion.Name != "ForeignersStudents" &&
-                                                     arg.Promotion.Name != "STAFF")
-                                       .ToArray();
+            string search = HttpContext.Request.Query["search"];
+            string range = HttpContext.Request.Query["range"];
+            IQueryable<User> query = UserServices.AllForeignKeysQuery();
+
+            if (search != null) {
+                UserServices.likeSearchQuery(ref query, search);
+            }
+
+            if (range != null) {
+                int[] ranges = new int[2];
+                try {
+                    ranges = range.SplitRange("-");
+                }
+                catch (InvalidOperationException e) {
+                    ranges[0] = 0;
+                    ranges[1] = int.MaxValue;
+                } finally {
+                    query = query.Skip(ranges[0])
+                                 .Take(ranges[1]);
+                }
+            }
+            
+            UserServices.WithouStaffMembers(ref query);
+            
+            User[] users = query.AsNoTracking().ToArray();
             return Ok(users);
         }
 

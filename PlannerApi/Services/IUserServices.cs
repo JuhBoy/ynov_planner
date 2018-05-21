@@ -23,7 +23,20 @@ namespace events_planner.Services
         /// </summary>
         /// <returns>IQueryable object</returns>
         IQueryable<User> AllForeignKeysQuery();
-        
+
+        /// <summary>
+        /// Set a query that handle a like SQL search
+        /// </summary>
+        /// <param name="query">The query object as Ref</param>
+        /// <param name="expression">The expression to looks for</param>
+        void likeSearchQuery(ref IQueryable<User> query, string expression);
+
+        /// <summary>
+        /// Remove staff memebers of the current list
+        /// </summary>
+        /// <param name="query">The query object as Ref</param>
+        void WithouStaffMembers(ref IQueryable<User> query);
+
         #endregion
     }
 }

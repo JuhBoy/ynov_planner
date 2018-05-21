@@ -15,6 +15,7 @@ using System.IdentityModel.Tokens.Jwt;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Remotion.Linq.Clauses;
 
 namespace Microsoft.Extensions.DependencyInjection {
@@ -173,6 +174,14 @@ namespace Microsoft.Extensions.DependencyInjection {
                 .Include(inc => inc.Role)
                 .Include(inc => inc.Promotion)
                 .Include(inc => inc.JuryPoint);
+        }
+
+        public void likeSearchQuery(ref IQueryable<User> query, string expression) {
+            query = query.Where(arg => arg.FirstName.Contains(expression) || arg.LastName.Contains(expression));
+        }
+
+        public void WithouStaffMembers(ref IQueryable<User> query) {
+            query = query.Where(arg => arg.Promotion.Name != "STAFF");
         }
         
         #endregion
