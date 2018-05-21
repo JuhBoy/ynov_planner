@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using events_planner.Services;
-using Microsoft.AspNetCore.Http.Features;
+using events_planner.App_Start;
 
 namespace events_planner {
     public partial class Startup {
@@ -32,6 +32,10 @@ namespace events_planner {
                         builder.AllowAnyHeader();
                     });
             });
+
+            // Email services
+            services.AddSingleton<IEmailConfiguration>(Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>());
+            services.AddTransient<IEmailService, EmailService>();
 
             services.AddMvc();
             services.AddRouting(option => option.LowercaseUrls = true);
