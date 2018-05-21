@@ -102,11 +102,15 @@ namespace events_planner.Controllers {
             Booking[] events = await Context.Booking
                                           .AsTracking()
                                           .Include(inc => inc.Event)
-                                          .Where((Booking arg) => arg.UserId == CurrentUser.Id &&
-                                                !arg.Present)
+                                          .Where(arg => arg.UserId == CurrentUser.Id 
+                                                        && !arg.Present)
                                           .ToArrayAsync();
 
-            return new ObjectResult(events.Select((arg) => arg.Event.Forward()));
+            Event[] result = events.Where((arg) => arg.Event.Forward())
+                                   .Select(arg => arg.Event)
+                                   .ToArray();
+
+            return Ok(result);
         }
 
         /// <summary>
@@ -171,8 +175,18 @@ namespace events_planner.Controllers {
             return NoContent();
         }
 
-        [HttpPost("confirm/{userId}/{eventId}"), Authorize(Roles = "Admin")]
-        public async Task<IActionResult> ConfirmUser(int userId, int eventId) {
+        /// <summary>
+        /// Confirms the user at the specified event.
+        /// </summary>
+        /// <returns>204</returns>
+        /// <param name="userId">User identifier.</param>
+        /// <param name="eventId">Event identifier.</param>
+        /// <param name="confirm">If set to <c>true</c> confirm the user, 
+        /// otherwise it remove the booking</param>
+        [HttpPost("confirm/{userId}/{eventId}/{confirm}"), Authorize(Roles = "Admin")]
+        public async Task<IActionResult> ConfirmUser(int userId,
+                                                     int eventId,
+                                                     bool confirm) {
             Booking booking = await Context.Booking
                                            .Include(arg => arg.Event)
                                            .FirstOrDefaultAsync(arg => 
@@ -189,11 +203,18 @@ namespace events_planner.Controllers {
                 return BadRequest("User already Validated");
             }
 
-            booking.Event.ValidatedNumber++;
-            booking.Validated = true;
+            booking.Validated = confirm;
 
             try {
-                Context.Booking.Update(booking);
+                if (!confirm) {
+                    booking.Event.SubscribedNumber--;
+                    Context.Event.Update(booking.Event);
+                    Context.Booking.Remove(booking);
+                } else {
+                    booking.Event.ValidatedNumber++;
+                    Context.Booking.Update(booking);
+                }
+
                 await Context.SaveChangesAsync();
             } catch (DbUpdateException e) {
                 return BadRequest(e.InnerException.Message);

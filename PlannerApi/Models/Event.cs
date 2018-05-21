@@ -130,7 +130,7 @@ namespace events_planner.Models {
         }
 
         public bool Forward() {
-            return DateTime.Compare(DateTime.UtcNow, (DateTime)CloseAt) >= 0;
+            return DateTime.Compare(DateTime.UtcNow, (DateTime)CloseAt) <= 0;
         }
     }
 }
