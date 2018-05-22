@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,10 +32,6 @@ namespace events_planner {
                     });
             });
 
-            // Email services
-            services.AddSingleton<IEmailConfiguration>(Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>());
-            services.AddTransient<IEmailService, EmailService>();
-
             services.AddMvc();
             services.AddRouting(option => option.LowercaseUrls = true);
 
@@ -49,6 +44,10 @@ namespace events_planner {
             services.AddScoped<IRoleServices, RoleServices>();
             services.AddScoped<IEventServices, EventServices>();
             services.AddScoped<ICategoryServices, CategoryServices>();
+
+            // Email services
+            services.AddSingleton<IEmailConfiguration>(Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>());
+            services.AddTransient<IEmailService, EmailService>();
 
             services.AddTransient<IImageServices, ImageServices>();
 
