@@ -23,6 +23,8 @@ namespace events_planner.Deserializers
 
         public bool? ValidationRequired { get; set; }
 
+        public int? JuryPoint { get; set;}
+
         public string Location { get; set; }
 
         public DateTime? StartAt { get; set; }
@@ -57,6 +59,9 @@ namespace events_planner.Deserializers
 
             if (EndAt.HasValue)
                 model.EndAt = EndAt;
+
+            if (JuryPoint.HasValue)
+                model.JuryPoint = JuryPoint;
 
             if (ValidationRequired.HasValue && ValidationRequired == true) {
                 model.ValidationRequired = true;
