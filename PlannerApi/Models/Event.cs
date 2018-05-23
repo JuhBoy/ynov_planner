@@ -63,7 +63,6 @@ namespace events_planner.Models {
         /// </summary>
         /// <value>When the subscriptions start.</value>
         [Column("start_at")]
-        [Required]
         public DateTime? StartAt { get; set; }
 
         /// <summary>
@@ -77,15 +76,14 @@ namespace events_planner.Models {
         /// Gets or sets the open at.
         /// </summary>
         /// <value>When the event start</value>
-        [Column("open_at")]
+        [Column("open_at"), Required]
         public DateTime? OpenAt { get; set; }
 
         /// <summary>
         /// Gets or sets the close at.
         /// </summary>
         /// <value>When the event ends</value>
-        [Column("close_at")]
-        [Required]
+        [Column("close_at"), Required]
         public DateTime? CloseAt { get; set; }
 
         /***********************

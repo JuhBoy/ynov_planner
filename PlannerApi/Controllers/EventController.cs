@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Http;
 using System.IO;
 using System.Collections.Generic;
 using System.Net;
+using events_planner.App_Start;
 
 namespace events_planner.Controllers {
     [Route("api/[controller]")]
@@ -150,11 +151,11 @@ namespace events_planner.Controllers {
         ///         - categories (boolean as true string) include events categories
         ///
         /// </remarks>
-        /// <param name="order">0 = ASC, 1 = DESC, type is int32</param>
+        /// <param name="order"> ASC, DESC (Default: DESC)</param>
         /// <response code="200">Event + is Booked data</response>
         /// <response code="500">if the credential given is not valid or DB update failed</response>
         [HttpGet("list/{order}"), AllowAnonymous]
-        public async Task<IActionResult> GetList(int order,
+        public async Task<IActionResult> GetList(string order,
                                                  [FromServices] ICategoryServices categoryServices) {
             IQueryable<Event> query;
             Event[] events;
@@ -169,11 +170,11 @@ namespace events_planner.Controllers {
             string filters = HttpContext.Request.Query["filter"];
             
 
-            switch ((OrderBy)order) {
-                case (OrderBy.ASC):
+            switch (order) {
+                case ("ASC"):
                     query = Context.Event.OrderBy((Event arg) => arg.StartAt);
                     break;
-                case (OrderBy.DESC):
+                case ("DESC"):
                 default:
                     query = Context.Event.OrderByDescending((Event arg) => arg.StartAt);
                     break;
