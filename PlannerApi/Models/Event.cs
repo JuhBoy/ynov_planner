@@ -5,14 +5,17 @@ using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
 
 namespace events_planner.Models {
-    public enum Status {
-        DRAFT = 1,
-        ONGOING = 2,
-        DONE = 3
+
+    public static class Status {
+        public const string ValidRegex = @"ongoing|done|draft";
+        public static string ONGOING = "ongoing";
+        public static string DONE = "done";
+        public static string DRAFT = "draft";
     }
 
     [Table("event")]
     public class Event {
+        
         [Column("event_id"), Key]
         public int Id { get; set; }
 
@@ -43,7 +46,7 @@ namespace events_planner.Models {
         public int? JuryPoint { get; set; } = null;
 
         [Column("status"), Required]
-        public Status Status { get; set; }
+        public string Status { get; set; }
 
         [Column("location")]
         public string Location { get; set; }

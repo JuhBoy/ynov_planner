@@ -18,8 +18,8 @@ namespace events_planner.Deserializers
         [Range(0, 1000)]
         public int? SubscribeNumber { get; set; }
 
-        [Range(1, 3)]
-        public int? Status { get; set; }
+        [RegularExpression(Models.Status.ValidRegex)]
+        public string Status { get; set; }
 
         public bool? ValidationRequired { get; set; }
 
@@ -38,15 +38,15 @@ namespace events_planner.Deserializers
         public void BindWithModel(ref Event model) {
             if (Title != null)
                 model.Title = Title;
-
+            
             if (Description != null)
                 model.Description = Description;
             
             if (SubscribeNumber.HasValue)
                 model.SubscribeNumber = (int) SubscribeNumber;
 
-            if (Status.HasValue)
-                model.Status = (Status)Status;
+            if (Status != null)
+                model.Status = Status;
             
             if (Location != null)
                 model.Location = Location;
