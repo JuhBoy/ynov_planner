@@ -4,22 +4,19 @@ using Microsoft.Extensions.DependencyInjection;
 using System.IO;
 using Swashbuckle.AspNetCore.Swagger;
 
-namespace events_planner
-{
-    public partial class Startup
-    {
+namespace events_planner {
+    public partial class Startup {
         private void AddSwagger(IServiceCollection services) {
             services.AddSwaggerGen(c => {
-               c.SwaggerDoc("v1.0", new Info {
-                   Title = "Event planner Ynov",
-                   Version = "v1.0"
+                c.SwaggerDoc("v1.0", new Info {
+                    Title = "Event planner Ynov",
+                    Version = "v1.0"
                 });
 
                 var basePath = AppContext.BaseDirectory;
-                var xmlPath = Path.Combine(basePath, "events_planner.xml"); 
+                var xmlPath = Path.Combine(basePath, "events_planner.xml");
                 c.IncludeXmlComments(xmlPath);
-                c.AddSecurityDefinition("Bearer", new ApiKeyScheme
-                {
+                c.AddSecurityDefinition("Bearer", new ApiKeyScheme {
                     Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
                     Name = "Authorization",
                     In = "header",

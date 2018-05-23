@@ -12,6 +12,10 @@ namespace events_planner.Services {
 
         Task<Event> GetEventByIdAsync(int id);
 
+        Task<Price> GetPriceForRoleAsync(int roleId, int eventId);
+
+        Task<bool> IsEventBooked(int userId, int eventId);
+
         #region QUERIES
 
         void FromDate<T>(ref IQueryable<T> query, string date) where T : Event;
@@ -25,6 +29,8 @@ namespace events_planner.Services {
         void IncludeModerators<T>(ref IQueryable<T> query) where T : Event;
 
         void IncludeCategories<T>(ref IQueryable<T> query) where T : Event;
+
+        void LimitElements<T>(ref IQueryable<T> query, string limit) where T : Event;
         
         IQueryable<Event> GetParticipedEvents(int userId);
 

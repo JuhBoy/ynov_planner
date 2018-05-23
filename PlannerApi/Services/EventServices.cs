@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Microsoft.Extensions.DependencyInjection {
 
@@ -33,6 +34,21 @@ namespace Microsoft.Extensions.DependencyInjection {
 
         public async Task<Event> GetEventByIdAsync(int id) {
             return await Context.Event.FirstOrDefaultAsync<Event>((Event @event) => @event.Id == id);
+        }
+
+        public async Task<Price> GetPriceForRoleAsync(int roleId, int eventId) {
+            Price price;
+            price = await Context.Price
+                                 .AsNoTracking()
+                                 .FirstOrDefaultAsync(p => p.EventId == eventId &&
+                                                      p.RoleId == roleId);
+            return price;
+        }
+
+        public async Task<bool> IsEventBooked(int userId, int eventId) {
+            return await Context.Booking
+                                .AnyAsync(prop => prop.EventId == eventId &&
+                                          prop.UserId == userId);
         }
     }
 
@@ -90,12 +106,22 @@ namespace Microsoft.Extensions.DependencyInjection {
                          .ThenInclude(arg => arg.Category);
         }
 
+        public void LimitElements<T>(ref IQueryable<T> query,
+                                     string limit) where T : Event {
+            Match match = (new Regex("[0-9]+")).Match(limit);
+
+            if (!String.IsNullOrEmpty(match.Value)) {
+                query = query.Take(int.Parse(match.Value));
+            }
+        }
+
         public IQueryable<Event> GetParticipedEvents(int userId) {
             return Context.Booking
                 .Include(inc => inc.Event)
                 .Where(arg => arg.UserId == userId && arg.Present == true)
                 .Select(arg => arg.Event);
         }
+
     }
 
     #endregion

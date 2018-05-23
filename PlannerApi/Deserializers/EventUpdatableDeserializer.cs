@@ -1,12 +1,10 @@
 using events_planner.Models;
 using System.ComponentModel.DataAnnotations;
 using System;
-using System.Linq;
 
-namespace events_planner.Deserializers
-{
-    public class EventUpdatableDeserializer
-    {
+namespace events_planner.Deserializers {
+    
+    public class EventUpdatableDeserializer {
 
         [StringLength(255, MinimumLength = 3)]
         [MaxLength(255, ErrorMessage = "Title must be under 255 characters")]
@@ -23,7 +21,7 @@ namespace events_planner.Deserializers
 
         public bool? ValidationRequired { get; set; }
 
-        public int? JuryPoint { get; set;}
+        public int? JuryPoint { get; set; }
 
         public string Location { get; set; }
 
@@ -38,19 +36,19 @@ namespace events_planner.Deserializers
         public void BindWithModel(ref Event model) {
             if (Title != null)
                 model.Title = Title;
-            
+
             if (Description != null)
                 model.Description = Description;
-            
+
             if (SubscribeNumber.HasValue)
-                model.SubscribeNumber = (int) SubscribeNumber;
+                model.SubscribeNumber = (int)SubscribeNumber;
 
             if (Status != null)
                 model.Status = Status;
-            
+
             if (Location != null)
                 model.Location = Location;
-            
+
             if (StartAt.HasValue)
                 model.StartAt = StartAt;
 

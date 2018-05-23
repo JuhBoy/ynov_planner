@@ -42,7 +42,8 @@ namespace events_planner.Models {
         [Column("validation_required")]
         public bool ValidationRequired { get; set; } = false;
 
-        [Column("jury_point"), JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        [Column("jury_point"),
+         JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public int? JuryPoint { get; set; } = null;
 
         [Column("status"), Required]
@@ -119,7 +120,8 @@ namespace events_planner.Models {
         [JsonIgnore] public IList<EventUser> EventUser { get; set; }
         
         /// <summary> relation with moderators </summary>
-        [JsonProperty(NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore, 
+                      DefaultValueHandling = DefaultValueHandling.Ignore)]
         public IList<TemporaryRole> TemporaryRoles { get; set; }
 
         /// <summary> Is Event expired ? </summary>

@@ -102,6 +102,9 @@ namespace events_planner.Controllers {
             Booking[] events = await Context.Booking
                                           .AsTracking()
                                           .Include(inc => inc.Event)
+                                            .ThenInclude(tinc => tinc.Images)
+                                          .Include(iii => iii.Event)
+                                            .ThenInclude(tinc => tinc.EventCategory)
                                           .Where(arg => arg.UserId == CurrentUser.Id 
                                                         && !arg.Present)
                                           .ToArrayAsync();

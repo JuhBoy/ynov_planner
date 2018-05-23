@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace events_planner.Controllers {
     public abstract class BaseController : Controller {
+        
         protected PlannerContext Context { get; set; }
 
         private User _currentUser;

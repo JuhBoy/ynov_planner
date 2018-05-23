@@ -3,10 +3,10 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Folder Include="wwwroot\" />
     <Folder Include="Data\" />
     <Folder Include="Services\Constants\" />
     <Folder Include="Migrations\" />
+    <Folder Include="wwwroot\" />
   </ItemGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>bin/Debug/netcoreapp2.0/events_planner.xml</DocumentationFile>
@@ -27,5 +27,8 @@
     <Compile Remove="Deserializers\IDeserializer\IUserPartialUpdate.cs" />
     <Compile Remove="Deserializers\IDeserializers\IUserBaseModel.cs" />
     <Compile Remove="Migrations\20180213173310_AddBdd.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Remove="wwwroot\.gitkeep" />
   </ItemGroup>
 </Project>

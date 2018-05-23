@@ -16,14 +16,32 @@ using System.Net;
 using events_planner.App_Start;
 
 namespace events_planner.Controllers {
+
     [Route("api/[controller]")]
     public class EventController : BaseController {
+
         private IEventServices Services { get; set; }
 
-        public EventController(PlannerContext context,
-                               IEventServices services) {
+        private IQueryable<Event> Query;
+
+        public EventController(PlannerContext context, IEventServices services) {
             Context = context;
             Services = services;
+        }
+
+        public void InitializeQuery() {
+            Query = Context.Event;
+
+            bool loadImages = HttpContext.Request.Query["images"] == bool.TrueString;
+            bool includeModerators = HttpContext.Request.Query["moderators"] == bool.TrueString;
+            bool includeCategories = HttpContext.Request.Query["categories"] == bool.TrueString;
+
+            if (loadImages)
+                Services.IncludeImages(ref Query);
+            if (includeModerators)
+                Services.IncludeModerators(ref Query);
+            if (includeCategories)
+                Services.IncludeCategories(ref Query);
         }
 
         #region User CRUD
@@ -56,33 +74,19 @@ namespace events_planner.Controllers {
         /// <response code="500">if the credential given is not valid or DB update failed</response>
         [HttpGet("{id}"), Authorize(Roles = "Admin, Student")]
         public async Task<IActionResult> Read(int id) {
-            Event eventModel = await Context.Event
-                                            .Include(ev => ev.Images)
-                                            .AsNoTracking()
-                                            .FirstOrDefaultAsync(e => e.Id == id);
+            InitializeQuery();
+            Event eventModel = await Query.AsNoTracking()
+                                          .FirstOrDefaultAsync(e => e.Id == id);
 
             if (eventModel == null) { return NotFound("Event Not Found"); }
 
-            Price price = await Context.Price
-                                       .AsNoTracking()
-                                       .FirstOrDefaultAsync(p => p.EventId == id && p.RoleId == CurrentUser.Role.Id);
+            Price price = await Services.GetPriceForRoleAsync(CurrentUser.Role.Id, id);
+            bool booked = await Services.IsEventBooked(CurrentUser.Id, id);
 
-            Booking booking = await Context.Booking
-                                           .AsNoTracking()
-                                           .FirstOrDefaultAsync(prop => prop.EventId == id &&
-                                                                CurrentUser.Id == prop.UserId);
-
-            User moderator = Context.temporaryRoles
-                                    .AsNoTracking()
-                                    .Include((arg) => arg.User)
-                                    .FirstOrDefault(arg => arg.EventId == id)
-                                    ?.User;
-            
-            return new ObjectResult(new {
+            return Ok(new {
                 Event = eventModel,
                 Price = price,
-                Booked = (booking != null),
-                Moderator = moderator?.FullName ?? null
+                Booked = booked
             });
         }
 
@@ -92,20 +96,20 @@ namespace events_planner.Controllers {
         /// <response code="401">User/Admin token is not permitted</response>
         /// <response code="500">if the credential given is not valid or DB update failed</response>
         [HttpPatch("{id}"), Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Update([FromBody] EventUpdatableDeserializer eventFromRequest, int id) {
+        public async Task<IActionResult> Update([FromBody] EventUpdatableDeserializer eventReq,
+                                                int id) {
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
+
             Event eventModel = await Context.Event
                                             .FirstOrDefaultAsync((obj) => obj.Id == id);
 
             if (eventModel == null) return NotFound("Event not found");
 
-            try {
-                eventFromRequest.BindWithModel(ref eventModel);
+            eventReq.BindWithModel(ref eventModel);
+
+            try {    
                 Context.Event.Update(eventModel);
-                int i = await Context.SaveChangesAsync();
-                if (i < 1)
-                    throw new DbUpdateException("Nothing has been updated",
-                                                innerException: new System.Exception());
+                await Context.SaveChangesAsync();
             } catch (DbUpdateException e) {
                 return BadRequest(e.InnerException.Message);
             }
@@ -123,8 +127,12 @@ namespace events_planner.Controllers {
             Event eventModel = await Context.Event.FirstOrDefaultAsync((obj) => obj.Id == id);
             if (eventModel == null) return NotFound("Event Not Found");
 
-            Context.Event.Remove(eventModel);
-            await Context.SaveChangesAsync();
+            try {
+                Context.Event.Remove(eventModel);
+                await Context.SaveChangesAsync();
+            } catch (DbUpdateException e) {
+                return BadRequest(e.InnerException.Message);
+            }
 
             return NoContent();
         }
@@ -157,69 +165,50 @@ namespace events_planner.Controllers {
         [HttpGet("list/{order}"), AllowAnonymous]
         public async Task<IActionResult> GetList(string order,
                                                  [FromServices] ICategoryServices categoryServices) {
-            IQueryable<Event> query;
             Event[] events;
+            InitializeQuery();
 
             string from = HttpContext.Request.Query["from"];
             string to = HttpContext.Request.Query["to"];
             string limit = HttpContext.Request.Query["limit"];
-            bool loadImage = HttpContext.Request.Query["images"] == bool.TrueString;
-            bool obsolete = HttpContext.Request.Query["obsolete"] == bool.TrueString;
-            bool includeModerators = HttpContext.Request.Query["moderators"] == bool.TrueString;
-            bool includeCategories = HttpContext.Request.Query["categories"] == bool.TrueString;
             string filters = HttpContext.Request.Query["filter"];
-            
+            bool obsolete = HttpContext.Request.Query["obsolete"] == bool.TrueString;
 
-            switch (order) {
-                case ("ASC"):
-                    query = Context.Event.OrderBy((Event arg) => arg.StartAt);
-                    break;
-                case ("DESC"):
-                default:
-                    query = Context.Event.OrderByDescending((Event arg) => arg.StartAt);
-                    break;
-            }
+            if (order == "ASC")
+                Query = Query.OrderBy((Event arg) => arg.StartAt);
+            else
+                Query = Query.OrderByDescending((Event arg) => arg.StartAt);
 
-            if (from != null)
-                Services.FromDate(ref query, from);
-            if (to != null)
-                Services.ToDate(ref query, to);
-            if (loadImage)
-                Services.IncludeImages(ref query);
-            if (limit != null) {
-                Match match = (new Regex("[0-9]+")).Match(limit);
-                if (!String.IsNullOrEmpty(match.Value))
-                    query = query.Take(int.Parse(match.Value));
-            }
-            if (!obsolete)
-                Services.EndAfterToday(ref query);
-            if (includeModerators)
-                Services.IncludeModerators(ref query);
-            if (includeCategories)
-                Services.IncludeCategories(ref query);
+            if (from != null) Services.FromDate(ref Query, from);
+
+            if (to != null) Services.ToDate(ref Query, to);
+
+            if (!obsolete) Services.EndAfterToday(ref Query);
+
+            if (limit != null) Services.LimitElements(ref Query, limit);
 
             try {
                 if (filters != null) {
                     int[] eventsIdsFromCategories = categoryServices.GetCategoriesFromString(filters)
                                                                .Select((arg) => arg.EventId)
                                                                .ToArray();
-                    query = query.Where((arg) => eventsIdsFromCategories.Contains(arg.Id))
+                    Query = Query.Where((arg) => eventsIdsFromCategories.Contains(arg.Id))
                                  .Include(arg => arg.EventCategory)
                                  .ThenInclude(arg => arg.Category);
-                    events = await query.AsNoTracking().ToArrayAsync();
+                    events = await Query.AsNoTracking().ToArrayAsync();
 
                     return new ObjectResult(events.Select((arg) => new {
                         Event = arg,
                         Categories = arg.EventCategory.Select((uu) => uu.Category).ToArray()
                     }));
                 }
-                
-                events = await query.AsNoTracking().ToArrayAsync();
+
+                events = await Query.AsNoTracking().ToArrayAsync();
             } catch (Exception e) {
                 return BadRequest(e.InnerException.Message);
             }
 
-            return new ObjectResult(events);
+            return Ok(events);
         }
 
         #endregion
@@ -371,7 +360,7 @@ namespace events_planner.Controllers {
             try {
                 Image image = Context.Images
                                      .FirstOrDefault((arg) => arg.ImageId == imageId);
-                await imageServices.RemoveImages(image.Url);    
+                await imageServices.RemoveImages(image.Url);
             } catch (FileNotFoundException e) {
                 return BadRequest(e.Message);
             }

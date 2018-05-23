@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System;
 
 namespace events_planner.Deserializers {
+    
     public class EventDeserializer {
 
         [StringLength(255, MinimumLength = 3)]
