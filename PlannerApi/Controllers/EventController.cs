@@ -29,7 +29,7 @@ namespace events_planner.Controllers {
             Services = services;
         }
 
-        public void InitializeQuery() {
+        private void InitializeQuery() {
             Query = Context.Event;
 
             bool loadImages = HttpContext.Request.Query["images"] == bool.TrueString;
