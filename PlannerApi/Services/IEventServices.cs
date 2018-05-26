@@ -1,5 +1,4 @@
 using System.Threading.Tasks;
-using System.Collections.Generic;
 using events_planner.Models;
 using System.Linq;
 

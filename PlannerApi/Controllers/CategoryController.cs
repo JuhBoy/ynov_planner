@@ -6,7 +6,6 @@ using events_planner.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using events_planner.Services;
-using System.Linq;
 using events_planner.Services.Constants;
 
 namespace events_planner.Controllers {

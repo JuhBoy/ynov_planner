@@ -5,15 +5,11 @@ using System.Threading.Tasks;
 using events_planner.Services;
 using Microsoft.AspNetCore.Authorization;
 using events_planner.Deserializers;
-using events_planner.Constants.Services;
 using System.Linq;
 using System;
-using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Http;
 using System.IO;
 using System.Collections.Generic;
-using System.Net;
-using events_planner.App_Start;
 
 namespace events_planner.Controllers {
 
@@ -258,6 +254,7 @@ namespace events_planner.Controllers {
         /// <response code="401">User/Admin token is not permitted</response>
         /// <response code="500">if the credential given is not valid or DB update failed</response>
         /// <response code="200">If category has been removed</response>
+        /// TODO: Remove Parent category or children depending of the request
         [HttpDelete("{eventId}/category/{categoryId}"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteCategory(int eventId, int categoryId) {
             Event eventModel = await Context.Event.Include(inc => inc.EventCategory)
@@ -267,7 +264,8 @@ namespace events_planner.Controllers {
                 eventModel.EventCategory == null ||
                 !eventModel.EventCategory.Any(cc => cc.CategoryId == categoryId)) { return NotFound(); }
 
-            EventCategory category = eventModel.EventCategory.FirstOrDefault(cc => cc.CategoryId == categoryId);
+            EventCategory category = eventModel.EventCategory
+                                               .FirstOrDefault(cc => cc.CategoryId == categoryId);
 
             try {
                 Context.EventCategory.Remove(category);

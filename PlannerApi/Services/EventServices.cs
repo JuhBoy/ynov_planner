@@ -2,7 +2,6 @@ using System;
 using events_planner.Services;
 using events_planner.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Text.RegularExpressions;
