@@ -13,8 +13,12 @@ namespace Microsoft.Extensions.DependencyInjection {
 
         private PlannerContext Context { get; set; }
 
-        public EventServices(PlannerContext context) {
+        private ICategoryServices CategoryServices { get; set; }
+
+        public EventServices(PlannerContext context,
+                             ICategoryServices categoryServices) {
             Context = context;
+            CategoryServices = categoryServices;
         }
 
         public void RemoveAllEventCategoryReferencesFor(int categoryId) {
@@ -97,7 +101,7 @@ namespace Microsoft.Extensions.DependencyInjection {
         }
 
         public void IncludeModerators<T>(ref IQueryable<T> query) where T : Event {
-            query = query.Include(arg => arg.TemporaryRoles)
+            query = query.Include(arg => arg.Moderators)
                          .ThenInclude(arg => arg.User);
         }
 
@@ -113,6 +117,17 @@ namespace Microsoft.Extensions.DependencyInjection {
             if (!String.IsNullOrEmpty(match.Value)) {
                 query = query.Take(int.Parse(match.Value));
             }
+        }
+
+        public void FilterByCategories<T>(ref IQueryable<T> query,
+                                                string categories) where T : Event {
+            int[] eventIds = CategoryServices.GetCategoriesFromString(categories)
+                                           .Select((arg) => arg.EventId)
+                                           .ToArray();
+            
+            query = query.Where((arg) => eventIds.Contains(arg.Id))
+                         .Include(arg => arg.EventCategory)
+                         .ThenInclude(arg => arg.Category);
         }
 
         public IQueryable<Event> GetParticipedEvents(int userId) {

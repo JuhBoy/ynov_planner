@@ -22,11 +22,16 @@ namespace events_planner.Controllers {
 
         private IEventServices Services { get; set; }
 
+        private ICategoryServices CategoryServices { get; set; }
+
         private IQueryable<Event> Query;
 
-        public EventController(PlannerContext context, IEventServices services) {
+        public EventController(PlannerContext context,
+                               IEventServices services,
+                               ICategoryServices categoryServices) {
             Context = context;
             Services = services;
+            CategoryServices = categoryServices;
         }
 
         private void InitializeQuery() {
@@ -107,7 +112,7 @@ namespace events_planner.Controllers {
 
             eventReq.BindWithModel(ref eventModel);
 
-            try {    
+            try {
                 Context.Event.Update(eventModel);
                 await Context.SaveChangesAsync();
             } catch (DbUpdateException e) {
@@ -171,7 +176,7 @@ namespace events_planner.Controllers {
             string from = HttpContext.Request.Query["from"];
             string to = HttpContext.Request.Query["to"];
             string limit = HttpContext.Request.Query["limit"];
-            string filters = HttpContext.Request.Query["filter"];
+            string filters = HttpContext.Request.Query["filters"];
             bool obsolete = HttpContext.Request.Query["obsolete"] == bool.TrueString;
 
             if (order == "ASC")
@@ -187,22 +192,9 @@ namespace events_planner.Controllers {
 
             if (limit != null) Services.LimitElements(ref Query, limit);
 
+            if (filters != null) Services.FilterByCategories(ref Query, filters);
+
             try {
-                if (filters != null) {
-                    int[] eventsIdsFromCategories = categoryServices.GetCategoriesFromString(filters)
-                                                               .Select((arg) => arg.EventId)
-                                                               .ToArray();
-                    Query = Query.Where((arg) => eventsIdsFromCategories.Contains(arg.Id))
-                                 .Include(arg => arg.EventCategory)
-                                 .ThenInclude(arg => arg.Category);
-                    events = await Query.AsNoTracking().ToArrayAsync();
-
-                    return new ObjectResult(events.Select((arg) => new {
-                        Event = arg,
-                        Categories = arg.EventCategory.Select((uu) => uu.Category).ToArray()
-                    }));
-                }
-
                 events = await Query.AsNoTracking().ToArrayAsync();
             } catch (Exception e) {
                 return BadRequest(e.InnerException.Message);
@@ -230,20 +222,26 @@ namespace events_planner.Controllers {
                 return BadRequest("Bind already exist");
             }
 
-            Event eventModel = await Context.Event
-                                            .AsNoTracking()
-                                            .FirstOrDefaultAsync((Event arg) => arg.Id == eventId);
+            Event eventModel = await Services.GetEventByIdAsync(eventId);
 
-            Category category = await Context.Category
-                                             .AsNoTracking()
-                                             .FirstOrDefaultAsync((Category arg) => arg.Id == categoryId);
+            Category category = await CategoryServices.GetByIdAsync(categoryId);
+
+            if (category.ParentCategory.HasValue) {
+                EventCategory parentCat = new EventCategory() {
+                    Category = await CategoryServices.GetByIdAsync((int)category.ParentCategory),
+                    Event = eventModel
+                };
+                Context.EventCategory.Add(parentCat);
+            }
 
             if (eventModel == null || category == null) { return NotFound(); }
 
-            EventCategory eventCategory = new EventCategory() { Category = category, Event = eventModel };
+            EventCategory eventCategory = new EventCategory() {
+                Category = category, Event = eventModel 
+            };
 
             try {
-                Context.EventCategory.Update(eventCategory);
+                Context.EventCategory.Add(eventCategory);
                 await Context.SaveChangesAsync();
             } catch (DbUpdateException e) {
                 return BadRequest(e.InnerException.Message);
@@ -278,7 +276,7 @@ namespace events_planner.Controllers {
                 return BadRequest(e.InnerException.Message);
             }
 
-            return new OkObjectResult("Category removed");
+            return Ok("Category removed");
         }
 
         /// <summary>

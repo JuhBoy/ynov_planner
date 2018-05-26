@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using events_planner.Deserializers;
 using events_planner.Models;
 
@@ -5,11 +6,15 @@ namespace events_planner.Services
 {
     public interface ICategoryServices
     {
-        Category[] GetAllSubs();
+        void LoadSubs(ref Category[] parents);
+
+        void UpdateFromDeserializer(ref CategoryDeserializer categoryDeserializer,
+                                    ref Category category);
+
         Category[] GetAllParents();
-        void bindSubCategoryFromDb(ref Category category, int subId);
-        void DeleteCircular(int categoryId);
-        void UpdateFromDeserializer(ref CategoryDeserializerUpdate categoryDeserializer, ref Category category);
+        
         EventCategory[] GetCategoriesFromString(string categories);
+
+        Task<Category> GetByIdAsync(int id);
     }
 }

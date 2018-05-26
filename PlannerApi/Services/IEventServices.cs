@@ -31,6 +31,8 @@ namespace events_planner.Services {
         void IncludeCategories<T>(ref IQueryable<T> query) where T : Event;
 
         void LimitElements<T>(ref IQueryable<T> query, string limit) where T : Event;
+
+        void FilterByCategories<T>(ref IQueryable<T> query, string categories) where T : Event;
         
         IQueryable<Event> GetParticipedEvents(int userId);
 

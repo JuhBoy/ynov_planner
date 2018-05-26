@@ -8,9 +8,9 @@ namespace events_planner.Models {
 
     public static class Status {
         public const string ValidRegex = @"ongoing|done|draft";
-        public static string ONGOING = "ongoing";
-        public static string DONE = "done";
-        public static string DRAFT = "draft";
+        public const string ONGOING = "ongoing";
+        public const string DONE = "done";
+        public const string DRAFT = "draft";
     }
 
     [Table("event")]
@@ -122,7 +122,7 @@ namespace events_planner.Models {
         /// <summary> relation with moderators </summary>
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore, 
                       DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public IList<TemporaryRole> TemporaryRoles { get; set; }
+        public IList<TemporaryRole> Moderators { get; set; }
 
         /// <summary> Is Event expired ? </summary>
         public bool Expired() {
