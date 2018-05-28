@@ -46,6 +46,10 @@ namespace events_planner.Controllers {
                 return BadRequest("User Already Booked or Event Expired");
             }
 
+            if (!@event.SubscribtionOpen()) {
+                return BadRequest("Subscriptions are not open");
+            }
+
             Booking book = new Booking() {
                 Present = false,
                 User = CurrentUser,
@@ -73,8 +77,10 @@ namespace events_planner.Controllers {
                                   book.EventId == eventId
             );
 
-            if (@event == null || booking == null || @event.Expired())
-                return BadRequest("Event not found or Expired");
+            if (@event == null || booking == null || @event.Expired() ||
+                !@event.SubscribtionOpen()) {
+                return BadRequest("Can't unsubscribe to the event");
+            }
 
             @event.SubscribedNumber--;
 

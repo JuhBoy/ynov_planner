@@ -135,5 +135,18 @@ namespace events_planner.Models {
         public bool Forward() {
             return DateTime.Compare(DateTime.UtcNow, (DateTime)CloseAt) <= 0;
         }
+
+        public bool SubscribtionOpen() {
+            var now = DateTime.UtcNow;
+            bool isOpen = true;
+
+            if (StartAt != null)
+                isOpen &= DateTime.Compare(now, (DateTime)StartAt) >= 0;
+
+            if (EndAt != null)
+                isOpen &= DateTime.Compare(now, (DateTime)EndAt) <= 0;
+
+            return isOpen;           
+        }
     }
 }

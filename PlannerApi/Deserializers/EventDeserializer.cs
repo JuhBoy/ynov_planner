@@ -29,17 +29,15 @@ namespace events_planner.Deserializers {
 
         public string Location { get; set; }
 
-        [Required]
-        public DateTime StartAt { get; set; }
+        public DateTime? StartAt { get; set; }
+
+        public DateTime? EndAt { get; set; }
 
         [Required]
         public DateTime CloseAt { get; set; }
 
         [Required]
         public DateTime OpenAt { get; set; }
-
-        [Required]
-        public DateTime EndAt { get; set; }
 
         public ICollection<Image> Images { get; set; }
 
