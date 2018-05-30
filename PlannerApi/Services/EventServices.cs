@@ -78,7 +78,7 @@ namespace Microsoft.Extensions.DependencyInjection {
         /// <typeparam name="T">The 1st type parameter as Event.</typeparam>
         public void ToDate<T>(ref IQueryable<T> query,
                               string date) where T : Event {
-            query = query.Where(cc => cc.EndAt <= DateTime.Parse(date));
+            query = query.Where(cc => cc.CloseAt <= DateTime.Parse(date));
         }
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace Microsoft.Extensions.DependencyInjection {
         /// <param name="query">Query Event / Childs.</param>
         /// <typeparam name="T">The 1st type parameter as event.</typeparam>
         public void EndAfterToday<T>(ref IQueryable<T> query) where T : Event {
-            query = query.Where((arg) => arg.EndAt >= DateTime.Now);
+            query = query.Where((arg) => arg.CloseAt >= DateTime.Now);
         }
 
         /// <summary>
