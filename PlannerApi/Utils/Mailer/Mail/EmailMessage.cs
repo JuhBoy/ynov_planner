@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace events_planner.App_Start {
+namespace events_planner.Utils {
     
     public class EmailMessage {
 
@@ -29,7 +29,7 @@ namespace events_planner.App_Start {
         public string Content { get; set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:events_planner.App_Start.EmailMessage"/> class.
+        /// Initializes a new instance of the <see cref="T:events_planner.Utils.EmailMessage"/> class.
         /// </summary>
         public EmailMessage() {
             ToAddresses = new List<EmailAddress>();

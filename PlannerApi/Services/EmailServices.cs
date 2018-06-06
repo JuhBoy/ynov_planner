@@ -5,15 +5,15 @@ using MailKit.Net.Smtp;
 using MimeKit;
 using MimeKit.Text;
 
-namespace events_planner.App_Start {
-    
+namespace events_planner.Utils {
+
     public interface IEmailService {
         void Send(EmailMessage emailMessage);
         List<EmailMessage> ReceiveEmail(int maxCount = 10);
     }
 
     public class EmailService : IEmailService {
-        
+
         private readonly IEmailConfiguration _emailConfiguration;
 
         public EmailService(IEmailConfiguration emailConfiguration) {

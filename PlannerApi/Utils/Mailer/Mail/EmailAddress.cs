@@ -1,4 +1,4 @@
-﻿namespace events_planner.App_Start {
+﻿namespace events_planner.Utils {
     
     public struct EmailAddress {
         

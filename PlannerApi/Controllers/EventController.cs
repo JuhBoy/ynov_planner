@@ -10,6 +10,7 @@ using System;
 using Microsoft.AspNetCore.Http;
 using System.IO;
 using System.Collections.Generic;
+using events_planner.Utils;
 
 namespace events_planner.Controllers {
 
@@ -201,7 +202,7 @@ namespace events_planner.Controllers {
 
         #endregion
 
-        #region Set Sub Operation 
+        #region Set Sub Operation
 
         /// <summary>
         /// Add a Category the An Event
@@ -233,7 +234,7 @@ namespace events_planner.Controllers {
             if (eventModel == null || category == null) { return NotFound(); }
 
             EventCategory eventCategory = new EventCategory() {
-                Category = category, Event = eventModel 
+                Category = category, Event = eventModel
             };
 
             try {

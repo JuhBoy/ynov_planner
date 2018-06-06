@@ -2,8 +2,12 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration.Binder;
 using events_planner.Services;
-using events_planner.App_Start;
+using events_planner.Utils;
+using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace events_planner {
     public partial class Startup {
@@ -14,8 +18,8 @@ namespace events_planner {
         public Startup(IConfiguration configuration, IHostingEnvironment env) {
             Configuration = configuration;
             Env = env;
-        }
 
+        }
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services) {
             // Mysql Database Context
@@ -48,6 +52,12 @@ namespace events_planner {
             // Email services
             services.AddSingleton<IEmailConfiguration>(Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>());
             services.AddTransient<IEmailService, EmailService>();
+
+            // Template generator
+            TemplateGenerator generator = new TemplateGenerator(Env) {
+                Configuration = Configuration.GetSection("TemplateGenerator").Get<TemplateMailerConfiguration>()
+            };
+            services.AddSingleton<ITemplateGenerator>(generator);
 
             services.AddTransient<IImageServices, ImageServices>();
 

@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>Un Email Responsive</title>
+        <style type="text/css">
+        body {
+          margin: 0;
+          padding: 0;
+          min-width: 100%!important;
+          font-family: Arial;
+          font-size: 16px;
+          line-height: 1.5;
+          -webkit-text-size-adjust:none;
+        }
+        </style>
+    </head>
+    <body>
+        <table width="100%" border="0" cellpadding="10" cellspacing="0">
+            <tbody>
+              <tr>
+                <td align="center" bgcolor="#eeeeee">
+                  <table style="max-width:600px; width:100%; background-color:#fff" cellpadding="0" cellspacing="0" border="0">
+                    <thead>
+                      <tr style="background-color: #42ab9e; text-align:center;">
+                        <td style="height:150px" colspan="3">
+                          <a href="{{ynov_url}}">
+                            <img src="{{logo}}" alt="logo_ynov_event" style="width:150px; padding:20px 0"/>
+                          </a>
+                        </td>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td align="center" colspan="3">
+                          <img src="{{main_icon}}" style="width:80px; padding-top: 30px;" alt="icon-waiting"/>
+                          <h1 style="padding:10px 20px; font-size:18px; margin:0; text-transform: uppercase">Inscription validée</h1>
+                          <p style="padding:0 20px">Bonjour {{user_firstname}} !</p>
+                          <p style="padding:0 20px">Votre inscription à l'événement <strong>{{event_name}}</strong> a été validée par notre administateur. Vous trouverez ci-dessous les informations nécessaires relatives à l'événement.</p>
+                          <p style="padding:0 20px; font-size:20px"><strong>En cas d'absence, merci de prévenir suffisamment à l'avance.</strong></p>
+                          <div style="padding:20px; background-color : #263747; width:80%; border-radius: 5px; color:#fff" >
+                            <p style="margin:0">{{event_date}}</p>
+                            <p style="margin:0">{{event_open_at_hour}} - {{event_close_at_hour}}</p>
+                            <p style="margin:0">{{event_name}}</p>
+                            <p style="margin:0">{{event_address}}</p>
+                            <p style="margin:0">Tel : 05 56 90 00 10</p>
+                          </div>
+                          <p style="padding:0 20px">A bientôt !<br/>L'équipe <strong><a href="#" style="color:#e93a58; text-decoration:none">Ynov Bordeaux</a></strong></p>
+                          <p style="font-size: 12px;">Ynov Bordeaux<br>
+                          89 Quai des Chartrons, 33000 Bordeaux <br>
+                          Tel :  05 56 90 00 10 <br>
+                          Mail : mail@ynov.com
+                          </p>
+                        </td>
+                      </tr>
+
+                    </tbody>
+                    <tfoot>
+                      <tr style="background-color: #e93a58;" colspan="3">
+                        <td align="right" style="padding:20px 0;">
+                          <a href="{{facebook_url}}">
+                           <img src="{{facebook_icon}}" alt="Facebook" width="30" height="30" style="display: block;" border="0"/>
+                          </a>
+                        </td>
+                        <td align="center">
+                          <a href="{{instagram_url}}">
+                           <img src="{{instagram_icon}}" alt="Instagram" width="30" height="30" style="display: block;" border="0"/>
+                          </a>
+                        </td>
+                        <td align="left">
+                          <a href="{{twitter_url}}">
+                           <img src="{{twitter_icon}}" alt="Twitter" width="30" height="30" style="display: block;" border="0"/>
+                          </a>
+                        </td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </td>
+              </tr>
+            </tbody>
+        </table>
+    </body>
+</html>

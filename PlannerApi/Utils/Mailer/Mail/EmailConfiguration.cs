@@ -1,4 +1,5 @@
-﻿namespace events_planner.App_Start {
+﻿namespace events_planner.Utils {
+
     public interface IEmailConfiguration {
         bool UseSSL { get; set; }
 
@@ -16,7 +17,7 @@
     }
 
     public class EmailConfiguration : IEmailConfiguration {
-        
+
         // SSL USE:
         public bool UseSSL { get; set; }
 
