@@ -21,6 +21,11 @@ namespace events_planner.Utils {
             Environment = hostingEnvironment;
         }
 
+        public string GenerateFor(BookingTemplate template, ref User user, ref Event @event) {
+            var users = new User[] { user };
+            return GenerateFor(template, ref users, ref @event)[0];
+        }
+
         /// <summary>
         /// Generate a string[] from a template file located in templates path
         /// </summary>

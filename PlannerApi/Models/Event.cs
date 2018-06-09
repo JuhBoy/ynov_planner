@@ -15,7 +15,7 @@ namespace events_planner.Models {
 
     [Table("event")]
     public class Event {
-        
+
         [Column("event_id"), Key]
         public int Id { get; set; }
 
@@ -118,11 +118,15 @@ namespace events_planner.Models {
 
         /// <summary> relation with User (Many to Many) </summary>
         [JsonIgnore] public IList<EventUser> EventUser { get; set; }
-        
+
         /// <summary> relation with moderators </summary>
-        [JsonProperty(NullValueHandling = NullValueHandling.Ignore, 
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore,
                       DefaultValueHandling = DefaultValueHandling.Ignore)]
         public IList<TemporaryRole> Moderators { get; set; }
+
+        public bool HasSubscriptionWindow() {
+            return (StartAt.HasValue || EndAt.HasValue);
+        }
 
         /// <summary> Is Event expired ? </summary>
         public bool Expired() {
@@ -146,7 +150,7 @@ namespace events_planner.Models {
             if (EndAt != null)
                 isOpen &= DateTime.Compare(now, (DateTime)EndAt) <= 0;
 
-            return isOpen;           
+            return isOpen;
         }
     }
 }

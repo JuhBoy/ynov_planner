@@ -8,6 +8,8 @@ using events_planner.Models;
 using System.Linq;
 using System;
 using System.Linq.Expressions;
+using Microsoft.Extensions.DependencyInjection;
+using events_planner.Utils;
 
 namespace events_planner.Controllers {
 
@@ -16,10 +18,14 @@ namespace events_planner.Controllers {
 
         public IEventServices EventServices;
 
+        public IEmailService EmailServices;
+
         public BookingController(PlannerContext context,
-                                IEventServices eventServices) {
+                                IEventServices eventServices,
+                                IEmailService mailServices) {
             Context = context;
             EventServices = eventServices;
+            EmailServices = mailServices;
         }
 
         /// <summary>
@@ -40,10 +46,14 @@ namespace events_planner.Controllers {
 
             if (@event == null || @event.SubscribedNumber >= @event.SubscribeNumber)
                 return BadRequest("Unprocessable, Max Subscriber reach or event not found");
-            
+
             if (Context.Booking.Any((Booking booking) => booking.EventId == eventId
-                && booking.UserId == CurrentUser.Id) || @event.Expired()) {
-                return BadRequest("User Already Booked or Event Expired");
+                && booking.UserId == CurrentUser.Id)) {
+                return BadRequest("User Already Booked");
+            }
+
+            if (!@event.HasSubscriptionWindow() && @event.Expired()) {
+                return BadRequest("Event Expired, can't subscribe");
             }
 
             if (!@event.SubscribtionOpen()) {
@@ -62,6 +72,14 @@ namespace events_planner.Controllers {
                 Context.Booking.Add(book);
                 Context.Event.Update(@event);
                 await Context.SaveChangesAsync();
+
+                BookingTemplate template;
+                if (!book.Validated.HasValue) {
+                    template = BookingTemplate.AUTO_VALIDATED;
+                } else {
+                    template = BookingTemplate.PENDING_VALIDATION;
+                }
+                EmailServices.SendFor(CurrentUser, @event, template);
             } catch (DbUpdateException e) {
                 return BadRequest(e.InnerException.Message);
             }
@@ -73,7 +91,7 @@ namespace events_planner.Controllers {
         public async Task<IActionResult> UnSubscribe(int eventId) {
             Event @event = await EventServices.GetEventByIdAsync(eventId);
             Booking booking = await Context.Booking.FirstOrDefaultAsync(
-                (Booking book) => book.UserId == CurrentUser.Id && 
+                (Booking book) => book.UserId == CurrentUser.Id &&
                                   book.EventId == eventId
             );
 
@@ -111,7 +129,7 @@ namespace events_planner.Controllers {
                                             .ThenInclude(tinc => tinc.Images)
                                           .Include(iii => iii.Event)
                                             .ThenInclude(tinc => tinc.EventCategory)
-                                          .Where(arg => arg.UserId == CurrentUser.Id 
+                                          .Where(arg => arg.UserId == CurrentUser.Id
                                                         && !arg.Present)
                                           .ToArrayAsync();
 
@@ -143,12 +161,13 @@ namespace events_planner.Controllers {
             }
 
             // RETRIEVE THE BOOKING CORRESPONDIG TO USER + EVENT
-            Expression<Func<Booking, bool>> action = 
+            Expression<Func<Booking, bool>> action =
                 (Booking arg) => arg.UserId == bookingValidation.UserId &&
                                  arg.EventId == bookingValidation.EventId;
 
             Booking book = await Context.Booking
                                         .AsTracking()
+                                        .Include(inc => inc.User)
                                         .Include(inc => inc.Event)
                                         .FirstOrDefaultAsync(action);
 
@@ -177,6 +196,8 @@ namespace events_planner.Controllers {
             try {
                 Context.Booking.Update(book);
                 await Context.SaveChangesAsync();
+                EmailServices.SendFor(book.User, book.Event,
+                                          BookingTemplate.PRESENT);
             } catch (DbUpdateException e) {
                 return BadRequest(e.InnerException.Message);
             }
@@ -190,21 +211,22 @@ namespace events_planner.Controllers {
         /// <returns>204</returns>
         /// <param name="userId">User identifier.</param>
         /// <param name="eventId">Event identifier.</param>
-        /// <param name="confirm">If set to <c>true</c> confirm the user, 
+        /// <param name="confirm">If set to <c>true</c> confirm the user,
         /// otherwise it remove the booking</param>
         [HttpPost("confirm/{userId}/{eventId}/{confirm}"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> ConfirmUser(int userId,
                                                      int eventId,
                                                      bool confirm) {
             Booking booking = await Context.Booking
+                                           .Include(arg => arg.User)
                                            .Include(arg => arg.Event)
-                                           .FirstOrDefaultAsync(arg => 
-                                                                arg.UserId == userId 
+                                           .FirstOrDefaultAsync(arg =>
+                                                                arg.UserId == userId
                                                                 && arg.EventId == eventId);
 
-            if (booking == null) 
+            if (booking == null)
                 return BadRequest("Booking Not found");
-            else if (booking.Event.Expired()) 
+            else if (booking.Event.Expired())
                 return BadRequest("Event expired");
             else if (!booking.Event.ValidationRequired)
                 return BadRequest("Event doesn't need validation");
@@ -215,16 +237,19 @@ namespace events_planner.Controllers {
             booking.Validated = confirm;
 
             try {
+                BookingTemplate template;
                 if (!confirm) {
                     booking.Event.SubscribedNumber--;
                     Context.Event.Update(booking.Event);
                     Context.Booking.Remove(booking);
+                    template = BookingTemplate.AWAY;
                 } else {
                     booking.Event.ValidatedNumber++;
                     Context.Booking.Update(booking);
+                    template = BookingTemplate.SUBSCRIPTION_VALIDATED;
                 }
-
                 await Context.SaveChangesAsync();
+                EmailServices.SendFor(booking.User, booking.Event, template);
             } catch (DbUpdateException e) {
                 return BadRequest(e.InnerException.Message);
             }

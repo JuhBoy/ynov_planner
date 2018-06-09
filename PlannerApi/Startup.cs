@@ -76,7 +76,7 @@ namespace events_planner {
                 // Enable the authentication
                 app.UseAuthentication();
             }
-            
+
             swaggerConfigure(app);
             app.UseMvc();
         }

@@ -1,6 +1,9 @@
 ﻿namespace events_planner.Utils {
 
     public interface IEmailConfiguration {
+        string SenderName { get; set; }
+        string SenderEmail { get; set; }
+
         bool UseSSL { get; set; }
 
         // SMTP Server Options
@@ -17,6 +20,8 @@
     }
 
     public class EmailConfiguration : IEmailConfiguration {
+        public string SenderName { get; set; }
+        public string SenderEmail { get; set; }
 
         // SSL USE:
         public bool UseSSL { get; set; }
