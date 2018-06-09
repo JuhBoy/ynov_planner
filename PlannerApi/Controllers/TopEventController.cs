@@ -89,7 +89,7 @@ namespace events_planner.Controllers {
                 int start = newOrderIndex - 1;
 
                 currentEvent.Index = newOrderIndex;
-                topEvents.OrderBy((arg) => arg.Index);
+                topEvents = topEvents.OrderBy((arg) => arg.Index).ToArray();
 
                 for (int i = start; totalIteration > 0; i += sign) {
                     totalIteration--;

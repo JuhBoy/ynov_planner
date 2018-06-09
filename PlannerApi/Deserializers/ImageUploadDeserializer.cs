@@ -1,7 +1,4 @@
-﻿using events_planner.Models;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 
 namespace events_planner.Deserializers {
@@ -10,14 +7,14 @@ namespace events_planner.Deserializers {
 
         public string ImagesData { get; set; }
 
-        private List<AltAndTitleFormatter> list;
+        private List<AltAndTitleFormatter> List;
 
         public List<AltAndTitleFormatter> GetImagesData() {
-            if (list == null) {
-                list = JsonConvert.DeserializeObject<List<AltAndTitleFormatter>>(ImagesData);
+            if (List == null) {
+                List = JsonConvert.DeserializeObject<List<AltAndTitleFormatter>>(ImagesData);
             }
 
-            return list;
+            return List;
         }
 
         // ============================

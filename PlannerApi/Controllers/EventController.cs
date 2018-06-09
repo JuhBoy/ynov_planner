@@ -10,7 +10,6 @@ using System;
 using Microsoft.AspNetCore.Http;
 using System.IO;
 using System.Collections.Generic;
-using events_planner.Utils;
 
 namespace events_planner.Controllers {
 
@@ -219,9 +218,10 @@ namespace events_planner.Controllers {
                 return BadRequest("Bind already exist");
             }
 
-            Event eventModel = await Services.GetEventByIdAsync(eventId);
-
+            Event eventModel  = await Services.GetEventByIdAsync(eventId);
             Category category = await CategoryServices.GetByIdAsync(categoryId);
+            
+            if (eventModel == null || category == null) { return NotFound(); }
 
             if (category.ParentCategory.HasValue) {
                 EventCategory parentCat = new EventCategory() {
@@ -230,8 +230,6 @@ namespace events_planner.Controllers {
                 };
                 Context.EventCategory.Add(parentCat);
             }
-
-            if (eventModel == null || category == null) { return NotFound(); }
 
             EventCategory eventCategory = new EventCategory() {
                 Category = category, Event = eventModel
@@ -258,7 +256,8 @@ namespace events_planner.Controllers {
         /// TODO: Remove Parent category or children depending of the request
         [HttpDelete("{eventId}/category/{categoryId}"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteCategory(int eventId, int categoryId) {
-            Event eventModel = await Context.Event.Include(inc => inc.EventCategory)
+            Event eventModel = await Context.Event
+                                            .Include(inc => inc.EventCategory)
                                             .FirstOrDefaultAsync((Event ev) => ev.Id == eventId);
 
             if (eventModel == null ||
@@ -340,7 +339,7 @@ namespace events_planner.Controllers {
                 string message = (e.InnerException != null) ? e.InnerException.Message :
                                                                e.Message;
                 return BadRequest(message);
-            };
+            }
 
             return Ok();
         }

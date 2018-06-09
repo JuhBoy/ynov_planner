@@ -20,9 +20,9 @@ namespace PlannerApi.Tests.Fixtures {
                                              .UseEnvironment("test")
                                              .UseContentRoot(Path.GetFullPath("../../../../PlannerApi"));
 
-            TestServer Server = new TestServer(builder);
+            TestServer server = new TestServer(builder);
 
-            using (var scope = Server.Host.Services.CreateScope())
+            using (var scope = server.Host.Services.CreateScope())
             {
                 IServiceProvider services = scope.ServiceProvider;
                 try
@@ -38,7 +38,7 @@ namespace PlannerApi.Tests.Fixtures {
                 }
             }
 
-            Client = Server.CreateClient();
+            Client = server.CreateClient();
         }
 
         public void Dispose()

@@ -116,6 +116,7 @@ namespace events_planner.Controllers {
                     ranges = range.SplitRange("-");
                 }
                 catch (InvalidOperationException e) {
+                    Console.WriteLine(e.Message);
                     ranges[0] = 0;
                     ranges[1] = int.MaxValue;
                 } finally {
@@ -145,9 +146,9 @@ namespace events_planner.Controllers {
                                    .Where((arg) => arg.EventId == eventId)
                                    .Select((arg) => arg.UserId).ToArray();
 
-            User[] users = UserServices.AllForeignKeysQuery()
+            User[] users = await UserServices.AllForeignKeysQuery()
                                        .Where((arg) => userIds.Contains(arg.Id))
-                                       .ToArray();
+                                       .ToArrayAsync();
             return Ok(users);
         }
 

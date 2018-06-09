@@ -1,22 +1,17 @@
 using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Threading.Tasks;
-using events_planner.Services;
-using events_planner.Models;
-using Microsoft.EntityFrameworkCore;
-using events_planner.Deserializers;
-using events_planner.Constants.Services;
-
-// JWT GENERATING ENGINE
 using System.Security.Claims;
 using System.Text;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using Microsoft.Extensions.Configuration;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Remotion.Linq.Clauses;
+using events_planner.Constants.Services;
+using events_planner.Deserializers;
+using events_planner.Models;
+using events_planner.Services;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Microsoft.Extensions.DependencyInjection {
     

@@ -1,13 +1,9 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using events_planner.Services;
+using events_planner.Utils;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration.Binder;
-using events_planner.Services;
-using events_planner.Utils;
-using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace events_planner {
     public partial class Startup {

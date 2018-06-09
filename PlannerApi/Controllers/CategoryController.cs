@@ -34,7 +34,7 @@ namespace events_planner.Controllers {
             Category category = new Category() { Name = categoryFromRequest.Name };
 
             if (category.ParentCategory == null) {
-                category.ParentCategory = categoryFromRequest?.ParentCategory;
+                category.ParentCategory = categoryFromRequest.ParentCategory;
             }
 
             try {

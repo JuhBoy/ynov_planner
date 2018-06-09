@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 using System.IO;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace events_planner.Data {
     public static class DbSeeder {

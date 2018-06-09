@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.Azure.KeyVault.Models;
 using Newtonsoft.Json;
 
 namespace events_planner.Models {

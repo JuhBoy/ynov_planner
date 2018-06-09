@@ -3,7 +3,6 @@ using events_planner.Models;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
-using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace events_planner.Controllers {
     public abstract class BaseController : Controller {
