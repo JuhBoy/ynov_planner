@@ -65,15 +65,8 @@ namespace events_planner {
             app.UseCors("CrossOrigins");
             app.UseAuthentication();
             app.UseStaticFiles();
-
-            if (env.IsDevelopment()) {
-                app.UseDeveloperExceptionPage();
-            } else {
-                // Enable the authentication
-                app.UseAuthentication();
-            }
-
             swaggerConfigure(app);
+            app.UseJsonExceptionHandler();
             app.UseMvc();
         }
     }
