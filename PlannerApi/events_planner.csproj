@@ -9,6 +9,7 @@
     <Folder Include="wwwroot\" />
     <Folder Include="Templates\" />
     <Folder Include="Templates\Mail\" />
+    <Folder Include="Utils\Scheduler\" />
   </ItemGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>bin/Debug/netcoreapp2.0/events_planner.xml</DocumentationFile>
@@ -16,6 +17,7 @@
   <ItemGroup>
     <PackageReference Include="CsvHelper" Version="7.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.0" />
+    <PackageReference Include="ncrontab" Version="3.3.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="1.1.0" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" version="2.0.1" Version="2.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="2.0.1" />

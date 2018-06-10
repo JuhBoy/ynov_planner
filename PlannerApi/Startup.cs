@@ -1,9 +1,12 @@
 ﻿using events_planner.Services;
 using events_planner.Utils;
+using events_planner.Scheduler;
+using events_planner.Scheduler.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace events_planner {
     public partial class Startup {
@@ -45,6 +48,15 @@ namespace events_planner {
             services.AddScoped<IEventServices, EventServices>();
             services.AddScoped<ICategoryServices, CategoryServices>();
 
+            // Background tasks
+            services.AddSingleton<IScheduledTask>(new EventUpdateStatus(Configuration.GetConnectionString("Mysql")));
+
+            // Scheduler wich manage Background Tasks [Extension]
+            services.AddScheduler((sender, args) => {
+                Console.Write(args.Exception.Message);
+                args.SetObserved();
+            });
+
             // Email services
             services.AddSingleton<IEmailConfiguration>(Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>());
             services.AddTransient<IEmailService, EmailService>();
@@ -65,7 +77,9 @@ namespace events_planner {
             app.UseCors("CrossOrigins");
             app.UseAuthentication();
             app.UseStaticFiles();
+
             swaggerConfigure(app);
+
             app.UseJsonExceptionHandler();
             app.UseMvc();
         }

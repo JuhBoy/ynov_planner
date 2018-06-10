@@ -7,7 +7,8 @@ using Newtonsoft.Json;
 namespace events_planner.Models {
 
     public static class Status {
-        public const string ValidRegex = @"ongoing|done|draft";
+        public const string ValidRegex = @"pending|ongoing|done|draft";
+        public const string PENDING = "pending";
         public const string ONGOING = "ongoing";
         public const string DONE = "done";
         public const string DRAFT = "draft";

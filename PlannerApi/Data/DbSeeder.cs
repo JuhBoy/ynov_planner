@@ -23,7 +23,7 @@ namespace events_planner.Data {
 
         public static void Initialize(PlannerContext context, string ENV) {
             lock (safeThreadObject) {
-            context.Database.Migrate();
+                context.Database.Migrate();
 
                 string currentDirectory = Directory.GetCurrentDirectory();
 
