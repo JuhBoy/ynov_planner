@@ -220,7 +220,7 @@ namespace events_planner.Controllers {
 
             Event eventModel  = await Services.GetEventByIdAsync(eventId);
             Category category = await CategoryServices.GetByIdAsync(categoryId);
-            
+
             if (eventModel == null || category == null) { return NotFound(); }
 
             if (category.ParentCategory.HasValue) {

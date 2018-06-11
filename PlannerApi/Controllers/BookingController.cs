@@ -87,6 +87,10 @@ namespace events_planner.Controllers {
             return NoContent();
         }
 
+        /// <summary>
+        /// Unsubscribe from an event
+        /// </summary>
+        /// <returns>204 No Content</returns>
         [HttpGet("unsubscribe/{eventId}")]
         public async Task<IActionResult> UnSubscribe(int eventId) {
             Event @event = await EventServices.GetEventByIdAsync(eventId);
@@ -142,13 +146,15 @@ namespace events_planner.Controllers {
 
         /// <summary>
         /// Validate the presence of a user to an event.
+        /// </summary>
+        /// <remarks>
         /// It ensure that :
         ///     - User is subscribed to this event
         ///     - Event isn't done already
         ///     - User has been Validated if required
         ///     - Request is done by a moderator or an Administrator
         ///     - It also create the jury point associated with this event
-        /// </summary>
+        /// </remarks>
         /// <returns>201 No content</returns>
         [HttpPost("validate"), Authorize(Roles = "Admin, Moderator")]
         public async Task<IActionResult> ValidatePresence(

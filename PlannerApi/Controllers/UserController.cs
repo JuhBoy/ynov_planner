@@ -207,9 +207,9 @@ namespace events_planner.Controllers {
             Role role = Context.Role.FirstOrDefault(f => f.Id == roleId);
             Event @event = Context.Event.FirstOrDefault(ff => ff.Id == eventId);
 
-            if (role == null) 
+            if (role == null)
                 errors.Add("Role not found");
-            if (user == null) 
+            if (user == null)
                 errors.Add("User not found");
             if (@event == null || @event.Expired())
                 errors.Add("Event not found or expired");

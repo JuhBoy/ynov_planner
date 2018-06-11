@@ -43,9 +43,10 @@ namespace events_planner.Services {
 
         #region FORMATTERS
 
-        public void GenerateName(ref string name) {
-
+        private string GenerateName(ref string name, string extension) {
+            return Guid.NewGuid() + "_" + name + extension;
         }
+
         #endregion
 
         public async Task<Dictionary<string, string>> UploadImageAsync(IFormFileCollection files,
@@ -69,15 +70,10 @@ namespace events_planner.Services {
 
                     if (IsValidMymeType(file.ContentType) &&
                         IsValidExtension(file.FileName)) {
-                        string newFileName = Guid.NewGuid() +
-                                                 "_" +
-                                                 baseFileName +
-                                                 Path.GetExtension(file.FileName);
-
+                        string newFileName = GenerateName(ref baseFileName, Path.GetExtension(file.FileName));
                         string filePath = Path.Combine(path, newFileName);
 
-                        using (var stream = new FileStream(filePath,
-                                                           FileMode.CreateNew)) {
+                        using (var stream = new FileStream(filePath, FileMode.CreateNew)) {
                             try {
                                 file.CopyTo(stream);
                                 response.UrlsName.Add(folder + "/" + newFileName, file.FileName);

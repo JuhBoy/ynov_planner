@@ -15,15 +15,16 @@ namespace events_planner.Models {
         public DbSet<Image> Images { get; set; }
         public DbSet<JuryPoint> JuryPoints { get; set; }
         public DbSet<TemporaryRole> temporaryRoles { get; set; }
+        public DbSet<WebConfig> WebConfig { get; set; }
 
         //JOINTS
         public DbSet<EventCategory> EventCategory { get; set; }
         public DbSet<EventPromotion> EventPromotion { get; set; }
         public DbSet<EventUser> EventUser { get; set; }
-        
-        
+
+
         /// <summary>
-        /// This line is added to sync the database with migration file 
+        /// This line is added to sync the database with migration file
         /// </summary>
         public PlannerContext(DbContextOptions options) : base(options) {}
         public PlannerContext() {}
@@ -95,7 +96,7 @@ namespace events_planner.Models {
                 obj.Property(p => p.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             });
 
-            modelBuilder.Entity<Event>((obj) => 
+            modelBuilder.Entity<Event>((obj) =>
             {
                 obj.Property(p => p.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
                 obj.Property(p => p.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
@@ -110,7 +111,7 @@ namespace events_planner.Models {
                    .OnDelete(DeleteBehavior.Cascade);
             });
 
-            modelBuilder.Entity<Category>((obj) => 
+            modelBuilder.Entity<Category>((obj) =>
             {
                 obj.Property(p => p.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
                 obj.Property(p => p.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
