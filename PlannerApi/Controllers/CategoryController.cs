@@ -31,11 +31,10 @@ namespace events_planner.Controllers {
         public IActionResult Create([FromBody] CategoryDeserializer categoryFromRequest) {
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
 
-            Category category = new Category() { Name = categoryFromRequest.Name };
-
-            if (category.ParentCategory == null) {
-                category.ParentCategory = categoryFromRequest.ParentCategory;
-            }
+            Category category = new Category() {
+                Name = categoryFromRequest.Name,
+                ParentCategory = categoryFromRequest.ParentCategory
+            };
 
             try {
                 Context.Category.Add(category);

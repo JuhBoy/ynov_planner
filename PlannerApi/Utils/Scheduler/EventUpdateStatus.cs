@@ -6,7 +6,6 @@ using System.Linq.Expressions;
 using events_planner.Models;
 using Microsoft.EntityFrameworkCore;
 using events_planner.Scheduler.Extensions;
-using Microsoft.Extensions.Configuration;
 
 namespace events_planner.Scheduler {
     
