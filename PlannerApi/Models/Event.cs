@@ -130,11 +130,10 @@ namespace events_planner.Models {
         }
 
         /// <summary> Is Event expired ? </summary>
-        public bool Expired() {
+        public bool OnGoingWindow() {
             int from = DateTime.Compare(DateTime.UtcNow, (DateTime)OpenAt);
             int to = DateTime.Compare(DateTime.UtcNow, (DateTime)CloseAt);
-
-            return !(CloseAt == null || (from >= 0 && to < 0));
+            return (from >= 0 && to <= 0);
         }
 
         public bool Forward() {

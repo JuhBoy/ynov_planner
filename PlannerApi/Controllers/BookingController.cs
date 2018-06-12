@@ -52,7 +52,7 @@ namespace events_planner.Controllers {
                 return BadRequest("User Already Booked");
             }
 
-            if (!@event.HasSubscriptionWindow() && @event.Expired()) {
+            if (!@event.HasSubscriptionWindow() && !@event.Forward()) {
                 return BadRequest("Event Expired, can't subscribe");
             }
 
@@ -99,7 +99,7 @@ namespace events_planner.Controllers {
                                   book.EventId == eventId
             );
 
-            if (@event == null || booking == null || @event.Expired() ||
+            if (@event == null || booking == null || !@event.Forward() ||
                 !@event.SubscribtionOpen()) {
                 return BadRequest("Can't unsubscribe to the event");
             }
@@ -179,7 +179,7 @@ namespace events_planner.Controllers {
 
             if (book == null)
                 return NotFound("Booking not found");
-            else if (book.Event.Expired() ||
+            else if (book.Event.OnGoingWindow() ||
                book.Event.Status != Status.ONGOING)
                 return BadRequest("Can't validate presence outside of open window");
             else if (book.Present)
@@ -232,7 +232,7 @@ namespace events_planner.Controllers {
 
             if (booking == null)
                 return BadRequest("Booking Not found");
-            else if (booking.Event.Expired())
+            else if (!booking.Event.Forward())
                 return BadRequest("Event expired");
             else if (!booking.Event.ValidationRequired)
                 return BadRequest("Event doesn't need validation");

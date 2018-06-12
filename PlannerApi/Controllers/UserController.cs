@@ -211,7 +211,7 @@ namespace events_planner.Controllers {
                 errors.Add("Role not found");
             if (user == null)
                 errors.Add("User not found");
-            if (@event == null || @event.Expired())
+            if (@event == null || !@event.Forward())
                 errors.Add("Event not found or expired");
             
             if (errors.Count > 0)
