@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace events_planner.Services {
     public interface IEventServices {
-        
+
         void RemoveAllEventCategoryReferencesFor(int categoryId);
 
         Task<Event[]> GetEVentsFromIds(int[] ids);
@@ -32,8 +32,10 @@ namespace events_planner.Services {
         void LimitElements<T>(ref IQueryable<T> query, string limit) where T : Event;
 
         void FilterByCategories<T>(ref IQueryable<T> query, string categories) where T : Event;
-        
+
         IQueryable<Event> GetParticipedEvents(int userId);
+
+        bool IsTimeWindowValid(ref Event @event);
 
         #endregion
     }

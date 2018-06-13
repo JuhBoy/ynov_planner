@@ -123,7 +123,7 @@ namespace Microsoft.Extensions.DependencyInjection {
             int[] eventIds = CategoryServices.GetCategoriesFromString(categories)
                                            .Select((arg) => arg.EventId)
                                            .ToArray();
-            
+
             query = query.Where((arg) => eventIds.Contains(arg.Id))
                          .Include(arg => arg.EventCategory)
                          .ThenInclude(arg => arg.Category);
@@ -134,6 +134,21 @@ namespace Microsoft.Extensions.DependencyInjection {
                 .Include(inc => inc.Event)
                 .Where(arg => arg.UserId == userId && arg.Present == true)
                 .Select(arg => arg.Event);
+        }
+
+        public bool IsTimeWindowValid(ref Event @event) {
+            bool valid = true;
+
+            if (@event.StartAt != null)
+                valid &= (@event.CloseAt >= @event.StartAt);
+            if (@event.EndAt != null)
+                valid &= (@event.CloseAt >= @event.EndAt);
+            if (@event.StartAt != null && @event.EndAt != null)
+                valid &= (@event.StartAt < @event.EndAt);
+
+            valid &= (@event.CloseAt >= @event.OpenAt);
+
+            return valid;
         }
 
     }

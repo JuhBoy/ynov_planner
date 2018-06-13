@@ -56,16 +56,22 @@ namespace events_planner.Controllers {
         public IActionResult Create([FromBody] EventDeserializer eventFromRequest) {
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
 
-            Event eventModel;
+            Event mEvent;
+            eventFromRequest.BindWithEventModel<Event>(out mEvent);
+
+            if (!Services.IsTimeWindowValid(ref mEvent)) {
+                var error = new String[] { "Time window is not valid, ensure close start before open" };
+                return BadRequest(new { TimeWindow = error });
+            }
+
             try {
-                eventFromRequest.BindWithEventModel<Event>(out eventModel);
-                Context.Event.Add(eventModel);
+                Context.Event.Add(mEvent);
                 Context.SaveChanges();
             } catch (DbUpdateException e) {
                 return BadRequest(e.InnerException.Message);
             }
 
-            return CreatedAtAction(nameof(Read), new { id = eventModel.Id }, eventModel);
+            return CreatedAtAction(nameof(Read), new { id = mEvent.Id }, mEvent);
         }
 
         /// <summary>

@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System;
 
 namespace events_planner.Deserializers {
-    
+
     public class EventDeserializer {
 
         [StringLength(255, MinimumLength = 3)]
@@ -24,7 +24,7 @@ namespace events_planner.Deserializers {
 
         [RegularExpression(Models.Status.ValidRegex)]
         public string Status { get; set; } = Models.Status.ONGOING;
-        
+
         public int? JuryPoint { get; set; }
 
         public string Location { get; set; }
