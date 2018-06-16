@@ -20,8 +20,8 @@ namespace events_planner.Controllers {
             EventServices = eventServices;
         }
 
-        [HttpGet("add/{eventId}/{index}/{name?}")]
-        public async Task<IActionResult> AddTopEvent(int eventId, int index, string name) {
+        [HttpPost("add/{eventId}/{name}")]
+        public async Task<IActionResult> AddTopEvent(int eventId, string name) {
             Event @event = await EventServices.GetEventByIdAsync(eventId);
 
             if (@event == null)
@@ -32,7 +32,7 @@ namespace events_planner.Controllers {
             TopEvents newTopEvent = new TopEvents() {
                 Event = @event,
                 EventId = @event.Id,
-                Index = index,
+                Index = Context.Tops.Count() + 1,
                 Name = name
             };
             @event.TopEvents = newTopEvent;
@@ -50,10 +50,12 @@ namespace events_planner.Controllers {
         [HttpGet("list"), AllowAnonymous]
         public IActionResult GetAllTopEvents() {
             TopEvents[] events = Context.Tops
+                                        .AsNoTracking()
                                         .Include(args => args.Event)
                                             .ThenInclude(ev => ev.Images)
+                                        .OrderBy(arg => arg.Index)
                                         .ToArray();
-            return new ObjectResult(events);
+            return Ok(events);
         }
 
         [HttpDelete("{eventId}")]
@@ -63,8 +65,18 @@ namespace events_planner.Controllers {
             if (@event == null)
                 return NotFound("Event Not In Top");
 
+            var tops = Context.Tops.Where((arg) => arg.EventId != eventId)
+                              .OrderBy(arg => arg.Index)
+                              .ToArray();
+            int cursor = 1;
+            foreach(var top in tops) {
+                top.Index = cursor;
+                cursor++;
+            }
+
             try {
                 Context.Tops.Remove(@event);
+                Context.Tops.UpdateRange(tops);
                 Context.SaveChanges();
             } catch (DbUpdateException e) {
                 return BadRequest(e.InnerException.Message);
@@ -73,33 +85,39 @@ namespace events_planner.Controllers {
             return NoContent();
         }
 
-        [HttpGet("order/{eventId}/{newOrderIndex}")]
-        public IActionResult Order(int newOrderIndex, int eventId) {
+        [HttpPatch("order/{eventId}/{newIndex}"), Authorize(Roles = "Admin")]
+        public IActionResult Order(int eventId, int newIndex) {
             TopEvents[] topEvents = Context.Tops
                                            .Include(ccc => ccc.Event)
-                                           .AsTracking().ToArray();
+                                           .AsTracking()
+                                           .OrderBy((arg) => arg.Index)
+                                           .ToArray();
             
-            TopEvents currentEvent = topEvents.FirstOrDefault((arg) => arg.EventId == eventId);
+            TopEvents current = topEvents.FirstOrDefault((arg) => arg.EventId == eventId);
+            int diff = newIndex - current.Index;
+            current.Index = newIndex;
 
-            if (currentEvent == null) return NotFound("Event not found");
+            if (current == null)
+                return NotFound("Event not found");
+            if (newIndex > topEvents.Length) 
+                return BadRequest("Index out of range");
 
-            if (MathF.Abs(newOrderIndex - currentEvent.Index) > 1) {
-                int sign = (newOrderIndex > currentEvent.Index) ? -1 : 1;
-                int totalIteration = (newOrderIndex > currentEvent.Index) ? newOrderIndex - 1 : topEvents.Length - newOrderIndex - 1;
-                int start = newOrderIndex - 1;
-
-                currentEvent.Index = newOrderIndex;
-                topEvents = topEvents.OrderBy((arg) => arg.Index).ToArray();
-
-                for (int i = start; totalIteration > 0; i += sign) {
-                    totalIteration--;
-                    if (topEvents[i] == currentEvent ||
-                       topEvents[i].Index + sign == 0) continue;
-                    topEvents[i].Index += sign;
-                }
+            if (diff == 0) {
+                /* things ordered */ 
+            } else if (Math.Abs(diff) == 1) {
+                topEvents[newIndex-1].Index -= Math.Sign(diff);
             } else {
-                topEvents.First((arg) => arg.Index == newOrderIndex).Index = (int) currentEvent.Index;
-                currentEvent.Index = newOrderIndex;
+                int cursor = 1;
+                for (int i = 0; i < topEvents.Length; i++) {
+                    if (topEvents[i] == current) continue;
+
+                    if (i == newIndex-1) {
+                        cursor = newIndex - Math.Sign(diff);
+                    }
+
+                    topEvents[i].Index = cursor;
+                    cursor++;
+                }
             }
 
             try {
@@ -109,7 +127,7 @@ namespace events_planner.Controllers {
                 return BadRequest(e.InnerException.Message);
             }
 
-            return new ObjectResult(topEvents.OrderBy((arg) => arg.Index));
+            return Ok(topEvents.OrderBy((arg) => arg.Index));
         }
     }
 }
