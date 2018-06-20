@@ -11,9 +11,10 @@ namespace events_planner.Models {
         [Key, Column("top_events_id"), JsonIgnore]
         public int TopEventsId { get; set; }
 
-        [Required]
+        [Required, Column("index")]
         public int Index { get; set; }
 
+        [Column("name")]
         public string Name { get; set; }
 
         [Required, Column("event_id"), ForeignKey("event_id"), JsonIgnore]
