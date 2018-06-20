@@ -47,8 +47,11 @@ namespace events_planner.Controllers {
             if (@event == null || @event.SubscribedNumber >= @event.SubscribeNumber)
                 return BadRequest("Unprocessable, Max Subscriber reach or event not found");
 
+            // Don't force lambda to request Db for other scops.
+            int userId = CurrentUser.Id;
+
             if (Context.Booking.Any((Booking booking) => booking.EventId == eventId
-                && booking.UserId == CurrentUser.Id)) {
+                && booking.UserId == userId)) {
                 return BadRequest("User Already Booked");
             }
 
@@ -137,7 +140,7 @@ namespace events_planner.Controllers {
                                           .Where(arg => arg.UserId == CurrentUser.Id
                                                         && !arg.Present)
                                           .ToArrayAsync();
-            
+
             Event[] result = events.Where((arg) => arg.Event.Forward())
                                    .Select(arg => arg.Event)
                                    .Where((arg) => arg.Forward())

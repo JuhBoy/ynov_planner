@@ -25,9 +25,17 @@ namespace events_planner.Utils {
             Contract.Ensures(Contract.Result<Task>() != null);
 
             try {
-                await Next.Invoke(context);    
+                await Next.Invoke(context);
             } catch (Exception error) {
-                context.Response.StatusCode = 500;
+                string userError = null;
+
+                if (error.GetType() == typeof(NotFoundUserException)) {
+                    context.Response.StatusCode = 401;
+                    userError = error.Message;
+                } else {
+                    context.Response.StatusCode = 500;
+                }
+
                 using (var writter = new StreamWriter(context.Response.Body)) {
                     // Set the handler for previous Middleware
                     var handler = context.Features.Get<IExceptionHandlerFeature>();
@@ -41,9 +49,9 @@ namespace events_planner.Utils {
 
                     // Serialize the Error in JSon format using stream.
                     if (environment.IsDevelopment()) {
-                        new JsonSerializer().Serialize(writter, error);    
+                        new JsonSerializer().Serialize(writter, error);
                     } else {
-                        new JsonSerializer().Serialize(writter, "Internal Error");    
+                        new JsonSerializer().Serialize(writter, userError ?? "Internal Error");
                     }
 
                     await writter.FlushAsync().ConfigureAwait(false);
