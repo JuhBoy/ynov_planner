@@ -6,10 +6,10 @@ namespace events_planner.Models
     [Table("eventcategory")]
     public class EventCategory
     {
-        [Column("event_id")]
+        [Column("event_id"), JsonIgnore]
         public int EventId { get; set; }
 
-        [Column("category_id")]
+        [Column("category_id"), JsonIgnore]
         public int CategoryId { get; set; }
 
         public Category Category { get; set; }

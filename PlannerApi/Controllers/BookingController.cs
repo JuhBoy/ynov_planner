@@ -133,12 +133,14 @@ namespace events_planner.Controllers {
                                             .ThenInclude(tinc => tinc.Images)
                                           .Include(iii => iii.Event)
                                             .ThenInclude(tinc => tinc.EventCategory)
+                                                .ThenInclude(evcat => evcat.Category)
                                           .Where(arg => arg.UserId == CurrentUser.Id
                                                         && !arg.Present)
                                           .ToArrayAsync();
-
+            
             Event[] result = events.Where((arg) => arg.Event.Forward())
                                    .Select(arg => arg.Event)
+                                   .Where((arg) => arg.Forward())
                                    .ToArray();
 
             return Ok(result);
