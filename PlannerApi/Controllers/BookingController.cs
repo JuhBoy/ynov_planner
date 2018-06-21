@@ -124,7 +124,7 @@ namespace events_planner.Controllers {
         }
 
         /// <summary>
-        /// List of all events wich has been subscribed by the current user
+        /// List of all booking wich has been subscribed by the current user
         /// The list doesn't contains the past events
         /// </summary>
         /// <returns>A list of events</returns>
@@ -140,12 +140,8 @@ namespace events_planner.Controllers {
                                           .Where(arg => arg.UserId == CurrentUser.Id
                                                         && !arg.Present)
                                           .ToArrayAsync();
-
-            Event[] result = events.Where((arg) => arg.Event.Forward())
-                                   .Select(arg => arg.Event)
-                                   .Where((arg) => arg.Forward())
-                                   .ToArray();
-
+            Booking[] result = events.Where((arg) => arg.Event.Forward())
+                                     .ToArray();
             return Ok(result);
         }
 
