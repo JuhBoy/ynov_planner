@@ -27,6 +27,8 @@ namespace events_planner.Utils {
             try {
                 await Next.Invoke(context);
             } catch (Exception error) {
+                if (context.Response.HasStarted) { throw; }
+
                 string userError = null;
 
                 if (error.GetType() == typeof(NotFoundUserException)) {

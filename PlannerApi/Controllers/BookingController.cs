@@ -267,5 +267,36 @@ namespace events_planner.Controllers {
 
             return NoContent();
         }
+
+        /// <summary>
+        /// List of booking with user included
+        /// </summary>
+        /// <remarks>
+        /// Response:
+        ///
+        ///   {
+        ///     "id": 2,
+        ///     "present": false,
+        ///     "validated": null,
+        ///      "eventId": 2
+        ///     "user": {
+        ///        ... User model
+        ///     },
+        ///   }
+        ///
+        /// When validate is null the event doesn't required anyvalidations.
+        /// The value will be settled to false or true otherwise.
+        ///
+        /// </remarks>
+        /// <returns>200</returns>
+        /// <param name="eventId">Event identifier.</param>
+        [HttpGet("users_status/{eventId}"), Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetUserStatusForBooking(int eventId) {
+            var books = Context.Booking
+                               .Include(inc => inc.User)
+                               .Where(boks => boks.EventId == eventId)
+                               .ToArray();
+            return Ok(books);
+        }
     }
 }

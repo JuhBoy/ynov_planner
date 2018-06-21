@@ -58,7 +58,7 @@ namespace events_planner.Models
         ************************/
 
         /// <summary> relation with Booking (One to Many) </summary>
-        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        [JsonIgnore]
         public ICollection<Booking> Bookings { get; set; }
 
         /// <summary> relation with Subcribe (One to Many) </summary>
@@ -98,7 +98,7 @@ namespace events_planner.Models
         public IList<TemporaryRole> TemporaryRoleId { get; set; }
 
         #region Public HELPERS
-        
+
         [NotMapped]
         public string FullName {
             get {

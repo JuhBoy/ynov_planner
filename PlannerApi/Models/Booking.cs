@@ -17,11 +17,11 @@ namespace events_planner.Models
         [Column("validated")]
         public bool? Validated { get; set; } = null;
 
-        [Column("created_at")]
+        [Column("created_at"), JsonIgnore]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        [Column("updated_at")]
+        [Column("updated_at"), JsonIgnore]
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime UpdatedAt { get; set; }
 
@@ -31,14 +31,15 @@ namespace events_planner.Models
 
         /// <summary> relation with user (Many to One) </summary>
         [Column("user_id"), ForeignKey("user_id"), JsonIgnore]
-        public int UserId { get; set; }   
+        public int UserId { get; set; }
 
-        [JsonIgnore]
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public User User { get; set; }
 
         /// <summary> relation with Event  (Many To One) </summary>
         [Column("event_id"), ForeignKey("event_id")]
         public int EventId { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public Event Event { get; set; }
     }
 }

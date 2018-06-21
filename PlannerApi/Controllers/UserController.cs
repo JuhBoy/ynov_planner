@@ -93,12 +93,12 @@ namespace events_planner.Controllers {
         /// Return Users as a list
         /// </summary>
         /// <remarks>
-        /// GET Params: 
+        /// GET Params:
         ///     - search ([a-zA-Z]+ for Firstname and Lastname)
         ///     - range  (Two Numbers separated by "-")
         /// For the range param, the First number is the number of elements to skip,
         /// the second is how many elements you take.
-        /// <br/> example : to get the elements from 7 to 13 ask for : 7-6 (skip the 7 first element then take 6) 
+        /// <br/> example : to get the elements from 7 to 13 ask for : 7-6 (skip the 7 first element then take 6)
         /// </remarks>
         [HttpGet("all"), Authorize(Roles = "Admin")]
         public IActionResult ReadAll() {
@@ -124,9 +124,9 @@ namespace events_planner.Controllers {
                                  .Take(ranges[1]);
                 }
             }
-            
+
             UserServices.WithouStaffMembers(ref query);
-            
+
             User[] users = query.AsNoTracking().ToArray();
             return Ok(users);
         }
@@ -213,7 +213,7 @@ namespace events_planner.Controllers {
                 errors.Add("User not found");
             if (@event == null || !@event.Forward())
                 errors.Add("Event not found or expired");
-            
+
             if (errors.Count > 0)
                 return NotFound(errors);
 
@@ -265,7 +265,7 @@ namespace events_planner.Controllers {
                                     .FirstOrDefault(u => u.Id == userId);
 
             if (user == null) return NotFound("User Not Found");
-            
+
             Event[] events = eventServices.GetParticipedEvents(userId).ToArray();
 
             return Ok(new {
