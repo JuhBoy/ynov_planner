@@ -48,14 +48,16 @@ namespace events_planner {
             services.AddScoped<IEventServices, EventServices>();
             services.AddScoped<ICategoryServices, CategoryServices>();
 
-            // Background tasks
-            services.AddSingleton<IScheduledTask>(new EventUpdateStatus(Configuration.GetConnectionString("Mysql")));
+            if (Configuration.GetValue<bool>("SechduleActivation")) {
+                // Background tasks
+                services.AddSingleton<IScheduledTask>(new EventUpdateStatus(Configuration.GetConnectionString("Mysql")));
 
-            // Scheduler wich manage Background Tasks [Extension]
-            services.AddScheduler((sender, args) => {
-                Console.Write(args.Exception.Message);
-                args.SetObserved();
-            });
+                // Scheduler wich manage Background Tasks [Extension]
+                services.AddScheduler((sender, args) => {
+                    Console.WriteLine(args.Exception.Message);
+                    args.SetObserved();
+                });
+            }
 
             // Email services
             services.AddSingleton<IEmailConfiguration>(Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>());
