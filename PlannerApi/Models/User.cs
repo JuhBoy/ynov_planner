@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -98,6 +99,17 @@ namespace events_planner.Models
         public IList<TemporaryRole> TemporaryRoleId { get; set; }
 
         #region Public HELPERS
+
+        [NotMapped]
+        public int? TotalJuryPoints {
+            get {
+                if (JuryPoint == null) return null;
+                int total = 0;
+                foreach (int u in JuryPoint.Select(s => s.Points))
+                    total += u;
+                return total;
+            }
+        }
 
         [NotMapped]
         public string FullName {
