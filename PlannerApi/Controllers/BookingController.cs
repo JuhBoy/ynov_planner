@@ -290,6 +290,7 @@ namespace events_planner.Controllers {
         public async Task<IActionResult> GetUserStatusForBooking(int eventId) {
             var books = Context.Booking
                                .Include(inc => inc.User)
+                               .ThenInclude(user => user.Promotion)
                                .Where(boks => boks.EventId == eventId)
                                .ToArray();
             return Ok(books);

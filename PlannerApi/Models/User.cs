@@ -68,7 +68,7 @@ namespace events_planner.Models
 
         /// <summary> relation with Promotion (Many to One) </summary>
         [Column("promotion_id")]
-        [ForeignKey("promotion_id")]
+        [ForeignKey("promotion_id"), JsonIgnore]
         public int PromotionId { get; set; }
 
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
