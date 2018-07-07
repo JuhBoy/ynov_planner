@@ -46,6 +46,12 @@ namespace events_planner.Models
         [Required, Phone]
         public int PhoneNumber { get; set; }
 
+        [Column("image_url"), Url]
+        public string ImageUrl { get; set; }
+
+        [Column("location")]
+        public string Location { get; set; }
+
         [Column("created_at")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

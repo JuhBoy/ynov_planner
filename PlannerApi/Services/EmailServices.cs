@@ -63,7 +63,7 @@ namespace Microsoft.Extensions.DependencyInjection {
         public void SendFor(User user, Event @event, BookingTemplate template) {
             if (!_env.IsProduction()) {
                 Console.ForegroundColor = ConsoleColor.DarkGreen;
-                Console.WriteLine("Email are skiped out of production mode");
+                Console.WriteLine($"Email are skiped out of production mode {template.ToString()}");
                 Console.ResetColor();
                 return;
             }

@@ -32,6 +32,11 @@ namespace events_planner.Deserializers {
         [MinLength(8, ErrorMessage = "Password must be at least 8 characters")]
         public string PhoneNumber { get; set; }
 
+        [Url]
+        public string ImageUrl { get; set; }
+
+        public string Location { get; set; }
+
         public void BindWithUser<T>(ref T user) where T: User {
             if (Password != null && (Password != PasswordConfirmation)) {
                 throw new ValidationException("Confirmed password is not valid");
@@ -47,6 +52,10 @@ namespace events_planner.Deserializers {
                 user.Password = Password;
             if (PhoneNumber != null)
                 user.PhoneNumber = int.Parse(PhoneNumber);
+            if (ImageUrl != null)
+                user.ImageUrl = ImageUrl;
+            if (Location != null)
+                user.Location = Location;
         }
     }
 }
