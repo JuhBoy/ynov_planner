@@ -237,8 +237,8 @@ namespace events_planner.Controllers {
                 return BadRequest("Event expired");
             else if (!booking.Event.ValidationRequired)
                 return BadRequest("Event doesn't need validation");
-            else if (booking.Validated.HasValue && (bool) booking.Validated) {
-                return BadRequest("User already Validated");
+            else if (booking.Validated.HasValue && (bool) booking.Validated == confirm) {
+                return BadRequest("User already Validated this way");
             }
 
             booking.Validated = confirm;
