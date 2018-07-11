@@ -363,6 +363,8 @@ namespace events_planner.Controllers {
                 Image image = Context.Images
                                      .FirstOrDefault((arg) => arg.ImageId == imageId);
                 await imageServices.RemoveImages(image.Url);
+                Context.Images.Remove(image);
+                Context.SaveChanges();
             } catch (FileNotFoundException e) {
                 return BadRequest(e.Message);
             }
