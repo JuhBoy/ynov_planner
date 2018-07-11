@@ -161,7 +161,7 @@ namespace events_planner.Controllers {
         ///         - limit (Integer)
         ///         - images (boolean as "true string" = True / False, respect the case)
         ///         - obsolete (boolean as "true string")
-        ///         - filter (list of categories as a string "," as a separator)
+        ///         - filters (list of categories as a string "," as a separator)
         ///         - moderators (boolean as true string) include moderators for all events
         ///         - categories (boolean as true string) include events categories
         ///
