@@ -25,6 +25,8 @@ namespace events_planner.Services {
 
         void EndAfterToday<T>(ref IQueryable<T> query) where T : Event;
 
+        void NonObsolete<T>(ref IQueryable<T> query) where T : Event;
+
         void IncludeModerators<T>(ref IQueryable<T> query) where T : Event;
 
         void IncludeCategories<T>(ref IQueryable<T> query) where T : Event;

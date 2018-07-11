@@ -91,6 +91,16 @@ namespace Microsoft.Extensions.DependencyInjection {
         }
 
         /// <summary>
+        /// Events which arn't obsolete.
+        /// </summary>
+        /// <param name="query">Query Event / Childs.</param>
+        /// <typeparam name="T">The 1st type parameter as event.</typeparam>
+        public void NonObsolete<T>(ref IQueryable<T> query) where T : Event {
+            string[] status = { Status.PENDING, Status.ONGOING };
+            query = query.Where((arg) => status.Contains(arg.Status));
+        }
+
+        /// <summary>
         /// Includes the images.
         /// </summary>
         /// <param name="query">Query Event / childs.</param>

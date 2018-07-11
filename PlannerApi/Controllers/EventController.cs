@@ -190,7 +190,7 @@ namespace events_planner.Controllers {
 
             if (to != null) Services.ToDate(ref Query, to);
 
-            if (!obsolete) Services.EndAfterToday(ref Query);
+            if (!obsolete) Services.NonObsolete(ref Query);
 
             if (limit != null) Services.LimitElements(ref Query, limit);
 
