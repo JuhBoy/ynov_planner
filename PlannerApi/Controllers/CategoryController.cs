@@ -40,7 +40,13 @@ namespace events_planner.Controllers {
                 Context.Category.Add(category);
                 Context.SaveChanges();
             } catch (Exception e) {
-                return BadRequest(e.InnerException.Message);
+                string msg = e.InnerException.Message;
+                if (msg.Contains("Duplicate")) {
+                    msg = $"Le nom {category.Name} est déjà utilisé";
+                } else {
+                    msg = "Erreur interne";
+                }
+                return BadRequest(msg);
             }
 
             return new OkObjectResult(category);
@@ -53,7 +59,7 @@ namespace events_planner.Controllers {
         /// <remarks>
         ///     - all All categories are returned
         ///     - subs return all parents categories with their sub included,
-        ///     - parents return only the parent without subs included  
+        ///     - parents return only the parent without subs included
         /// </remarks>
         /// <response code="401">Admin token is not permitted</response>
         /// <response code="500">if the credential given is not valid or DB update failed</response>
