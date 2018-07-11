@@ -108,7 +108,8 @@ namespace events_planner.Models {
         [JsonIgnore] public ICollection<Booking> Bookings { get; set; }
 
         /// <summary> relation with Prices (One to Many) </summary>
-        [JsonIgnore] public ICollection<Price> Prices { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public ICollection<Price> Prices { get; set; }
 
         /// <summary> relation with Category (Many to Many) </summary>
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]

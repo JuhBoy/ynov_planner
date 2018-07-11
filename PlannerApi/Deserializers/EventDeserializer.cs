@@ -41,6 +41,8 @@ namespace events_planner.Deserializers {
 
         public ICollection<Image> Images { get; set; }
 
+        public Price[] Prices { get; set; }
+
         public void BindWithEventModel<T>(out T model) where T : Event {
             Event modelEvent = new Event() {
                 Title = this.Title,
@@ -60,6 +62,8 @@ namespace events_planner.Deserializers {
             if (modelEvent.ValidationRequired) {
                 modelEvent.ValidatedNumber = 0;
             }
+
+            modelEvent.Prices = Prices;
 
             model = modelEvent as T;
         }

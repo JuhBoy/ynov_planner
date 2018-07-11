@@ -36,6 +36,7 @@ namespace events_planner.Controllers {
             bool loadImages = HttpContext.Request.Query["images"] == bool.TrueString;
             bool includeModerators = HttpContext.Request.Query["moderators"] == bool.TrueString;
             bool includeCategories = HttpContext.Request.Query["categories"] == bool.TrueString;
+            bool includePrices = HttpContext.Request.Query["prices"] == bool.TrueString;
 
             if (loadImages)
                 Services.IncludeImages(ref Query);
@@ -43,6 +44,8 @@ namespace events_planner.Controllers {
                 Services.IncludeModerators(ref Query);
             if (includeCategories)
                 Services.IncludeCategories(ref Query);
+            if (includePrices)
+                Services.IncludePrices(ref Query);
         }
 
         #region User CRUD

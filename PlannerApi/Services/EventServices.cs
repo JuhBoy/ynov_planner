@@ -128,6 +128,10 @@ namespace Microsoft.Extensions.DependencyInjection {
             }
         }
 
+        public void IncludePrices<T>(ref IQueryable<T> query) where T : Event {
+            query = query.Include(arg => arg.Prices);
+        }
+
         public void FilterByCategories<T>(ref IQueryable<T> query,
                                                 string categories) where T : Event {
             int[] eventIds = CategoryServices.GetCategoriesFromString(categories)

@@ -8,13 +8,13 @@ namespace events_planner.Models
     [Table("price")]
     public class Price
     {
-        [Column("price_id"), Key, JsonIgnore]
+        [Column("price_id"), Key]
         public int Id { get; set; }
 
         [Column("price"), Required]
         public int Amount { get; set; }
 
-        [Column("created_at"), 
+        [Column("created_at"),
          DatabaseGenerated(DatabaseGeneratedOption.Identity),
          JsonIgnore]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -35,7 +35,7 @@ namespace events_planner.Models
         public Event Event { get; set; }
 
         /// <summary> relation with Role (Many to Many) </summary>
-        [ForeignKey("role_id"), Column("role_id"), JsonIgnore]
+        [ForeignKey("role_id"), Column("role_id")]
         public int RoleId { get; set; }
 
         [JsonIgnore]
