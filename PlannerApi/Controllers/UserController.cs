@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using System.IO;
 using Microsoft.AspNetCore.Mvc;
 using events_planner.Deserializers;
 using events_planner.Services;
@@ -10,6 +11,10 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Collections.Generic;
 using events_planner.PrimitiveExt;
+using CsvHelper;
+using CsvHelper.TypeConversion;
+using CsvHelper.Configuration;
+using Microsoft.AspNetCore.Hosting;
 
 namespace events_planner.Controllers {
 
@@ -17,8 +22,12 @@ namespace events_planner.Controllers {
     public class UserController : BaseController {
 
         public IUserServices UserServices;
+        public IHostingEnvironment Env;
 
-        public UserController(IUserServices service, PlannerContext context) {
+        public UserController(IUserServices service,
+                                PlannerContext context,
+                                IHostingEnvironment env) {
+            Env = env;
             Context = context;
             UserServices = service;
         }
@@ -171,7 +180,7 @@ namespace events_planner.Controllers {
                 Context.SaveChanges();
             } catch (DbUpdateException update) {
                 return BadRequest(update.Message);
-            } catch (ValidationException e) {
+            } catch (System.ComponentModel.DataAnnotations.ValidationException e) {
                 return BadRequest(e.Message);
             }
 
@@ -272,6 +281,49 @@ namespace events_planner.Controllers {
                 User = user,
                 Events = events
             });
+        }
+
+        [HttpPost("export/{ids}"), Authorize(Roles = "Admin")]
+        public async Task<IActionResult> CsvExport(string ids) {
+            int[] iIds = ids.Split(',').Select(arg => int.Parse(arg)).ToArray();
+            string fileName;
+            if (iIds.Length <= 0) {
+                return BadRequest("No Ids provided, unable to write the CSV file");
+            }
+
+            try {
+                IEnumerable<User> users = Context.User.Include(a => a.JuryPoint)
+                                                      .Include(a => a.Promotion)
+                                                      .Where(arg => iIds.Contains(arg.Id));
+                fileName = "export_" + DateTime.Now.ToString("HH_mm_ss") + ".csv";
+                string path = Path.Combine(Env.WebRootPath, "csv", fileName);
+                
+                using (var stream = new StreamWriter(path, false)) {
+                    var csvWriter = new CsvWriter(stream);
+                    csvWriter.Configuration.RegisterClassMap<UserDataMap>();
+                    csvWriter.WriteRecords(users);
+                }
+            } catch (ParserException e) {
+                return BadRequest(e);
+            } catch (IOException e) {
+                return BadRequest(e);
+            }
+
+            return Ok(fileName);
+        }
+    }
+    
+    // =========================================
+    // Used to provide a mapping for CSV export
+    // =========================================
+    public class UserDataMap : ClassMap<User> {
+        public UserDataMap() {
+            Map(m => m.LastName);
+            Map(m => m.FirstName);
+            Map(m => m.Email);
+            Map(m => m.PhoneNumber);
+            Map(m => m.JuryPointAmount);
+            Map(m => m.Promotion.Name).Name("promotion_name");
         }
     }
 

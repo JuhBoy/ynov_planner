@@ -124,6 +124,20 @@ namespace events_planner.Models
             }
         }
 
+        [NotMapped]
+        public int? JuryPointAmount {
+            get {
+                if (JuryPoint != null) {
+                    int i = 0;
+                    foreach (var p in JuryPoint) {
+                        i += p.Points;
+                    }
+                    return i;
+                }
+                return null;
+            }
+        }
+
         #endregion
     }
 }
