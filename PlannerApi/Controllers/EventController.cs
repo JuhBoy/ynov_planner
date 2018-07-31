@@ -115,6 +115,19 @@ namespace events_planner.Controllers {
 
             if (eventModel == null) return NotFound("Event not found");
 
+            if (eventReq.ValidationRequired.HasValue && eventReq.ValidationRequired != eventModel.ValidationRequired) {
+                Booking[] bookings = Context.Booking.Where(book => book.EventId == eventModel.Id).ToArray();
+
+                foreach (var book in bookings) {
+                    if (eventReq.ValidationRequired.Value)
+                        book.Validated = false;
+                    else
+                        book.Validated = null;
+                }
+
+                Context.Booking.UpdateRange(bookings);
+            }
+            
             eventReq.BindWithModel(ref eventModel);
 
             try {

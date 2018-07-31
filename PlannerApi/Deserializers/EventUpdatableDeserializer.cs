@@ -61,8 +61,8 @@ namespace events_planner.Deserializers {
             if (JuryPoint.HasValue)
                 model.JuryPoint = JuryPoint;
 
-            if (ValidationRequired.HasValue && ValidationRequired == true) {
-                model.ValidationRequired = true;
+            if (ValidationRequired.HasValue && ValidationRequired != model.ValidationRequired) {
+                model.ValidationRequired = (bool) ValidationRequired;
                 model.ValidatedNumber = 0;
             }
         }
