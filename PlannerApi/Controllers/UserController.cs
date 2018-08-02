@@ -10,6 +10,8 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Collections.Generic;
 using events_planner.PrimitiveExt;
+using System.Net.Http;
+using System.Xml.Linq;
 
 namespace events_planner.Controllers {
 
@@ -43,6 +45,19 @@ namespace events_planner.Controllers {
             string token = UserServices.GenerateToken(ref m_user);
 
             return new ObjectResult(token);
+        }
+
+
+        [HttpPost("sso"), AllowAnonymous]
+        public async Task<IActionResult> GetSso([FromBody] UserSsoDeserializer userSso) {
+            if (userSso.Ticket.Length > 0 && userSso.Service.Length > 0 && userSso.SsoUrl.Length > 0) {
+                using (HttpClient client = new HttpClient()) {
+                    string res = await client.GetStringAsync(userSso.SsoUrl + "/serviceValidate?service=" + userSso.Service + "&ticket=" + userSso.Ticket);
+                    // TODO: check if user exists (extract id and email from XML), then send back a token if so, create him if not
+                    return new ObjectResult(res);
+                }
+            }
+            return BadRequest();
         }
 
         // ===============================
