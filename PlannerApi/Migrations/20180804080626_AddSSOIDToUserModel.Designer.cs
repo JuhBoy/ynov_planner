@@ -11,9 +11,10 @@ using System;
 namespace events_planner.Migrations
 {
     [DbContext(typeof(PlannerContext))]
-    partial class PlannerContextModelSnapshot : ModelSnapshot
+    [Migration("20180804080626_AddSSOIDToUserModel")]
+    partial class AddSSOIDToUserModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -460,7 +461,8 @@ namespace events_planner.Migrations
                     b.Property<string>("Email")
                         .IsConcurrencyToken()
                         .IsRequired()
-                        .HasColumnName("email");
+                        .HasColumnName("email")
+                        .HasMaxLength(30);
 
                     b.Property<string>("FirstName")
                         .IsRequired()

@@ -17,6 +17,7 @@ using CsvHelper.Configuration;
 using Microsoft.AspNetCore.Hosting;
 using System.Net.Http;
 using System.Xml.Linq;
+using System.Xml.Serialization;
 
 namespace events_planner.Controllers {
 
@@ -59,14 +60,54 @@ namespace events_planner.Controllers {
 
         [HttpPost("sso"), AllowAnonymous]
         public async Task<IActionResult> GetSso([FromBody] UserSsoDeserializer userSso) {
-            if (userSso.Ticket.Length > 0 && userSso.Service.Length > 0 && userSso.SsoUrl.Length > 0) {
-                using (HttpClient client = new HttpClient()) {
-                    string res = await client.GetStringAsync(userSso.SsoUrl + "/serviceValidate?service=" + userSso.Service + "&ticket=" + userSso.Ticket);
-                    // TODO: check if user exists (extract id and email from XML), then send back a token if so, create him if not
-                    return new ObjectResult(res);
+            if (!ModelState.IsValid) { return BadRequest(ModelState); }
+            string token;
+
+            using (HttpClient client = new HttpClient()) {
+                // TODO: Use Real Connection
+                // var xml = await client.GetStringAsync($"{userSso.SsoUrl}/serviceValidate?service={userSso.Service}&ticket={userSso.Ticket}");
+                var xml = "<?xml version=\"1.0\" encoding=\"UTF - 8\" ?><YnovSSO><SSOID>1</SSOID><Email>viverra.Donec.tempus@ipsumSuspendisse.com</Email></YnovSSO>";
+
+                XmlSerializer parser = new XmlSerializer(typeof(YnovSSO));
+                YnovSSO SSOData;
+                using (var reader = new StringReader(xml)) {
+                    SSOData = parser.Deserialize(reader) as YnovSSO;
                 }
+
+                // TODO: CHECK IF SSO FROM XML IS VALID() /!\
+                var error = false; // TODO
+                if (error) return BadRequest("SSO TICKET INVALID"); // TODO
+
+
+                User user = Context.User.Include(u => u.Role).FirstOrDefault(u => u.SSOID == SSOData.SSOID);
+                List<string> properties;
+
+                try {
+                    if (user == null) {
+                        user = new User() {
+                            Email = SSOData.Email,
+                            SSOID = SSOData.SSOID,
+                            FirstName = "fake",
+                            LastName = "fake",
+                            Password = Guid.NewGuid().ToString(),
+                            PhoneNumber = 0619198695,
+                        };
+                        UserServices.MakeUser(user);
+                        Context.User.Add(user);
+                    } else if (UserServices.ShouldUpdateFromSSO(user, SSOData, out properties)) {
+                        UserServices.UpdateUserFromSsoDate(user, SSOData, properties);
+                        Context.User.Update(user);
+                    }
+
+                    Context.SaveChanges();
+                } catch (DbUpdateException e) {
+                    return BadRequest(e.InnerException.Message);
+                }
+
+                token = UserServices.GenerateToken(ref user);
             }
-            return BadRequest();
+
+            return Ok(token);
         }
 
         // ===============================
@@ -140,7 +181,6 @@ namespace events_planner.Controllers {
                     ranges = range.SplitRange("-");
                 }
                 catch (InvalidOperationException e) {
-                    Console.WriteLine(e.Message);
                     ranges[0] = 0;
                     ranges[1] = int.MaxValue;
                 } finally {

@@ -1,5 +1,5 @@
 using System.Linq;
-using System.Threading.Tasks;
+using System.Collections.Generic;
 using events_planner.Deserializers;
 using events_planner.Models;
 using events_planner.Constants.Services;
@@ -10,11 +10,14 @@ namespace events_planner.Services
     {
         string GenerateToken(ref User m_user);
         User CreateUser(UserCreationDeserializer userFromRequest);
+        void MakeUser(User user);
         string ReadJwtTokenClaims(string bearerToken, JwtSelector extractor = JwtSelector.EMAIL);
         bool IsModeratorFor(int eventId, int userId);
+        bool ShouldUpdateFromSSO(User user, YnovSSO ssoData, out List<string> properties);
+        void UpdateUserFromSsoDate(User user, YnovSSO ssoData, List<string> properties);
 
         #region QUERIES
-        
+
         /// <summary>
         /// Return a query that handle the inclusion of:
         /// - Role

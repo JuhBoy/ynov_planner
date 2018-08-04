@@ -13,6 +13,9 @@ namespace events_planner.Models
         [Key]
         public int Id { get; set; }
 
+        [Column("sso_id")]
+        public int? SSOID { get; set; }
+
         [Column("first_name")]
         [StringLength(20, MinimumLength = 3)]
         [MaxLength(20, ErrorMessage = "First Name must be under 20 characters")]
@@ -27,10 +30,7 @@ namespace events_planner.Models
         [Required]
         public string LastName { get; set; }
 
-        [Column("email")]
-        [StringLength(30, MinimumLength = 3)]
-        [ConcurrencyCheck]
-        [Required]
+        [Column("email"), EmailAddress, ConcurrencyCheck, Required]
         public string Email { get; set; }
 
         [Column("date_of_birth")]

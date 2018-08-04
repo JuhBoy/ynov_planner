@@ -126,6 +126,17 @@ namespace Microsoft.Extensions.DependencyInjection {
             return user;
         }
 
+        public void MakeUser(User user) {
+            Promotion promotion;
+            Role role;
+
+            GetPromotion(null, out promotion);
+            GetRole("", out role);
+
+            user.Promotion = promotion;
+            user.Role = role;
+        }
+
         private void GetRole(string roleName, out Role role) {
             role = RoleServices.GetRoleByName(roleName);
             if (role == null) {
@@ -159,7 +170,35 @@ namespace Microsoft.Extensions.DependencyInjection {
                           .Any((TemporaryRole arg) => arg.EventId == eventId &&
                                                       arg.UserId == userId);
         }
-        
+
+        public bool ShouldUpdateFromSSO(User user, YnovSSO ssoData,
+                                        out List<string> properties) {
+            Type typeUser = user.GetType();
+            Type typeSSO = ssoData.GetType();
+            properties = new List<string>();
+
+            foreach (var prop in typeSSO.GetProperties()) {
+                var sValue = prop.GetValue(ssoData);
+                var uValue = typeUser.GetProperty(prop.Name).GetValue(user);
+
+                if (sValue != uValue) {
+                    properties.Add(prop.Name);
+                }
+            }
+            return properties.Count > 0;
+        }
+
+        public void UpdateUserFromSsoDate(User user, YnovSSO ssoData,
+                                          List<string> properties) {
+            Type typeUser = user.GetType();
+            Type typeSSO = ssoData.GetType();
+
+            foreach (var prop in properties) {
+                var value = typeSSO.GetProperty(prop).GetValue(ssoData);
+                typeUser.GetProperty(prop).SetValue(user, value);
+            }
+        }
+
         #region Queries
 
         public IQueryable<User> AllForeignKeysQuery() {
