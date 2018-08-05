@@ -15,9 +15,9 @@ namespace events_planner.Data {
         public const string PROMOTIONS_PATH = "/Data/Promotions.json";
         public const string ROLE_PARH = "/Data/Roles.json";
 
-        public const string USERS_TEST_PARTH = "/Data/UsersTest.json";
-        public const string PROMOTIONS_TEST_PATH = "/Data/Promotions.json";
-        public const string ROLE_TEST_PARH = "/Data/Roles.json";
+        public const string USERS_TEST_PARTH = "/Fixtures/UsersTest.json";
+        public const string PROMOTIONS_TEST_PATH = "/Fixtures/Promotions.json";
+        public const string ROLE_TEST_PARH = "/Fixtures/Roles.json";
 
         public const string EVENTS_PATH = "/Data/Events.json";
 
@@ -51,10 +51,12 @@ namespace events_planner.Data {
             context.Database.Migrate();
             RemoveAdded(context);
 
+            string currentDirectory = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName;
+            
             if (!context.User.Any()) {
-                List<Promotion> promotions = JsonConvert.DeserializeObject<List<Promotion>>(File.ReadAllText(PROMOTIONS_TEST_PATH));
-                List<Role> role = JsonConvert.DeserializeObject<List<Role>>(File.ReadAllText(ROLE_TEST_PARH));
-                List<User> users = JsonConvert.DeserializeObject<List<User>>(File.ReadAllText(USERS_TEST_PARTH));
+                List<Promotion> promotions = JsonConvert.DeserializeObject<List<Promotion>>(File.ReadAllText(currentDirectory + PROMOTIONS_TEST_PATH));
+                List<Role> role = JsonConvert.DeserializeObject<List<Role>>(File.ReadAllText(currentDirectory + ROLE_TEST_PARH));
+                List<User> users = JsonConvert.DeserializeObject<List<User>>(File.ReadAllText(currentDirectory + USERS_TEST_PARTH));
 
                 foreach (User user in users) {
                     user.Promotion = promotions.First();

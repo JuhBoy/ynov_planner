@@ -22,15 +22,12 @@ namespace PlannerApi.Tests.IntegrationTests
 
             public GetToken(ServerFixtures server) : base(server) { }
             
-            [Theory]
-            [InlineData("Student", "123456789")]
+            [Theory, InlineData("email@admin.com", "123456789")]
             public async Task EnsureTokenIsReturned(string login, string password) {
                 string fakeJson = JsonConvert.SerializeObject(new UserConnectionDeserializer() { Login = login, Password = password });
 
                 HttpResponseMessage response = await HttpClient.PostAsync("api/user/token", new StringContent(fakeJson, System.Text.Encoding.UTF8, "application/json"));
                 string token = await response.Content.ReadAsStringAsync();
-
-                Console.WriteLine(token);
 
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 Assert.NotNull(token);
@@ -49,10 +46,11 @@ namespace PlannerApi.Tests.IntegrationTests
                     Email = (DateTimeOffset.Now.ToUnixTimeSeconds().ToString()) + "jhon@mymail.com",
                     Password = "123456789",
                     PhoneNumber = "0619198793",
-                    RoleName = "Student"
+                    RoleName = "Student",
+                    DateOfBirth = DateTime.Today
                 };
 
-                string json = JsonConvert.SerializeObject(user);
+                string json = JsonConvert.SerializeObject(user, new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore });
 
                 HttpResponseMessage response = await HttpClient.PostAsync("api/user", new StringContent(json, System.Text.Encoding.UTF8, "application/json"));
                 string stringResult = await response.Content.ReadAsStringAsync();
@@ -68,14 +66,17 @@ namespace PlannerApi.Tests.IntegrationTests
         public partial class ReadUser : UserControllerTests {
             public ReadUser(ServerFixtures server) : base(server) { }
 
-            [Fact]
-            public async Task ShouldReturnTheUser() {
-                string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJKdWxpZW4iLCJnaXZlbl9uYW1lIjoiQm95ZXIiLCJlbWFpbCI6Imp1bGllbkBnbWFpbC5jb20iLCJqdGkiOiIyODU0NDM4YS00MWFlLTQyNjUtYjVkMC02ZjlhN2IxNjY5MWYiLCJyb2xlcyI6IlN0dWRlbnQiLCJuYmYiOjE1MTk5MjQyNjcsImV4cCI6MTUyMDA5NzA2NywiaXNzIjoibG9jYWxob3N0OjUwMDAiLCJhdWQiOiJsb2NhbGhvc3Q6NTAwMCJ9.uw0srGJvXpTnCdbZeMy2DyoJkp5TuLDXnOqErwnI2s4";
+            [Theory, InlineData("email@admin.com", "123456789")]
+            public async Task ShouldReturnTheUser(string login, string password) {
+                string fakeJson = JsonConvert.SerializeObject(new UserConnectionDeserializer() { Login = login, Password = password });
+                
+                HttpResponseMessage response = await HttpClient.PostAsync("api/user/token", new StringContent(fakeJson, System.Text.Encoding.UTF8, "application/json"));
+                string token = await response.Content.ReadAsStringAsync();
 
                 HttpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-                HttpResponseMessage response = await HttpClient.GetAsync("api/user", HttpCompletionOption.ResponseContentRead);
+                HttpResponseMessage resp = await HttpClient.GetAsync("api/user", HttpCompletionOption.ResponseContentRead);
 
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.Equal(HttpStatusCode.OK, resp.StatusCode);
             }
         }
     }

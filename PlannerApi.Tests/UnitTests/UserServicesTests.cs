@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Linq;
+using System.Collections.Generic;
+using System.Security.Claims;
 using Xunit;
 using Moq;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using events_planner.Models;
 using Microsoft.Extensions.DependencyInjection;
@@ -43,11 +43,18 @@ namespace PlannerApi.Tests.UnitTests
             [Fact]
             public void ShouldReturnToken()
             {
-                var services = new UserServices(PlannerContext.Object, Configuration.Object, PromotionServices.Object, RoleServices.Object);
-
-                User user = new User() { LastName = "dupon", FirstName = "George", Password = "My_passwonrd", Email = "email@dqsd.fr" };
-                user.Role = new Role() { Name = "Student" };
-                string token = services.GenerateToken(ref user);
+                User user = new User() {
+                    Id = 1,
+                    LastName = "dupon", 
+                    FirstName = "George",
+                    Password = "My_passwonrd",
+                    Email = "email@dqsd.fr",
+                    Role = new Role() { Name = "Student" }
+                };
+                var us = new Mock<UserServices>(PlannerContext.Object, Configuration.Object, PromotionServices.Object, RoleServices.Object);
+                us.Setup(svces => svces.GetRoles(1, "Student")).Returns(new List<Claim>());
+                
+                string token = us.Object.GenerateToken(ref user);
                 string[] slicedToken = token.Split('.', StringSplitOptions.RemoveEmptyEntries);
 
                 Assert.NotNull(token);

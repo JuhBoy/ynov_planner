@@ -144,7 +144,7 @@ namespace Microsoft.Extensions.DependencyInjection {
             }
         }
 
-        private List<Claim> GetRoles(int userId, string role = null) {
+        public virtual List<Claim> GetRoles(int userId, string role = null) {
             List<Claim> claims = Context.TemporaryRoles
                                  .Include(arg => arg.Role)
                                  .Where((arg) => arg.UserId == userId)
