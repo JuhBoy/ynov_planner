@@ -7,8 +7,10 @@ using Newtonsoft.Json;
 namespace events_planner.Models {
 
     public static class Status {
-        public const string ValidRegex = @"pending|ongoing|done|draft";
+        public const string ValidRegex = @"pending|draft";
         public const string PENDING = "pending";
+        public const string SUBSCRIPTION = "subscription";
+        public const string INCOMING = "incoming";
         public const string ONGOING = "ongoing";
         public const string DONE = "done";
         public const string DRAFT = "draft";
@@ -132,17 +134,17 @@ namespace events_planner.Models {
 
         /// <summary> Is Event expired ? </summary>
         public bool OnGoingWindow() {
-            int from = DateTime.Compare(DateTime.UtcNow, (DateTime)OpenAt);
-            int to = DateTime.Compare(DateTime.UtcNow, (DateTime)CloseAt);
+            int from = DateTime.Compare(DateTime.Now, (DateTime)OpenAt);
+            int to = DateTime.Compare(DateTime.Now, (DateTime)CloseAt);
             return (from >= 0 && to <= 0);
         }
 
         public bool Forward() {
-            return DateTime.Compare(DateTime.UtcNow, (DateTime)CloseAt) <= 0;
+            return DateTime.Compare(DateTime.Now, (DateTime)CloseAt) <= 0;
         }
 
         public bool SubscribtionOpen() {
-            var now = DateTime.UtcNow;
+            var now = DateTime.Now;
             bool isOpen = true;
 
             if (StartAt != null)
@@ -150,6 +152,8 @@ namespace events_planner.Models {
 
             if (EndAt != null)
                 isOpen &= DateTime.Compare(now, (DateTime)EndAt) <= 0;
+            else
+                isOpen &= DateTime.Compare(now, (DateTime) OpenAt) <= 0;
 
             return isOpen;
         }

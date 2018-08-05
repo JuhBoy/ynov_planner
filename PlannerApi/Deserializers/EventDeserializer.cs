@@ -23,7 +23,7 @@ namespace events_planner.Deserializers {
         public bool ValidationRequired { get; set; }
 
         [RegularExpression(Models.Status.ValidRegex)]
-        public string Status { get; set; } = Models.Status.ONGOING;
+        public string Status { get; set; } = Models.Status.PENDING;
 
         public int? JuryPoint { get; set; }
 

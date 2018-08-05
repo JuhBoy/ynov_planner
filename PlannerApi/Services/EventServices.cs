@@ -96,7 +96,7 @@ namespace Microsoft.Extensions.DependencyInjection {
         /// <param name="query">Query Event / Childs.</param>
         /// <typeparam name="T">The 1st type parameter as event.</typeparam>
         public void NonObsolete<T>(ref IQueryable<T> query) where T : Event {
-            string[] status = { Status.PENDING, Status.ONGOING };
+            string[] status = { Status.PENDING, Status.SUBSCRIPTION, Status.INCOMING, Status.ONGOING };
             query = query.Where((arg) => status.Contains(arg.Status));
         }
 
