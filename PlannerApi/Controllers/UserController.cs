@@ -282,7 +282,7 @@ namespace events_planner.Controllers {
                 return NotFound(errors);
 
             // Is already ann event ?
-            if (Context.temporaryRoles.Any(tt => tt.EventId == eventId &&
+            if (Context.TemporaryRoles.Any(tt => tt.EventId == eventId &&
                                            tt.UserId == userId &&
                                            tt.RoleId == roleId)) {
                 return BadRequest("User Already has this role");
@@ -295,7 +295,7 @@ namespace events_planner.Controllers {
             };
 
             try {
-                Context.temporaryRoles.Add(temp);
+                Context.TemporaryRoles.Add(temp);
                 Context.SaveChanges();
             } catch (DbUpdateException e) {
                 return BadRequest(e.InnerException.Message);
@@ -306,14 +306,14 @@ namespace events_planner.Controllers {
 
         [HttpDelete("temporary_role/{tempRoleId}"), Authorize(Roles = "Admin")]
         public IActionResult RemoveTempRole(int tempRoleId) {
-            TemporaryRole temporary = Context.temporaryRoles
+            TemporaryRole temporary = Context.TemporaryRoles
                                              .FirstOrDefault((arg) => arg.Id == tempRoleId);
             if (temporary == null) {
                 return NotFound("Role not Found");
             }
 
             try {
-                Context.temporaryRoles.Remove(temporary);
+                Context.TemporaryRoles.Remove(temporary);
                 Context.SaveChanges();
             } catch (DbUpdateException e) {
                 return BadRequest(e.InnerException.Message);

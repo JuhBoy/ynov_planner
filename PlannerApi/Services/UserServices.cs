@@ -145,7 +145,7 @@ namespace Microsoft.Extensions.DependencyInjection {
         }
 
         private List<Claim> GetRoles(int userId, string role = null) {
-            List<Claim> claims = Context.temporaryRoles
+            List<Claim> claims = Context.TemporaryRoles
                                  .Include(arg => arg.Role)
                                  .Where((arg) => arg.UserId == userId)
                                  .Select((arg) => new Claim("pk_user", arg.Role.Name))
@@ -166,7 +166,7 @@ namespace Microsoft.Extensions.DependencyInjection {
         }
 
         public bool IsModeratorFor(int eventId, int userId) {
-            return Context.temporaryRoles
+            return Context.TemporaryRoles
                           .Any((TemporaryRole arg) => arg.EventId == eventId &&
                                                       arg.UserId == userId);
         }

@@ -14,7 +14,7 @@ namespace events_planner.Models {
         public DbSet<TopEvents> Tops { get; set; }
         public DbSet<Image> Images { get; set; }
         public DbSet<JuryPoint> JuryPoints { get; set; }
-        public DbSet<TemporaryRole> temporaryRoles { get; set; }
+        public DbSet<TemporaryRole> TemporaryRoles { get; set; }
         public DbSet<WebConfig> WebConfig { get; set; }
 
         //JOINTS
