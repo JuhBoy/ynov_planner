@@ -62,6 +62,10 @@ namespace events_planner.Controllers {
             Event mEvent;
             eventFromRequest.BindWithEventModel<Event>(out mEvent);
 
+            if (mEvent.RestrictedEvent) {
+                Services.AddAndRemoveEventRoles(eventFromRequest.AddRestrictedRolesList, null, mEvent);
+            }
+
             if (!Services.IsTimeWindowValid(ref mEvent)) {
                 var error = new String[] { "Time window is not valid, ensure close start before open" };
                 return BadRequest(new { TimeWindow = error });
@@ -127,8 +131,14 @@ namespace events_planner.Controllers {
 
                 Context.Booking.UpdateRange(bookings);
             }
-            
+
             eventReq.BindWithModel(ref eventModel);
+
+            if (eventModel.RestrictedEvent) {
+              Services.AddAndRemoveEventRoles(eventReq.AddRestrictedRolesList, eventReq.RemoveRestrictedRolesList, eventModel);
+            } else {
+              Services.RemoveAllEventRoles(eventModel.Id);
+            }
 
             try {
                 Context.Event.Update(eventModel);

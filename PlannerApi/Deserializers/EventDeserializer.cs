@@ -22,6 +22,8 @@ namespace events_planner.Deserializers {
         [Required]
         public bool ValidationRequired { get; set; }
 
+        public bool RestrictedEvent { get; set; }
+
         [RegularExpression(Models.Status.ValidRegex)]
         public string Status { get; set; } = Models.Status.PENDING;
 
@@ -43,12 +45,15 @@ namespace events_planner.Deserializers {
 
         public Price[] Prices { get; set; }
 
+        public string[] AddRestrictedRolesList { get; set; }
+
         public void BindWithEventModel<T>(out T model) where T : Event {
             Event modelEvent = new Event() {
                 Title = this.Title,
                 Description = this.Description,
                 SubscribeNumber = this.SubscribeNumber,
                 ValidationRequired = this.ValidationRequired,
+                RestrictedEvent = this.RestrictedEvent,
                 Status = this.Status,
                 JuryPoint = this.JuryPoint,
                 Location = this.Location,

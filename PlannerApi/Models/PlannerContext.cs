@@ -21,6 +21,7 @@ namespace events_planner.Models {
         public DbSet<EventCategory> EventCategory { get; set; }
         public DbSet<EventPromotion> EventPromotion { get; set; }
         public DbSet<EventUser> EventUser { get; set; }
+        public DbSet<EventRole> EventRole { get; set; }
 
 
         /// <summary>

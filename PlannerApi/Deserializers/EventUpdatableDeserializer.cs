@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System;
 
 namespace events_planner.Deserializers {
-    
+
     public class EventUpdatableDeserializer {
 
         [StringLength(255, MinimumLength = 3)]
@@ -21,6 +21,8 @@ namespace events_planner.Deserializers {
 
         public bool? ValidationRequired { get; set; }
 
+        public bool? RestrictedEvent { get; set; }
+
         public int? JuryPoint { get; set; }
 
         public string Location { get; set; }
@@ -32,6 +34,10 @@ namespace events_planner.Deserializers {
         public DateTime? OpenAt { get; set; }
 
         public DateTime? EndAt { get; set; }
+
+        public string[] RemoveRestrictedRolesList { get; set; }
+
+        public string[] AddRestrictedRolesList { get; set; }
 
         public void BindWithModel(ref Event model) {
             if (Title != null)
@@ -65,6 +71,9 @@ namespace events_planner.Deserializers {
                 model.ValidationRequired = (bool) ValidationRequired;
                 model.ValidatedNumber = 0;
             }
+
+            if (RestrictedEvent.HasValue)
+                model.RestrictedEvent = (bool) RestrictedEvent;
         }
     }
 }

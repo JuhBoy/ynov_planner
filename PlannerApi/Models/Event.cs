@@ -45,6 +45,9 @@ namespace events_planner.Models {
         [Column("validation_required")]
         public bool ValidationRequired { get; set; } = false;
 
+        [Column("restricted_event")]
+        public bool RestrictedEvent { get; set; } = false;
+
         [Column("jury_point"),
          JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public int? JuryPoint { get; set; } = null;
@@ -127,7 +130,14 @@ namespace events_planner.Models {
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore,
                       DefaultValueHandling = DefaultValueHandling.Ignore)]
         public IList<TemporaryRole> Moderators { get; set; }
+        
+        /// <summary> Roles Authorized to subscribe to the event </summary>
+        public IList<EventRole> RestrictedRoles { get; set; }
 
+        /// <summary>
+        /// Is the event have a subscription window ?
+        /// </summary>
+        /// <returns>boolean</returns>
         public bool HasSubscriptionWindow() {
             return (StartAt.HasValue || EndAt.HasValue);
         }
