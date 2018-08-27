@@ -102,6 +102,8 @@ namespace events_planner.Controllers {
 
             try {
                 Services.UpdateFromDeserializer(ref categoryFromRequest, ref category);
+                Context.Category.Update(category);
+                await Context.SaveChangesAsync();
             } catch (DbUpdateException db) {
                 return BadRequest(db.InnerException.Message);
             }
