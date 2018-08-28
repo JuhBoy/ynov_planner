@@ -47,6 +47,7 @@ namespace events_planner {
             services.AddScoped<IRoleServices, RoleServices>();
             services.AddScoped<IEventServices, EventServices>();
             services.AddScoped<ICategoryServices, CategoryServices>();
+            services.AddScoped<ITopEventServices, TopEventServices>();
 
             if (Configuration.GetValue<bool>("SechduleActivation")) {
                 // Background tasks

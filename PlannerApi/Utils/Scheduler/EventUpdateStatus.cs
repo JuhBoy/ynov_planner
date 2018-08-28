@@ -6,11 +6,12 @@ using System.Linq.Expressions;
 using events_planner.Models;
 using Microsoft.EntityFrameworkCore;
 using events_planner.Scheduler.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace events_planner.Scheduler {
-    
+
     public class EventUpdateStatus : IScheduledTask {
-        
+
         public string Schedule => "* * * * *";
 
         public string ConnectionString { get; }
@@ -41,26 +42,39 @@ namespace events_planner.Scheduler {
                 this.PrettyPrint("Database connection established");
 
                 bool shouldBeProc = await db.Event.AnyAsync(Condition, cancellationToken);
-                
+
                 if (shouldBeProc) {
                     Event[] @events = await db.Event.Where(Condition).ToArrayAsync(cancellationToken);
                     foreach (var @event in @events) {
-                        
+
                         var from = @event.Status;
-                        
+
                         if (@event.HasSubscriptionWindow() && @event.SubscribtionOpen()) {
                             @event.Status = Status.SUBSCRIPTION;
                         } else if (@event.OnGoingWindow()) {
                             @event.Status = Status.ONGOING;
-                        } else if (@event.CloseAt >= DateTime.Now && 
+                        } else if (@event.CloseAt >= DateTime.Now &&
                                    (!@event.HasSubscriptionWindow() || @event.EndAt <= DateTime.Now)) {
                             @event.Status = Status.INCOMING;
                         } else if (@event.CloseAt <= DateTime.Now) {
                             @event.Status = Status.DONE;
+
+                            // Remove top event when event is done
+                            int id = @event.Id;
+                            TopEvents top = db.Tops.FirstOrDefault(e => e.EventId == id);
+                            if (top != null) {
+                              ITopEventServices service = new TopEventServices(db) as ITopEventServices;
+                              TopEvents[] tops = db.Tops.Where(e => e.EventId != id)
+                                                        .OrderBy(e => e.Index).ToArray();
+                              service.ReArrangeTopEvents(tops);
+
+                              db.Tops.Remove(top);
+                              db.Tops.UpdateRange(tops);
+                            }
                         } else {
                             @event.Status = Status.PENDING;
                         }
-                        
+
                         this.PrettyPrint($"Event: {@event.Id} is updating from: [{from}] to: [{@event.Status}] ");
                     }
 
