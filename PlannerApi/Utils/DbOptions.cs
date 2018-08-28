@@ -17,7 +17,7 @@ namespace events_planner
         public void SetDatabaseContext(IServiceCollection services) {
             if (Env.IsDevelopment()) {
                 services.AddDbContext<Models.PlannerContext>(optionsBuilder => {
-                    optionsBuilder.UseLoggerFactory(LoggerFactory);
+                 // optionsBuilder.UseLoggerFactory(LoggerFactory); NLog is now used to logg queries
                     optionsBuilder.UseMySql(Configuration.GetConnectionString("Mysql"));
                 });
             }

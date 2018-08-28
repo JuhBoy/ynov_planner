@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using events_planner.Data;
 using events_planner.Models;
 using Microsoft.Extensions.DependencyInjection;
+using NLog.Web;
 
 namespace events_planner
 {
@@ -14,7 +15,21 @@ namespace events_planner
 
         public static void Main(string[] args)
         {
-            IWebHost host = BuildWebHost(args);
+            // NLog: setup the logger first to catch all errors
+            var logger = NLogBuilder.ConfigureNLog("../../../nlog.config").GetCurrentClassLogger();
+            IWebHost host;
+            
+            try {
+                logger.Debug("Init Server...");
+                host = BuildWebHost(args);
+            }
+            catch (Exception ex) {
+                //NLog: catch setup errors
+                logger.Error(ex, "Stopped program because of exception");
+                NLog.LogManager.Shutdown();
+                throw;
+            }
+            
             using (var scope = host.Services.CreateScope())
             {
                 IServiceProvider services = scope.ServiceProvider;
@@ -27,8 +42,7 @@ namespace events_planner
                 }
                 catch (Exception ex)
                 {
-                    ILogger<Program> logger = services.GetRequiredService<ILogger<Program>>();
-                    logger.LogError(ex, "An error occurred while seeding the database.");
+                    logger.Error(ex, "An error occurred while seeding the database.");
                 }
             }
             host.Run();
@@ -38,8 +52,15 @@ namespace events_planner
             CreateWebHostbuilder(args).Build();
 
         public static IWebHostBuilder CreateWebHostbuilder(string[] args) =>
-                WebHost.CreateDefaultBuilder(args)
-                       .UseEnvironment(ENV)
-                       .UseStartup<Startup>();
+            WebHost.CreateDefaultBuilder(args)
+                .UseEnvironment(ENV)
+                .UseStartup<Startup>()
+                .ConfigureLogging(logging =>
+                {
+                    logging.ClearProviders();
+                    logging.SetMinimumLevel(LogLevel.Trace);
+                })
+                .UseNLog();
+
     }
 }
