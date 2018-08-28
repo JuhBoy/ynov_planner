@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using events_planner.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -59,7 +60,7 @@ namespace events_planner.Controllers {
         }
 
         [HttpDelete("{eventId}")]
-        public IActionResult RemoveEventFromTop(int eventId) {
+        public IActionResult RemoveEventFromTop(int eventId, [FromServices] ITopEventServices service) {
             TopEvents @event = Context.Tops
                                       .FirstOrDefault((arg) => arg.EventId == eventId);
             if (@event == null)
@@ -68,11 +69,7 @@ namespace events_planner.Controllers {
             var tops = Context.Tops.Where((arg) => arg.EventId != eventId)
                               .OrderBy(arg => arg.Index)
                               .ToArray();
-            int cursor = 1;
-            foreach(var top in tops) {
-                top.Index = cursor;
-                cursor++;
-            }
+            service.ReArrangeTopEvents(tops);
 
             try {
                 Context.Tops.Remove(@event);
@@ -92,18 +89,18 @@ namespace events_planner.Controllers {
                                            .AsTracking()
                                            .OrderBy((arg) => arg.Index)
                                            .ToArray();
-            
+
             TopEvents current = topEvents.FirstOrDefault((arg) => arg.EventId == eventId);
             int diff = newIndex - current.Index;
             current.Index = newIndex;
 
             if (current == null)
                 return NotFound("Event not found");
-            if (newIndex > topEvents.Length) 
+            if (newIndex > topEvents.Length)
                 return BadRequest("Index out of range");
 
             if (diff == 0) {
-                /* things ordered */ 
+                /* things ordered */
             } else if (Math.Abs(diff) == 1) {
                 topEvents[newIndex-1].Index -= Math.Sign(diff);
             } else {
