@@ -24,6 +24,9 @@
     <None Include="PlannerApi.Tests.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Fixtures\Events.json">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
     <Content Include="Fixtures\Promotions.json">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>

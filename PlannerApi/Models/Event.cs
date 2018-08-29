@@ -130,7 +130,7 @@ namespace events_planner.Models {
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore,
                       DefaultValueHandling = DefaultValueHandling.Ignore)]
         public IList<TemporaryRole> Moderators { get; set; }
-        
+
         /// <summary> Roles Authorized to subscribe to the event </summary>
         public IList<EventRole> RestrictedRoles { get; set; }
 

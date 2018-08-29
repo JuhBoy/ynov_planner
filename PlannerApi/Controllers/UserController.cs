@@ -352,7 +352,7 @@ namespace events_planner.Controllers {
                                                       .Where(arg => iIds.Contains(arg.Id));
                 fileName = "export_" + DateTime.Now.ToString("HH_mm_ss") + ".csv";
                 string path = Path.Combine(Env.WebRootPath, "csv", fileName);
-                
+
                 using (var stream = new StreamWriter(path, false)) {
                     var csvWriter = new CsvWriter(stream);
                     csvWriter.Configuration.RegisterClassMap<UserDataMap>();

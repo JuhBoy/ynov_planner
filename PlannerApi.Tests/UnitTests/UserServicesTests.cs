@@ -7,31 +7,23 @@ using Microsoft.Extensions.Configuration;
 using events_planner.Models;
 using Microsoft.Extensions.DependencyInjection;
 using events_planner.Services;
+using PlannerApi.Tests.IntegrationTests.Helpers;
 
 namespace PlannerApi.Tests.UnitTests
 {
     public partial class UserServicesTests
     {
 
-        public partial class GetToken : IDisposable {
-
-            Mock<IConfiguration> Configuration { get; set; }
-            Mock<PlannerContext> PlannerContext { get; set; }
-            Mock<IRoleServices> RoleServices { get; set; }
-            Mock<IPromotionServices> PromotionServices { get; set; }
+        public partial class GetToken : IDisposable
+        {
+            private Mock<IConfiguration> Configuration;
+            private Mock<PlannerContext> PlannerContext;
+            private Mock<IRoleServices> RoleServices;
+            private Mock<IPromotionServices> PromotionServices;
 
             public GetToken() {
-                Configuration = new Mock<IConfiguration>();
-                PlannerContext = new Mock<PlannerContext>();
-                RoleServices = new Mock<IRoleServices>();
-                PromotionServices = new Mock<IPromotionServices>();
-
-                Configuration.Setup(conf => conf["TokenAuthentication:Audience"])
-                             .Returns("localhost:5000");
-                Configuration.Setup(conf => conf["TokenAuthentication:Issuer"])
-                             .Returns("localhost:5000");
-                Configuration.Setup(conf => conf["TokenAuthentication:Secret"])
-                             .Returns("MySecretkeymustbesuperhotstobeacceptedbythehash");
+                TokenBearerHelper.MockUserServices(out Configuration, out PlannerContext, out RoleServices,
+                                                   out PromotionServices);
             }
 
             public void Dispose()
@@ -45,7 +37,7 @@ namespace PlannerApi.Tests.UnitTests
             {
                 User user = new User() {
                     Id = 1,
-                    LastName = "dupon", 
+                    LastName = "dupon",
                     FirstName = "George",
                     Password = "My_passwonrd",
                     Email = "email@dqsd.fr",
@@ -53,7 +45,7 @@ namespace PlannerApi.Tests.UnitTests
                 };
                 var us = new Mock<UserServices>(PlannerContext.Object, Configuration.Object, PromotionServices.Object, RoleServices.Object);
                 us.Setup(svces => svces.GetRoles(1, "Student")).Returns(new List<Claim>());
-                
+
                 string token = us.Object.GenerateToken(ref user);
                 string[] slicedToken = token.Split('.', StringSplitOptions.RemoveEmptyEntries);
 

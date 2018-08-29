@@ -17,7 +17,8 @@ namespace events_planner.Data {
 
         public const string USERS_TEST_PARTH = "/Fixtures/UsersTest.json";
         public const string PROMOTIONS_TEST_PATH = "/Fixtures/Promotions.json";
-        public const string ROLE_TEST_PARH = "/Fixtures/Roles.json";
+        public const string ROLE_TEST_PATH = "/Fixtures/Roles.json";
+        public const string EVENTS_TEST_PATH = "/Fixtures/Events.json";
 
         public const string EVENTS_PATH = "/Data/Events.json";
 
@@ -55,8 +56,11 @@ namespace events_planner.Data {
             
             if (!context.User.Any()) {
                 List<Promotion> promotions = JsonConvert.DeserializeObject<List<Promotion>>(File.ReadAllText(currentDirectory + PROMOTIONS_TEST_PATH));
-                List<Role> role = JsonConvert.DeserializeObject<List<Role>>(File.ReadAllText(currentDirectory + ROLE_TEST_PARH));
+                List<Role> role = JsonConvert.DeserializeObject<List<Role>>(File.ReadAllText(currentDirectory + ROLE_TEST_PATH));
                 List<User> users = JsonConvert.DeserializeObject<List<User>>(File.ReadAllText(currentDirectory + USERS_TEST_PARTH));
+                List<Event> events = JsonConvert.DeserializeObject<List<Event>>(File.ReadAllText(currentDirectory + EVENTS_TEST_PATH));
+                
+                context.Event.AddRange(events);
 
                 foreach (User user in users) {
                     user.Promotion = promotions.First();
