@@ -133,6 +133,11 @@ namespace events_planner.Controllers {
             }
 
             eventReq.BindWithModel(ref eventModel);
+            
+            if (!Services.IsTimeWindowValid(ref eventModel)) {
+                var error = new String[] { "Time window is not valid, ensure close start before open" };
+                return BadRequest(new { TimeWindow = error });
+            }
 
             if (eventModel.RestrictedEvent) {
               Services.AddAndRemoveEventRoles(eventReq.AddRestrictedRolesList, eventReq.RemoveRestrictedRolesList, eventModel);
