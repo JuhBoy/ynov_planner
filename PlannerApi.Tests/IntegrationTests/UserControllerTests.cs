@@ -59,7 +59,7 @@ namespace PlannerApi.Tests.IntegrationTests
                 Assert.Equal(HttpStatusCode.Created, response.StatusCode);
                 Assert.NotNull(obj);
                 Assert.Equal(obj.Email, user.Email);
-                Assert.Equal(obj.Role.Name, "Student");
+                Assert.Equal("Student", obj.Role.Name);
             }
         }
 

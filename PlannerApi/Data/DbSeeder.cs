@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 using System.IO;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Hosting.Internal;
 using Newtonsoft.Json;
 
 namespace events_planner.Data {
@@ -56,15 +57,21 @@ namespace events_planner.Data {
             
             if (!context.User.Any()) {
                 List<Promotion> promotions = JsonConvert.DeserializeObject<List<Promotion>>(File.ReadAllText(currentDirectory + PROMOTIONS_TEST_PATH));
-                List<Role> role = JsonConvert.DeserializeObject<List<Role>>(File.ReadAllText(currentDirectory + ROLE_TEST_PATH));
+                List<Role> roles = JsonConvert.DeserializeObject<List<Role>>(File.ReadAllText(currentDirectory + ROLE_TEST_PATH));
                 List<User> users = JsonConvert.DeserializeObject<List<User>>(File.ReadAllText(currentDirectory + USERS_TEST_PARTH));
                 List<Event> events = JsonConvert.DeserializeObject<List<Event>>(File.ReadAllText(currentDirectory + EVENTS_TEST_PATH));
                 
                 context.Event.AddRange(events);
+                context.Role.AddRange(roles);
 
                 foreach (User user in users) {
                     user.Promotion = promotions.First();
-                    user.Role = role.First();
+                    if (user.Email.Contains("admin")) {
+                        user.Role = roles.FirstOrDefault(r => r.Name.Equals("Admin"));
+                    }
+                    else {
+                        user.Role = roles.First();
+                    }
                 }
                 context.User.AddRange(users);
                 context.SaveChanges();

@@ -170,7 +170,8 @@ namespace events_planner.Controllers {
             [FromBody] BookingValidationDeserializer bookingValidation,
             [FromServices] IUserServices userServices) {
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
-            if (!userServices.IsModeratorFor(bookingValidation.EventId,
+            if (!CurrentUser.Role.Name.Equals("Admin") &&
+                !userServices.IsModeratorFor(bookingValidation.EventId,
                                             CurrentUser.Id)) {
                 return BadRequest("Not Allowed to moderate this event");
             }
@@ -188,8 +189,8 @@ namespace events_planner.Controllers {
 
             if (book == null)
                 return NotFound("Booking not found");
-            else if (book.Event.OnGoingWindow() ||
-               book.Event.Status != Status.ONGOING)
+            else if (!book.Event.OnGoingWindow() ||
+               !book.Event.Status.Equals(Status.ONGOING))
                 return BadRequest("Can't validate presence outside of open window");
             else if (book.Present)
                 return BadRequest("Presence Already validated");
