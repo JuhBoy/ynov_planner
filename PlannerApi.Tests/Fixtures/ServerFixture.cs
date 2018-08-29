@@ -13,37 +13,39 @@ namespace PlannerApi.Tests.Fixtures {
 
     public class ServerFixtures : IDisposable {
 
-        public HttpClient Client { get; set; }
+        public HttpClient Client;
+        private readonly TestServer _server;
 
         public ServerFixtures() {
-            IWebHostBuilder builder = Program.CreateWebHostbuilder(Array.Empty<string>())
-                                             .UseEnvironment("test")
-                                             .UseContentRoot(Path.GetFullPath("../../../../PlannerApi"));
+                IWebHostBuilder builder = Program.CreateWebHostbuilder(Array.Empty<string>())
+                    .UseEnvironment("test")
+                    .UseContentRoot(Path.GetFullPath("../../../../PlannerApi"));
 
-            TestServer server = new TestServer(builder);
+                _server = new TestServer(builder);
 
-            using (var scope = server.Host.Services.CreateScope())
-            {
-                IServiceProvider services = scope.ServiceProvider;
-                try
+                using (var scope = _server.Host.Services.CreateScope())
                 {
-                    DbSeeder.InitializeTest(
-                        services.GetRequiredService<PlannerContext>()
-                    );
+                    IServiceProvider services = scope.ServiceProvider;
+                    try
+                    {
+                        DbSeeder.InitializeTest(
+                            services.GetRequiredService<PlannerContext>()
+                        );
+                    }
+                    catch (Exception ex)
+                    {
+                        ILogger<Program> logger = services.GetRequiredService<ILogger<Program>>();
+                        logger.LogError(ex, "An error occurred while seeding the database.");
+                    }
                 }
-                catch (Exception ex)
-                {
-                    ILogger<Program> logger = services.GetRequiredService<ILogger<Program>>();
-                    logger.LogError(ex, "An error occurred while seeding the database.");
-                }
-            }
 
-            Client = server.CreateClient();
+                Client = _server.CreateClient();
         }
 
         public void Dispose()
         {
-            Client = null; 
+            Client.Dispose();
+            _server.Dispose();
         }
     }
 }

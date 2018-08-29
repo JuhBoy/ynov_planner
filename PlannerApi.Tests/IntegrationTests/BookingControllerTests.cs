@@ -15,7 +15,8 @@ using PlannerApi.Tests.IntegrationTests.Helpers;
 
 namespace PlannerApi.Tests.IntegrationTests
 {
-    public partial class BookingControllerTests : IClassFixture<ServerFixtures>, IDisposable
+    [Collection("Integration")] // Integration test must not be run in parallel
+    public class BookingControllerTests : IClassFixture<ServerFixtures>
     {
         protected HttpClient HttpClient { get; }
         protected string DbConnection = "server=localhost;port=3306;database=ynov_planner_tests;uid=root;password=root";
@@ -36,7 +37,7 @@ namespace PlannerApi.Tests.IntegrationTests
             }
         }
 
-        public partial class Subscriptions : BookingControllerTests
+        public class Subscriptions : BookingControllerTests
         {
             public Subscriptions(ServerFixtures server) : base(server) { }
 
@@ -69,7 +70,7 @@ namespace PlannerApi.Tests.IntegrationTests
             }
         }
 
-        public partial class Validation : BookingControllerTests
+        public class Validation : BookingControllerTests
         {
             public Validation(ServerFixtures server) : base(server) { }
 

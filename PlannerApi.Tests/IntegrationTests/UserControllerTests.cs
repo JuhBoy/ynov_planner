@@ -10,15 +10,16 @@ using PlannerApi.Tests.Fixtures;
 
 namespace PlannerApi.Tests.IntegrationTests
 {
-    public partial class UserControllerTests : IClassFixture<ServerFixtures>
+    [Collection("Integration")]
+    public class UserControllerTests : IClassFixture<ServerFixtures>
     {
-        protected HttpClient HttpClient { get; set; }
+        protected HttpClient HttpClient { get; }
 
         public UserControllerTests(ServerFixtures server) {
             HttpClient = server.Client;
         }
 
-        public partial class GetToken : UserControllerTests {
+        public class GetToken : UserControllerTests {
 
             public GetToken(ServerFixtures server) : base(server) { }
             
@@ -34,7 +35,7 @@ namespace PlannerApi.Tests.IntegrationTests
             }
         }
 
-        public partial class CreateUser : UserControllerTests {
+        public class CreateUser : UserControllerTests {
             public CreateUser(ServerFixtures server) : base(server) { }
 
             [Fact]
@@ -63,7 +64,7 @@ namespace PlannerApi.Tests.IntegrationTests
             }
         }
 
-        public partial class ReadUser : UserControllerTests {
+        public class ReadUser : UserControllerTests {
             public ReadUser(ServerFixtures server) : base(server) { }
 
             [Theory, InlineData("email@admin.com", "123456789")]
