@@ -208,9 +208,9 @@ namespace events_planner.Controllers {
             bool obsolete = HttpContext.Request.Query["obsolete"] == bool.TrueString;
 
             if (order == "ASC")
-                Query = Query.OrderBy((Event arg) => arg.StartAt);
+                Query = Query.OrderBy((Event arg) => arg.OpenAt);
             else
-                Query = Query.OrderByDescending((Event arg) => arg.StartAt);
+                Query = Query.OrderByDescending((Event arg) => arg.OpenAt);
 
             if (from != null) Services.FromDate(ref Query, from);
 
