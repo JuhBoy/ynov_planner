@@ -10,6 +10,7 @@ using System;
 using Microsoft.AspNetCore.Http;
 using System.IO;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace events_planner.Controllers {
 
@@ -338,7 +339,8 @@ namespace events_planner.Controllers {
         [HttpPost("{eventId}/upload/images"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> UploadImages(int eventId,
                                                       [FromServices] IImageServices imageServices,
-                                                      [FromForm] ImageUploadDeserializer imageCore) {
+                                                      [FromForm] ImageUploadDeserializer imageCore,
+                                                      CancellationToken cancellationToken) {
             if (!ModelState.IsValid) {
                 return BadRequest(ModelState);
             }
@@ -354,7 +356,7 @@ namespace events_planner.Controllers {
                                         @event.CreatedAt.ToString("yyyyMMdd");
 
             try {
-                Dictionary<string, string> urls = await imageServices.UploadImageAsync(files, baseFileName);
+                Dictionary<string, string> urls = await imageServices.UploadImageAsync(files, baseFileName, cancellationToken);
                 List<Image> rangeUpdate = new List<Image>();
 
                 foreach (var pair in urls) {
@@ -393,7 +395,9 @@ namespace events_planner.Controllers {
             try {
                 Image image = Context.Images
                                      .FirstOrDefault((arg) => arg.ImageId == imageId);
-                await imageServices.RemoveImages(image.Url);
+                if (image == null) return BadRequest("Image Not Found");
+                
+                imageServices.RemoveImages(image.Url);
                 Context.Images.Remove(image);
                 Context.SaveChanges();
             } catch (FileNotFoundException e) {

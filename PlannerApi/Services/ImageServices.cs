@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace events_planner.Services {
@@ -51,59 +52,41 @@ namespace events_planner.Services {
 
         public async Task<Dictionary<string, string>> UploadImageAsync(IFormFileCollection files,
                                                                        string baseFileName,
+                                                                       CancellationToken cancellationToken,
                                                                        string folder = "images") {
             string path = Path.Combine(Environment.WebRootPath, folder);
-
-            ThreadResponse resultFromIOThread = await Task.Run<ThreadResponse>(() => {
-                var response = new ThreadResponse {
-                    UrlsName = new Dictionary<string, string>()
-                };
-
-                // CREATE DIRECTORY IF NECESSARY
-                if (!Directory.Exists(path)) {
-                    Directory.CreateDirectory(path);
-                }
-
-                // LOOP TO COPY IMAGES
-                foreach (IFormFile file in files) {
-                    if (file.Length <= 0) continue;
-
-                    if (IsValidMymeType(file.ContentType) &&
-                        IsValidExtension(file.FileName)) {
-                        string newFileName = GenerateName(ref baseFileName, Path.GetExtension(file.FileName));
-                        string filePath = Path.Combine(path, newFileName);
-
-                        using (var stream = new FileStream(filePath, FileMode.CreateNew)) {
-                            try {
-                                file.CopyTo(stream);
-                                response.UrlsName.Add(folder + "/" + newFileName, file.FileName);
-                            } catch (IOException e) {
-                                response.Exception = e;
-                            }
-                        }
-                    }
-                }
-                return response;
-            });
-
-            if (resultFromIOThread.Exception != null) {
-                throw new IOException(resultFromIOThread.Exception.Message);
+            
+            // CREATE DIRECTORY IF NECESSARY
+            if (!Directory.Exists(path)) {
+                Directory.CreateDirectory(path);
             }
 
-            return resultFromIOThread.UrlsName;
+            var UrlsName = new Dictionary<string, string>();
+
+            foreach (IFormFile file in files) {
+                if (file.Length <= 0) continue;
+
+                if (IsValidMymeType(file.ContentType) &&
+                    IsValidExtension(file.FileName)) {
+                    string newFileName = GenerateName(ref baseFileName, Path.GetExtension(file.FileName));
+                    string filePath = Path.Combine(path, newFileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.CreateNew)) {
+                        await file.CopyToAsync(stream, cancellationToken);
+                        UrlsName.Add(folder + "/" + newFileName, file.FileName);
+                    }
+                }
+            }
+
+            return UrlsName;
         }
 
-        public async Task RemoveImages(string path) {
+        public void RemoveImages(string path) {
             string fullPath = Path.Combine(Environment.WebRootPath, path);
             if (!File.Exists(fullPath)) {
                 throw new FileNotFoundException(string.Format("File not found at path {0}", fullPath));
             }
-            await Task.Run(() => File.Delete(fullPath));
-        }
-
-        private struct ThreadResponse {
-            public IOException Exception { get; set; }
-            public Dictionary<string, string> UrlsName { get; set; }
+            Task.Run(() => File.Delete(fullPath));
         }
 
     }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
@@ -8,7 +9,8 @@ namespace events_planner.Services {
         bool IsValidMymeType(string file);
         Task<Dictionary<string, string>> UploadImageAsync(IFormFileCollection files,
                                                           string baseFileName,
+                                                          CancellationToken cancellationToken,
                                                           string folder = "images");
-        Task RemoveImages(string path);
+        void RemoveImages(string path);
     }
 }
