@@ -1,6 +1,7 @@
 using events_planner.Models;
 using System.ComponentModel.DataAnnotations;
 using System;
+using Microsoft.Data.OData.Query.SemanticAst;
 
 namespace events_planner.Deserializers {
 
@@ -66,6 +67,9 @@ namespace events_planner.Deserializers {
 
             if (JuryPoint.HasValue)
                 model.JuryPoint = JuryPoint;
+
+            if (OpenAt.HasValue)
+                model.OpenAt = OpenAt;
 
             if (ValidationRequired.HasValue && ValidationRequired != model.ValidationRequired) {
                 model.ValidationRequired = (bool) ValidationRequired;
