@@ -4,7 +4,7 @@ using events_planner.Models;
 
 namespace events_planner.Deserializers {
     public class UserUpdatableDeserializer {
-        
+
         [StringLength(20, MinimumLength = 3)]
         [MaxLength(20, ErrorMessage = "First Name must be under 20 characters")]
         [MinLength(3, ErrorMessage = "First Name must be at least 3 characters")]
@@ -56,6 +56,8 @@ namespace events_planner.Deserializers {
                 user.ImageUrl = ImageUrl;
             if (Location != null)
                 user.Location = Location;
+            if (DateOfBirth.HasValue)
+                user.DateOfBirth = DateOfBirth;
         }
     }
 }
