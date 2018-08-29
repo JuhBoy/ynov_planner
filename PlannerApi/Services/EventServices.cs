@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using events_planner.Services;
 using events_planner.Models;
 using Microsoft.EntityFrameworkCore;
@@ -29,6 +30,39 @@ namespace Microsoft.Extensions.DependencyInjection {
 
             Context.EventCategory.RemoveRange(categories);
             Context.SaveChanges();
+        }
+
+        public void AddAndRemoveEventRoles(string[] adds, string[] removes, Event @event) {
+            if (adds != null && adds.Length > 0) {
+                Role[] roles = Context.Role.Where(role => adds.Contains(role.Name)).ToArray();
+                var evRoles = new List<EventRole>(roles.Length);
+
+                for (int i = 0; i < roles.Length; i++) {
+                    if (Context.EventRole.Any(e => e.EventId == @event.Id && e.RoleId == roles[i].Id)) {
+                        continue;
+                    }
+                    evRoles.Add(new EventRole() { Event = @event, RoleId = roles[i].Id });
+                }
+
+                if (evRoles.Count() > 0)
+                    Context.EventRole.AddRange(evRoles);
+            }
+
+            if (removes != null && removes.Length > 0) {
+                Context.EventRole.RemoveRange(GetEventRolesFrom(removes, @event.Id));
+            }
+        }
+
+        public void RemoveAllEventRoles(int event_id) {
+          Context.EventRole.RemoveRange(
+            Context.EventRole.Where((EventRole e) => e.EventId == event_id).ToArray()
+          );
+        }
+
+        public EventRole[] GetEventRolesFrom(string[] list, int event_id) {
+            return Context.EventRole.Include(e => e.Role)
+                                    .Where(e => list.Contains(e.Role.Name) && e.EventId == event_id)
+                                    .ToArray();
         }
 
         public async Task<Event[]> GetEVentsFromIds(int[] ids) {

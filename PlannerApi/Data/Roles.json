@@ -1,11 +1,14 @@
 [
   {
+    "Name": "Foreigner"
+  },
+  {
     "Name":  "Student"
   },
   {
     "Name":  "Admin"
   },
   {
-      "Name":  "Moderator"
+    "Name":  "Moderator"
   }
 ]

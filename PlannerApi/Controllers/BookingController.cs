@@ -37,6 +37,7 @@ namespace events_planner.Controllers {
         ///     - Event hasn't reached its max subscribed number
         ///     - Event has not expired
         ///     - User doesn't already subsribed to this event
+        ///     - Event is restricted to the current user role
         /// </remarks>
         /// <param name="eventId">The event Id</param>
         /// <returns>204 no Content</returns>
@@ -49,6 +50,8 @@ namespace events_planner.Controllers {
 
             // Don't force lambda to request Db for other scops.
             int userId = CurrentUser.Id;
+            int roleId = CurrentUser.RoleId;
+            int eventID = @event.Id;
 
             if (Context.Booking.Any((Booking booking) => booking.EventId == eventId
                 && booking.UserId == userId)) {
@@ -61,6 +64,11 @@ namespace events_planner.Controllers {
 
             if (!@event.SubscribtionOpen()) {
                 return BadRequest("Subscriptions are not open");
+            }
+
+            if (@event.RestrictedEvent &&
+                !Context.EventRole.Any((EventRole ev) => ev.RoleId == roleId && ev.EventId == eventID)) {
+                return BadRequest("Sorry you are not allowed to subscribe");
             }
 
             Booking book = new Booking() {

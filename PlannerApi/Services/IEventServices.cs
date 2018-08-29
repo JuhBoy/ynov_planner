@@ -11,6 +11,12 @@ namespace events_planner.Services {
 
         Task<Event> GetEventByIdAsync(int id);
 
+        EventRole[] GetEventRolesFrom(string[] list, int event_id);
+
+        void RemoveAllEventRoles(int event_id);
+
+        void AddAndRemoveEventRoles(string[] adds, string[] removes, Event @event);
+
         Task<Price> GetPriceForRoleAsync(int roleId, int eventId);
 
         Task<bool> IsEventBooked(int userId, int eventId);
