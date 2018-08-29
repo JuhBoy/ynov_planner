@@ -145,11 +145,12 @@ namespace Microsoft.Extensions.DependencyInjection {
         }
 
         public virtual List<Claim> GetRoles(int userId, string role = null) {
-            List<Claim> claims = Context.TemporaryRoles
+            string[] roles = Context.TemporaryRoles
                                  .Include(arg => arg.Role)
                                  .Where((arg) => arg.UserId == userId)
-                                 .Select((arg) => new Claim("pk_user", arg.Role.Name))
-                                 .ToList();
+                                 .Select((arg) => arg.Role.Name)
+                                 .ToArray();
+            List<Claim> claims = roles.Distinct().Select((arg) => new Claim("pk_user", arg)).ToList();
             
             if (role != null)
                 claims.Add(new Claim("pk_user", role));
