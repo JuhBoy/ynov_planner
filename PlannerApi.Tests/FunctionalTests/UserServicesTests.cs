@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using Castle.Core.Internal;
 using events_planner.Models;
 using events_planner.Services;
 using Microsoft.EntityFrameworkCore;
@@ -36,7 +39,7 @@ namespace PlannerApi.Tests.FunctionalTests
             });
         }
 
-        public void Dispose() { }
+        public virtual void Dispose() { }
 
         public class GetRole : UserServicesTests {
             
@@ -95,6 +98,42 @@ namespace PlannerApi.Tests.FunctionalTests
                 Assert.Null(role);
             }
         }
-        
+
+        public class GetRoles : UserServicesTests
+        {
+            public GetRoles() : base() { }
+
+            public sealed override void Dispose() {
+                base.Dispose();
+                if (!Context.TemporaryRoles.Any()) { return; }
+                Context.RemoveRange(Context.TemporaryRoles.ToArray());
+                Context.SaveChanges();
+            }
+
+            [Theory, InlineData("julien@gmail.com")]
+            public void GetRolesShouldReturnDistinctRoles(string userMail) {
+                TokenBearerHelper.MockUserServices(out Cfg, out Pc, out Irs, out Ips);
+                User user = Context.User.FirstOrDefault(u => u.Email == userMail);
+                Role role = Context.Role.FirstOrDefault(r => r.Name == "Moderator");
+                Queue<Event> evQueue = new Queue<Event>(Context.Event.Take(3).ToArray());
+                
+                while (!evQueue.IsNullOrEmpty()) {
+                    int id = evQueue.Dequeue().Id;
+                    Context.TemporaryRoles.Add(
+                        new TemporaryRole() { UserId = user.Id, EventId = id, RoleId = role.Id }
+                    );
+                }
+                Context.SaveChanges();
+
+                var service = new UserServices(Context, Cfg.Object, Ips.Object, Irs.Object);
+                var claims = service.GetRoles(user.Id);
+                
+                Assert.NotNull(claims);
+                Assert.NotEmpty(claims);
+
+                Assert.Equal(1, claims.Count());
+            }
+        }
+
     }
 }
