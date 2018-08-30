@@ -224,7 +224,7 @@ namespace events_planner.Controllers {
         /// <remarks>A user can be updated partialy</remarks>
         /// <response code="404">User not found</response>
         /// <response code="500">if the credential given is not valid</response>
-        [HttpPatch("Update"), Authorize(Roles = "Student, Admin")]
+        [HttpPatch("Update"), Authorize(Roles = "Student, Admin, Foreigner")]
         public async Task<IActionResult> Update([FromBody] UserUpdatableDeserializer userFromRequest) {
             string email = UserServices.ReadJwtTokenClaims(Request.Headers["Authorization"]);
             User user = await Context.User.FirstOrDefaultAsync((User u) => u.Email == email);
@@ -256,7 +256,7 @@ namespace events_planner.Controllers {
         /// <response code="200">User removed</response>
         /// <response code="404">User not found</response>
         /// <response code="500">Db update exception, database is down</response>
-        [HttpDelete("delete"), Authorize(Roles = "Student, Admin")]
+        [HttpDelete("delete"), Authorize(Roles = "Student, Admin, Foreigner")]
         public async Task<IActionResult> Delete() {
             string email = UserServices.ReadJwtTokenClaims(Request.Headers["Authorization"]);
             User user = await Context.User.FirstOrDefaultAsync((User u) => u.Email == email);

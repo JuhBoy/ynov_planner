@@ -82,7 +82,7 @@ namespace events_planner.Controllers {
             return NoContent();
         }
 
-        [HttpPatch("order/{eventId}/{newIndex}"), Authorize(Roles = "Admin")]
+        [HttpPatch("order/{eventId}/{newIndex}")]
         public IActionResult Order(int eventId, int newIndex) {
             TopEvents[] topEvents = Context.Tops
                                            .Include(ccc => ccc.Event)

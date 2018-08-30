@@ -13,7 +13,7 @@ using events_planner.Utils;
 
 namespace events_planner.Controllers {
 
-    [Route("api/[controller]"), Authorize(Roles = "Student, Admin")]
+    [Route("api/[controller]")]
     public class BookingController : BaseController {
 
         public IEventServices EventServices;
@@ -41,7 +41,7 @@ namespace events_planner.Controllers {
         /// </remarks>
         /// <param name="eventId">The event Id</param>
         /// <returns>204 no Content</returns>
-        [HttpGet("subscribe/{eventId}")]
+        [HttpGet("subscribe/{eventId}"), Authorize(Roles = "Student, Admin, Foreigner")]
         public async Task<IActionResult> Subscribe(int eventId) {
             Event @event = await EventServices.GetEventByIdAsync(eventId);
 
@@ -102,7 +102,7 @@ namespace events_planner.Controllers {
         /// Unsubscribe from an event
         /// </summary>
         /// <returns>204 No Content</returns>
-        [HttpGet("unsubscribe/{eventId}")]
+        [HttpGet("unsubscribe/{eventId}"), Authorize(Roles = "Student, Admin, Foreigner")]
         public async Task<IActionResult> UnSubscribe(int eventId) {
             Event @event = await EventServices.GetEventByIdAsync(eventId);
             Booking booking = await Context.Booking.FirstOrDefaultAsync(
@@ -136,7 +136,7 @@ namespace events_planner.Controllers {
         /// The list doesn't contains the past events
         /// </summary>
         /// <returns>A list of events</returns>
-        [HttpGet, Authorize(Roles = "Student, Admin")]
+        [HttpGet, Authorize(Roles = "Student, Admin, Foreigner")]
         public async Task<IActionResult> GetBookedEvents() {
             Booking[] events = await Context.Booking
                                           .AsTracking()
@@ -289,13 +289,13 @@ namespace events_planner.Controllers {
         ///     },
         ///   }
         ///
-        /// When validate is null the event doesn't required anyvalidations.
+        /// When validate is null the event doesn't required any validations.
         /// The value will be settled to false or true otherwise.
         ///
         /// </remarks>
         /// <returns>200</returns>
         /// <param name="eventId">Event identifier.</param>
-        [HttpGet("users_status/{eventId}"), Authorize(Roles = "Admin")]
+        [HttpGet("users_status/{eventId}"), Authorize(Roles = "Admin, Moderator")]
         public async Task<IActionResult> GetUserStatusForBooking(int eventId) {
             var books = Context.Booking
                                .Include(inc => inc.User)

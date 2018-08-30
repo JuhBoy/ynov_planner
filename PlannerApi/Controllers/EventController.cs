@@ -87,7 +87,7 @@ namespace events_planner.Controllers {
         /// </summary>
         /// <response code="401">User/Admin token is not permitted</response>
         /// <response code="500">if the credential given is not valid or DB update failed</response>
-        [HttpGet("{id}"), Authorize(Roles = "Admin, Student")]
+        [HttpGet("{id}"), Authorize(Roles = "Admin, Student, Foreigner")]
         public async Task<IActionResult> Read(int id) {
             InitializeQuery();
             Event eventModel = await Query.AsNoTracking()
