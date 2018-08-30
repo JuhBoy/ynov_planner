@@ -16,7 +16,7 @@ namespace PlannerApi.Tests.IntegrationTests.Helpers
             Mock<PlannerContext > PlannerContext;
             Mock<IRoleServices> RoleServices;
             Mock<IPromotionServices > PromotionServices;
-            TokenBearerHelper.MockUserServices(out Configuration, out PlannerContext, out RoleServices, out PromotionServices);
+            MockUserServices(out Configuration, out PlannerContext, out RoleServices, out PromotionServices);
             
             IUserServices service = new UserServices(context, Configuration.Object, PromotionServices.Object, RoleServices.Object);
             return service.GenerateToken(ref user);

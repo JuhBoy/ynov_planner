@@ -13,7 +13,7 @@ namespace Microsoft.Extensions.DependencyInjection {
 
         public Promotion GetForeignPromotion() {
             return Context.Promotion
-                          .FirstOrDefault((Promotion arg) => arg.Name == "ForeignersStudents");
+                          .FirstOrDefault((Promotion arg) => arg.Name == "Foreigner");
         }
 
         public Promotion GetPromotionById(int id) {

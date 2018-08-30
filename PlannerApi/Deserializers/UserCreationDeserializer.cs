@@ -28,10 +28,6 @@ namespace events_planner.Deserializers
 
         [Required]
         public DateTime? DateOfBirth { get; set; }
-
-        public string RoleName { get; set; }
-
-        public int? Promotion { get; set; }
         
         public string Location { get; set; }
     }

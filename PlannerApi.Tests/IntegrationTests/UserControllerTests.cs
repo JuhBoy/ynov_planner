@@ -47,8 +47,8 @@ namespace PlannerApi.Tests.IntegrationTests
                     Email = (DateTimeOffset.Now.ToUnixTimeSeconds().ToString()) + "jhon@mymail.com",
                     Password = "123456789",
                     PhoneNumber = "0619198793",
-                    RoleName = "Student",
-                    DateOfBirth = DateTime.Today
+                    DateOfBirth = DateTime.Today,
+                    Location = "Fake_address"
                 };
 
                 string json = JsonConvert.SerializeObject(user, new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore });
@@ -60,7 +60,7 @@ namespace PlannerApi.Tests.IntegrationTests
                 Assert.Equal(HttpStatusCode.Created, response.StatusCode);
                 Assert.NotNull(obj);
                 Assert.Equal(obj.Email, user.Email);
-                Assert.Equal("Student", obj.Role.Name);
+                Assert.Equal("Foreigner", obj.Role.Name);
             }
         }
 

@@ -105,12 +105,10 @@ namespace Microsoft.Extensions.DependencyInjection {
         public User CreateUser(UserCreationDeserializer userFromRequest) {
             int phone;
             int.TryParse(userFromRequest.PhoneNumber, out phone);
-
-            Promotion promotion;
-            GetPromotion(userFromRequest.Promotion, out promotion);
+            var promotion = PromotionServices.GetForeignPromotion();
 
             Role role;
-            GetRole(userFromRequest.RoleName, out role);
+            GetRole(null, out role);
 
             User user = Context.User.Add(new User() {
                 FirstName = userFromRequest.FirstName,
@@ -132,17 +130,14 @@ namespace Microsoft.Extensions.DependencyInjection {
             Role role;
 
             GetPromotion(null, out promotion);
-            GetRole("", out role);
+            GetRole("Student", out role);
 
             user.Promotion = promotion;
             user.Role = role;
         }
 
         private void GetRole(string roleName, out Role role) {
-            role = RoleServices.GetRoleByName(roleName);
-            if (role == null) {
-                role = RoleServices.GetStudentRole();
-            }
+            role = (roleName != null) ?  RoleServices.GetRoleByName(roleName) : role = RoleServices.GetForeignerRole();
         }
 
         public virtual List<Claim> GetRoles(int userId, string role = null) {

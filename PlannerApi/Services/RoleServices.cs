@@ -17,5 +17,9 @@ namespace Microsoft.Extensions.DependencyInjection {
         Role IRoleServices.GetStudentRole() {
             return Context.Role.FirstOrDefault((Role arg) => arg.Name == "Student");
         }
+        
+        Role IRoleServices.GetForeignerRole() {
+            return Context.Role.FirstOrDefault((Role arg) => arg.Name == "Foreigner");
+        }
     }
 }
