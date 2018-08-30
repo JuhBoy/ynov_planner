@@ -32,5 +32,7 @@ namespace events_planner.Deserializers
         public string RoleName { get; set; }
 
         public int? Promotion { get; set; }
+        
+        public string Location { get; set; }
     }
 }

@@ -120,7 +120,8 @@ namespace Microsoft.Extensions.DependencyInjection {
                 PhoneNumber = phone,
                 Promotion = promotion,
                 DateOfBirth = userFromRequest.DateOfBirth,
-                Role = role
+                Role = role,
+                Location = userFromRequest.Location
             }).Entity;
             Context.SaveChanges();
             return user;
