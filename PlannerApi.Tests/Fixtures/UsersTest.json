@@ -3,14 +3,14 @@
     "firstName":  "Julien",
     "lastName":  "Boyer",
     "email":  "julien@gmail.com",
-    "password":  "123456789",
+    "password":  "98O8HYCOBHMq32eZZczDTKeuNEE=",
     "phoneNumber":  "0625791823"
   },
   {
     "firstName": "MyAdmin",
     "lastName": "AdminLastName",
     "email": "email@admin.com",
-    "password": "123456789",
+    "password": "98O8HYCOBHMq32eZZczDTKeuNEE=",
     "phoneNumber": "0625791823",
     "roleName": "Admin"
   }

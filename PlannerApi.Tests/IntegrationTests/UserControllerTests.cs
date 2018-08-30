@@ -73,6 +73,8 @@ namespace PlannerApi.Tests.IntegrationTests
                 
                 HttpResponseMessage response = await HttpClient.PostAsync("api/user/token", new StringContent(fakeJson, System.Text.Encoding.UTF8, "application/json"));
                 string token = await response.Content.ReadAsStringAsync();
+                
+                Assert.NotEqual(HttpStatusCode.NotFound, response.StatusCode);
 
                 HttpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                 HttpResponseMessage resp = await HttpClient.GetAsync("api/user", HttpCompletionOption.ResponseContentRead);
