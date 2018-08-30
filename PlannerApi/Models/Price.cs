@@ -40,5 +40,10 @@ namespace events_planner.Models
 
         [JsonIgnore]
         public Role Role { get; set; }
+        
+        [NotMapped, JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public string roleName {
+            get { return Role?.Name;  }
+        }
     }
 }
