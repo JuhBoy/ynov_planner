@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using Xunit;
 using Moq;
 using Microsoft.Extensions.Configuration;
@@ -51,6 +52,19 @@ namespace PlannerApi.Tests.UnitTests
 
                 Assert.NotNull(token);
                 Assert.Equal(3, slicedToken.Length);
+            }
+
+            [Theory, InlineData("myPassword")]
+            public void ShouldHashSHA256Password(string password) 
+            {
+                var service = new Mock<UserServices>(PlannerContext.Object, Configuration.Object, PromotionServices.Object, RoleServices.Object).Object;
+                string encodedPWD, encodedPWD2;
+                service.GeneratePasswordSha256(password, out encodedPWD);
+                service.GeneratePasswordSha256(password, out encodedPWD2);
+                
+                Assert.NotNull(encodedPWD);
+                Assert.NotEmpty(encodedPWD);
+                Assert.Equal(encodedPWD, encodedPWD2);
             }
         }
     }

@@ -15,6 +15,7 @@ namespace events_planner.Services
         bool IsModeratorFor(int eventId, int userId);
         bool ShouldUpdateFromSSO(User user, YnovSSO ssoData, out List<string> properties);
         void UpdateUserFromSsoDate(User user, YnovSSO ssoData, List<string> properties);
+        void GeneratePasswordSha256(string password, out string encodedPassword);
 
         #region QUERIES
 

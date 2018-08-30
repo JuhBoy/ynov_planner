@@ -16,6 +16,7 @@ using CsvHelper.TypeConversion;
 using CsvHelper.Configuration;
 using Microsoft.AspNetCore.Hosting;
 using System.Net.Http;
+using System.Security.Cryptography;
 using System.Xml.Linq;
 using System.Xml.Serialization;
 
@@ -43,11 +44,12 @@ namespace events_planner.Controllers {
         [HttpPost("token"), AllowAnonymous]
         public async Task<IActionResult> GetToken([FromBody] UserConnectionDeserializer userCredential) {
             if (!ModelState.IsValid) return BadRequest();
+            UserServices.GeneratePasswordSha256(userCredential.Password, out var passwordEncoded);
 
             User m_user = await Context.User
                                        .AsNoTracking()
                                        .Include(user => user.Role)
-                                       .FirstOrDefaultAsync((User user) => user.Password == userCredential.Password
+                                       .FirstOrDefaultAsync((User user) => user.Password == passwordEncoded
                                                                         && user.Email == userCredential.Login);
 
             if (m_user == null) { return NotFound(userCredential); }
@@ -141,7 +143,7 @@ namespace events_planner.Controllers {
         /// </summary>
         /// <remarks>return a set of informations about the user</remarks>
         /// <response code="404">User not found</response>
-        [HttpGet, Authorize(Roles = "Student, Admin")]
+        [HttpGet, Authorize(Roles = "Student, Admin, Foreigner")]
         public async Task<IActionResult> Read() {
             string token = Request.Headers["Authorization"];
             string email = UserServices.ReadJwtTokenClaims(token);
@@ -229,6 +231,11 @@ namespace events_planner.Controllers {
 
             if (user == null) { return NotFound(); }
 
+            if (!string.IsNullOrEmpty(userFromRequest.Password)) {
+                UserServices.GeneratePasswordSha256(userFromRequest.Password, out var encodedPassword);
+                userFromRequest.Password = encodedPassword;
+            }
+            
             try {
                 userFromRequest.BindWithUser(ref user);
                 Context.Update(user);

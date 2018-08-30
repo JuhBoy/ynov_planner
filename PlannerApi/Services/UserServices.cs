@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using events_planner.Constants.Services;
@@ -110,11 +111,14 @@ namespace Microsoft.Extensions.DependencyInjection {
             Role role;
             GetRole(null, out role);
 
+            string password;
+            GeneratePasswordSha256(userFromRequest.Password, out password);
+
             User user = Context.User.Add(new User() {
                 FirstName = userFromRequest.FirstName,
                 LastName = userFromRequest.LastName,
                 Email = userFromRequest.Email,
-                Password = userFromRequest.Password,
+                Password = password,
                 PhoneNumber = phone,
                 Promotion = promotion,
                 DateOfBirth = userFromRequest.DateOfBirth,
@@ -126,14 +130,13 @@ namespace Microsoft.Extensions.DependencyInjection {
         }
 
         public void MakeUser(User user) {
-            Promotion promotion;
-            Role role;
-
-            GetPromotion(null, out promotion);
-            GetRole("Student", out role);
+            GetPromotion(null, out var promotion);
+            GetRole("Student", out var role);
+            GeneratePasswordSha256(user.Password, out var password);
 
             user.Promotion = promotion;
             user.Role = role;
+            user.Password = password;
         }
 
         private void GetRole(string roleName, out Role role) {
@@ -159,6 +162,13 @@ namespace Microsoft.Extensions.DependencyInjection {
                 promotion = PromotionServices.GetForeignPromotion();
             } else {
                 promotion = PromotionServices.GetPromotionById((int)promotionId);
+            }
+        }
+
+        public void GeneratePasswordSha256(string password, out string encodedPassword) {
+            using (var sha = SHA1.Create()) {
+                var hash = sha.ComputeHash(Encoding.UTF8.GetBytes(password));
+                encodedPassword = Convert.ToBase64String(hash);
             }
         }
 
