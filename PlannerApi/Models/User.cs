@@ -124,20 +124,6 @@ namespace events_planner.Models
             }
         }
 
-        [NotMapped]
-        public float? JuryPointAmount {
-            get {
-                if (JuryPoint != null) {
-                    float i = 0;
-                    foreach (var p in JuryPoint) {
-                        i += p.Points;
-                    }
-                    return i;
-                }
-                return null;
-            }
-        }
-
         #endregion
     }
 }

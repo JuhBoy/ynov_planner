@@ -384,7 +384,7 @@ namespace events_planner.Controllers {
             Map(m => m.FirstName);
             Map(m => m.Email);
             Map(m => m.PhoneNumber);
-            Map(m => m.JuryPointAmount);
+            Map(m => m.TotalJuryPoints);
             Map(m => m.Promotion.Name).Name("promotion_name");
         }
     }
