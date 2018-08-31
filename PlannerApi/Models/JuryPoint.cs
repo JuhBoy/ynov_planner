@@ -11,7 +11,7 @@ namespace events_planner.Models {
         public int Id { get; set; }
 
         [Column("points")]
-        public int Points { get; set; } = 0;
+        public float Points { get; set; } = 0;
 
         [ForeignKey("user_id"), JsonIgnore]
         public int UserId { get; set; }

@@ -50,7 +50,7 @@ namespace events_planner.Models {
 
         [Column("jury_point"),
          JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-        public int? JuryPoint { get; set; } = null;
+        public float? JuryPoint { get; set; } = null;
 
         [Column("status"), Required]
         public string Status { get; set; }

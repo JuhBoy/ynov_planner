@@ -12,7 +12,7 @@ namespace events_planner.Models
         public int Id { get; set; }
 
         [Column("price"), Required]
-        public int Amount { get; set; }
+        public float Amount { get; set; }
 
         [Column("created_at"),
          DatabaseGenerated(DatabaseGeneratedOption.Identity),

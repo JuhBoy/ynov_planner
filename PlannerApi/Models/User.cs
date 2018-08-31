@@ -107,11 +107,11 @@ namespace events_planner.Models
         #region Public HELPERS
 
         [NotMapped]
-        public int? TotalJuryPoints {
+        public float? TotalJuryPoints {
             get {
                 if (JuryPoint == null) return null;
-                int total = 0;
-                foreach (int u in JuryPoint.Select(s => s.Points))
+                float total = 0;
+                foreach (float u in JuryPoint.Select(s => s.Points))
                     total += u;
                 return total;
             }
@@ -125,10 +125,10 @@ namespace events_planner.Models
         }
 
         [NotMapped]
-        public int? JuryPointAmount {
+        public float? JuryPointAmount {
             get {
                 if (JuryPoint != null) {
-                    int i = 0;
+                    float i = 0;
                     foreach (var p in JuryPoint) {
                         i += p.Points;
                     }

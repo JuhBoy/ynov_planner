@@ -27,6 +27,7 @@ namespace events_planner.Deserializers {
         [RegularExpression(Models.Status.ValidRegex)]
         public string Status { get; set; } = Models.Status.PENDING;
 
+        [Range(0, int.MaxValue, ErrorMessage = "The Jury Points must be superior to 0")]
         public int? JuryPoint { get; set; }
 
         public string Location { get; set; }
