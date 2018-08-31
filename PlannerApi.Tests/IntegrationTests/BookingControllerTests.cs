@@ -48,7 +48,6 @@ namespace PlannerApi.Tests.IntegrationTests
                 var admin = Context.User.Include(e => e.Role).FirstOrDefault(e => e.Email == email);
                 var id = @event.Id;
 
-                string token = TokenBearerHelper.GetTokenFor(admin, Context);
                 HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenBearerHelper.GetTokenFor(admin, Context));
                 HttpResponseMessage body = await HttpClient.GetAsync($"api/booking/subscribe/{id}");
                 

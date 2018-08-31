@@ -9,6 +9,7 @@ namespace events_planner.Deserializers {
         [MinLength(2, ErrorMessage = "Name must be at least 2 characters")]
         public string Name { get; set; }
 
+        [Range(0, int.MaxValue, ErrorMessage = "Parent ID cannot be negative")]
         public int? ParentCategory { get; set; }
     }
 }

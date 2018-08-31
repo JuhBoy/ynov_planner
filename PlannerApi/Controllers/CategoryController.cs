@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using events_planner.Deserializers;
@@ -28,12 +29,15 @@ namespace events_planner.Controllers {
         /// <response code="500">if the credential given is not valid or DB update failed</response>
         /// <response code="200">If category has been Added to the database</response>
         [HttpPost, Authorize(Roles = "Admin")]
-        public IActionResult Create([FromBody] CategoryDeserializer categoryFromRequest) {
+        public IActionResult Create([FromBody] CategoryDeserializer categoryDsr) {
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
+            if (!Context.Category.Any(a => a.Id == categoryDsr.ParentCategory)) {
+                categoryDsr.ParentCategory = null;
+            }
 
             Category category = new Category() {
-                Name = categoryFromRequest.Name,
-                ParentCategory = categoryFromRequest.ParentCategory
+                Name = categoryDsr.Name,
+                ParentCategory = categoryDsr.ParentCategory
             };
 
             try {
