@@ -1,0 +1,82 @@
+[
+  {
+    "firstName":  "Admin1",
+    "lastName":  "TheOne",
+    "email":  "admin1@example.com",
+    "password":  "98O8HYCOBHMq32eZZczDTKeuNEE=",
+    "phoneNumber":  "0625791823"
+  },
+  {
+    "firstName":  "Admin2",
+    "lastName":  "TheSecond",
+    "email":  "admin2@example.com",
+    "password": "98O8HYCOBHMq32eZZczDTKeuNEE=",
+    "phoneNumber": "0625791823",
+    "roleName": "Admin"
+  },
+  {
+    "firstName":  "Admin3",
+    "lastName":  "TheThird",
+    "email":  "admin3@example.com",
+    "password": "98O8HYCOBHMq32eZZczDTKeuNEE=",
+    "phoneNumber": "0625791823",
+    "roleName": "Admin"
+  },
+  {
+    "firstName":  "Admin4",
+    "lastName":  "TheFourth",
+    "email":  "admin4@example.com",
+    "password": "98O8HYCOBHMq32eZZczDTKeuNEE=",
+    "phoneNumber": "0625791823",
+    "roleName": "Admin"
+  },
+  {
+    "firstName":  "Admin5",
+    "lastName":  "TheFift",
+    "email":  "admin5@example.com",
+    "password": "98O8HYCOBHMq32eZZczDTKeuNEE=",
+    "phoneNumber": "0625791823",
+    "roleName": "Admin"
+  },
+  
+  {
+    "firstName": "User1",
+    "lastName": "OneUser",
+    "email": "user1@example.com",
+    "password": "98O8HYCOBHMq32eZZczDTKeuNEE=",
+    "phoneNumber": "0625791823",
+    "roleName": "Student"
+  },
+  {
+    "firstName":  "User2",
+    "lastName":  "Jimbo",
+    "email":  "user2@example.com",
+    "password": "98O8HYCOBHMq32eZZczDTKeuNEE=",
+    "phoneNumber": "0625791823",
+    "roleName": "Student"
+  },
+  {
+    "firstName":  "User3",
+    "lastName":  "Goto",
+    "email":  "user3@example.com",
+    "password": "98O8HYCOBHMq32eZZczDTKeuNEE=",
+    "phoneNumber": "0625791823",
+    "roleName": "Student"
+  },
+  {
+    "firstName":  "User4",
+    "lastName":  "Alpha",
+    "email":  "user4@example.com",
+    "password": "98O8HYCOBHMq32eZZczDTKeuNEE=",
+    "phoneNumber": "0625791823",
+    "roleName": "Student"
+  },
+  {
+    "firstName":  "User5",
+    "lastName":  "Genin",
+    "email":  "user5@example.com",
+    "password": "98O8HYCOBHMq32eZZczDTKeuNEE=",
+    "phoneNumber": "0625791823",
+    "roleName": "Student"
+  }
+]
