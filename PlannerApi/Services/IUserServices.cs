@@ -29,6 +29,12 @@ namespace events_planner.Services
         IQueryable<User> AllForeignKeysQuery();
 
         /// <summary>
+        /// Include all Booking for user
+        /// </summary>
+        /// <returns>void</returns>
+        void IncludeBookings(ref IQueryable<User> query);
+
+        /// <summary>
         /// Set a query that handle a like SQL search
         /// </summary>
         /// <param name="query">The query object as Ref</param>

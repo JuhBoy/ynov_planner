@@ -192,6 +192,7 @@ namespace events_planner.Controllers {
             }
 
             UserServices.WithouStaffMembers(ref query);
+            UserServices.IncludeBookings(ref query);
 
             User[] users = query.AsNoTracking().ToArray();
             return Ok(users);

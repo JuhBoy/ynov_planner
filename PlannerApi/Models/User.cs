@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using CsvHelper.Configuration.Attributes;
 using Newtonsoft.Json;
 
 namespace events_planner.Models
@@ -125,5 +126,18 @@ namespace events_planner.Models
         }
 
         #endregion
+
+        [NotMapped, JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public int? Participations {
+            get {
+                if (Bookings == null) return null;
+                int total = 0;
+                foreach (var booking in Bookings) {
+                    if (!booking.Present) continue;
+                    total++;
+                }
+                return total;
+            }
+        }
     }
 }

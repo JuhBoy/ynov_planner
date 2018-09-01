@@ -216,6 +216,10 @@ namespace Microsoft.Extensions.DependencyInjection {
                 .Include(inc => inc.JuryPoint);
         }
 
+        public void IncludeBookings(ref IQueryable<User> query) {
+            query = query.Include(inc => inc.Bookings);
+        }
+
         public void likeSearchQuery(ref IQueryable<User> query, string expression) {
             query = query.Where(arg => arg.FirstName.Contains(expression) || arg.LastName.Contains(expression));
         }
