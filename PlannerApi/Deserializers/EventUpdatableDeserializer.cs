@@ -56,14 +56,8 @@ namespace events_planner.Deserializers {
             if (Location != null)
                 model.Location = Location;
 
-            if (StartAt.HasValue)
-                model.StartAt = StartAt;
-
             if (CloseAt.HasValue)
                 model.CloseAt = CloseAt;
-
-            if (EndAt.HasValue)
-                model.EndAt = EndAt;
 
             if (JuryPoint.HasValue)
                 model.JuryPoint = JuryPoint;
@@ -78,6 +72,9 @@ namespace events_planner.Deserializers {
 
             if (RestrictedEvent.HasValue)
                 model.RestrictedEvent = (bool) RestrictedEvent;
+            
+            model.EndAt = EndAt;
+            model.StartAt = StartAt;
         }
     }
 }
