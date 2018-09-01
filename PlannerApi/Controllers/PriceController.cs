@@ -69,14 +69,19 @@ namespace events_planner.Controllers {
         /// <param name="priceId">Price uniq Id</param>
         /// <param name="amount">Amount as an integer</param>
         /// <returns>201</returns>
-        [HttpPut("{priceId}"), Authorize(Roles = "Admin")]
+        [HttpPut("{priceId}/{amount}"), Authorize(Roles = "Admin")]
         public IActionResult Update(int priceId, int amount) {
             var mPrice = Context.Price.FirstOrDefault(arg => arg.Id == priceId);
 
             if (mPrice == null) return NotFound();
+            
+            mPrice.Amount = amount;
+
+            if (!TryValidateModel(mPrice)) {
+                return BadRequest(ModelState);
+            }
 
             try {
-                mPrice.Amount = amount;
                 Context.Price.Update(mPrice);
                 Context.SaveChanges();
             } catch (DbUpdateException e) {

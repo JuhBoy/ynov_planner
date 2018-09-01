@@ -75,6 +75,34 @@ namespace PlannerApi.Tests.IntegrationTests {
                 Assert.NotNull(prices);
                 Assert.Single(prices);
             }
+
+            [Theory, InlineData("email@admin.com")]
+            public async void ShouldNotCreatePriceIfEventNotFound(string email) {
+                int id = int.MaxValue;
+                int roleId = Context.Role.First().Id;
+                HttpResponseMessage response = await HttpClient.PostAsync("api/price",
+                    BaseRequest(new PriceDeserializer() {Amount = 234, EventId = id, RoleId = roleId}, email));
+                
+                Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+                Assert.Equal("Event doesn't exist", await response.Content.ReadAsStringAsync());
+            }
+        }
+
+        public class Update : PriceControllerTests {
+            public Update(ServerFixtures server): base(server) { }
+
+            [Theory, InlineData("email@admin.com")]
+            public async void ShouldNotUpdateWhenAmountIsNegative(string email) {
+                Context.Price.Add(new Price() { Amount = 23, EventId = 1, RoleId = 1});
+                Context.SaveChanges();
+                string id = Context.Price.FirstOrDefault(p => p.Amount.Equals(23)).Id.ToString();
+                
+                HttpResponseMessage response = await HttpClient.PutAsync($"api/price/{id}/-23",
+                    BaseRequest(new PriceDeserializer() {Amount = -23, EventId = 1, RoleId = 1}, email));
+                
+                Assert.NotEmpty(await response.Content.ReadAsStringAsync());
+                Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            }
         }
     }
 }
