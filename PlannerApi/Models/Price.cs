@@ -11,7 +11,7 @@ namespace events_planner.Models
         [Column("price_id"), Key]
         public int Id { get; set; }
 
-        [Column("price"), Required]
+        [Column("price"), Required, Range(0, float.MaxValue)]
         public float Amount { get; set; }
 
         [Column("created_at"),
