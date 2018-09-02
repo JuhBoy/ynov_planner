@@ -10,7 +10,7 @@ using PlannerApi.Tests.Fixtures;
 
 namespace PlannerApi.Tests.IntegrationTests
 {
-    [Collection("Integration")]
+    [Collection("Synchrone")]
     public class UserControllerTests : IClassFixture<ServerFixtures>
     {
         protected HttpClient HttpClient { get; }

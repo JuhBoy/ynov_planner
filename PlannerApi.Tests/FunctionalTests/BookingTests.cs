@@ -9,7 +9,7 @@ using Xunit;
 
 namespace PlannerApi.Tests.FunctionalTests {
     
-    [Collection("Functional")]
+    [Collection("Synchrone")]
     public class BookingTests : IDisposable {
                 
         protected string DbConnection = "server=localhost;port=3306;database=ynov_planner_tests;uid=root;password=root";

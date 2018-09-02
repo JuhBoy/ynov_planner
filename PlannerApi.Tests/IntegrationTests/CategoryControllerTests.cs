@@ -13,7 +13,7 @@ using PlannerApi.Tests.Fixtures;
 using PlannerApi.Tests.IntegrationTests.Helpers;
 
 namespace PlannerApi.Tests.IntegrationTests {
-    [Collection("Integration")] // Integration test must not be run in parallel
+    [Collection("Synchrone")] // Integration test must not be run in parallel
     public class CategoryControllerTests : IClassFixture<ServerFixtures> {
         
         protected HttpClient HttpClient { get; }

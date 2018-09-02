@@ -15,8 +15,8 @@ using PlannerApi.Tests.IntegrationTests.Helpers;
 
 namespace PlannerApi.Tests.IntegrationTests
 {
-    [Collection("Integration")] // Integration test must not be run in parallel
-    public class BookingControllerTests : IClassFixture<ServerFixtures>
+    [Collection("Synchrone")] // Integration test must not be run in parallel
+    public class BookingControllerTests : IClassFixture<ServerFixtures>, IDisposable
     {
         protected HttpClient HttpClient { get; }
         protected string DbConnection = "server=localhost;port=3306;database=ynov_planner_tests;uid=root;password=root";
