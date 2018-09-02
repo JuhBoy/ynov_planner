@@ -130,8 +130,7 @@ namespace PlannerApi.Tests.FunctionalTests
                 
                 Assert.NotNull(claims);
                 Assert.NotEmpty(claims);
-
-                Assert.Equal(1, claims.Count());
+                Assert.Single(claims);
             }
         }
 
