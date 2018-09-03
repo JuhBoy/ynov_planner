@@ -178,15 +178,16 @@ namespace Microsoft.Extensions.DependencyInjection {
                                                       arg.UserId == userId);
         }
 
-        public bool ShouldUpdateFromSSO(User user, YnovSSO ssoData,
+        public bool ShouldUpdateFromSSO(User user, ServiceResponse serviceResponse,
                                         out List<string> properties) {
+            var ssoData = serviceResponse.AuthenticationSuccess.Attributes;
             Type typeUser = user.GetType();
             Type typeSSO = ssoData.GetType();
             properties = new List<string>();
 
             foreach (var prop in typeSSO.GetProperties()) {
                 var sValue = prop.GetValue(ssoData);
-                var uValue = typeUser.GetProperty(prop.Name).GetValue(user);
+                var uValue = typeUser.GetProperty(prop.Name).GetValue(user) ?? "";
 
                 if (sValue != uValue) {
                     properties.Add(prop.Name);
@@ -195,8 +196,9 @@ namespace Microsoft.Extensions.DependencyInjection {
             return properties.Count > 0;
         }
 
-        public void UpdateUserFromSsoDate(User user, YnovSSO ssoData,
+        public void UpdateUserFromSsoData(User user, ServiceResponse serviceResponse,
                                           List<string> properties) {
+            var ssoData = serviceResponse.AuthenticationSuccess.Attributes;
             Type typeUser = user.GetType();
             Type typeSSO = ssoData.GetType();
 
