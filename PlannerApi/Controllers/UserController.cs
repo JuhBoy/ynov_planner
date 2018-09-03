@@ -7,17 +7,13 @@ using events_planner.Services;
 using events_planner.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Collections.Generic;
 using events_planner.PrimitiveExt;
 using CsvHelper;
-using CsvHelper.TypeConversion;
 using CsvHelper.Configuration;
 using Microsoft.AspNetCore.Hosting;
 using System.Net.Http;
-using System.Security.Cryptography;
-using System.Xml.Linq;
 using System.Xml.Serialization;
 
 namespace events_planner.Controllers {
@@ -66,38 +62,38 @@ namespace events_planner.Controllers {
             string token;
 
             using (HttpClient client = new HttpClient()) {
-                // TODO: Use Real Connection
-                // var xml = await client.GetStringAsync($"{userSso.SsoUrl}/serviceValidate?service={userSso.Service}&ticket={userSso.Ticket}");
-                var xml = "<?xml version=\"1.0\" encoding=\"UTF - 8\" ?><YnovSSO><SSOID>1</SSOID><Email>viverra.Donec.tempus@ipsumSuspendisse.com</Email></YnovSSO>";
+                var xml = await client.GetStringAsync($"{userSso.SsoUrl}/serviceValidate?service={userSso.Service}&ticket={userSso.Ticket}");
 
-                XmlSerializer parser = new XmlSerializer(typeof(YnovSSO));
-                YnovSSO SSOData;
+                XmlSerializer parser = new XmlSerializer(typeof(ServiceResponse));
+                ServiceResponse serviceResponse;
+                
                 using (var reader = new StringReader(xml)) {
-                    SSOData = parser.Deserialize(reader) as YnovSSO;
+                    try {
+                        serviceResponse = parser.Deserialize(reader) as ServiceResponse;
+                    } catch (InvalidOperationException e) {
+                        Console.WriteLine($"Sso invalid {e.Message}");
+                        return BadRequest("SSO invalid");
+                    }
                 }
 
-                // TODO: CHECK IF SSO FROM XML IS VALID() /!\
-                var error = false; // TODO
-                if (error) return BadRequest("SSO TICKET INVALID"); // TODO
-
-
-                User user = Context.User.Include(u => u.Role).FirstOrDefault(u => u.SSOID == SSOData.SSOID);
+                User user = Context.User.Include(u => u.Role)
+                    .FirstOrDefault(u => u.Email == serviceResponse.AuthenticationSuccess.Attributes.Mail);
                 List<string> properties;
 
                 try {
                     if (user == null) {
                         user = new User() {
-                            Email = SSOData.Email,
-                            SSOID = SSOData.SSOID,
-                            FirstName = "fake",
+                            Email = serviceResponse.AuthenticationSuccess.Attributes.Mail,
+                            SSOID = 1,
+                            FirstName = serviceResponse.AuthenticationSuccess.Attributes.Name,
                             LastName = "fake",
                             Password = Guid.NewGuid().ToString(),
                             PhoneNumber = 0619198695,
                         };
                         UserServices.MakeUser(user);
                         Context.User.Add(user);
-                    } else if (UserServices.ShouldUpdateFromSSO(user, SSOData, out properties)) {
-                        UserServices.UpdateUserFromSsoDate(user, SSOData, properties);
+                    } else if (UserServices.ShouldUpdateFromSSO(user, serviceResponse, out properties)) {
+                        UserServices.UpdateUserFromSsoDate(user, serviceResponse, properties);
                         Context.User.Update(user);
                     }
 

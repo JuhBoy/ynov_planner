@@ -178,7 +178,7 @@ namespace Microsoft.Extensions.DependencyInjection {
                                                       arg.UserId == userId);
         }
 
-        public bool ShouldUpdateFromSSO(User user, YnovSSO ssoData,
+        public bool ShouldUpdateFromSSO(User user, ServiceResponse ssoData,
                                         out List<string> properties) {
             Type typeUser = user.GetType();
             Type typeSSO = ssoData.GetType();
@@ -195,7 +195,7 @@ namespace Microsoft.Extensions.DependencyInjection {
             return properties.Count > 0;
         }
 
-        public void UpdateUserFromSsoDate(User user, YnovSSO ssoData,
+        public void UpdateUserFromSsoDate(User user, ServiceResponse ssoData,
                                           List<string> properties) {
             Type typeUser = user.GetType();
             Type typeSSO = ssoData.GetType();

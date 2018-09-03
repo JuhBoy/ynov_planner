@@ -13,8 +13,8 @@ namespace events_planner.Services
         void MakeUser(User user);
         string ReadJwtTokenClaims(string bearerToken, JwtSelector extractor = JwtSelector.EMAIL);
         bool IsModeratorFor(int eventId, int userId);
-        bool ShouldUpdateFromSSO(User user, YnovSSO ssoData, out List<string> properties);
-        void UpdateUserFromSsoDate(User user, YnovSSO ssoData, List<string> properties);
+        bool ShouldUpdateFromSSO(User user, ServiceResponse ssoData, out List<string> properties);
+        void UpdateUserFromSsoDate(User user, ServiceResponse ssoData, List<string> properties);
         void GeneratePasswordSha256(string password, out string encodedPassword);
 
         #region QUERIES
