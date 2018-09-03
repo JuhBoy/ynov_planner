@@ -6,7 +6,7 @@ namespace events_planner.Models {
     [Table("temporary_role")]
     public class TemporaryRole {
 
-        [Column("id"), JsonIgnore]
+        [Column("id")]
         public int Id { get; set; }
 
         [Column("event_id"), ForeignKey("event_id"), JsonIgnore]
