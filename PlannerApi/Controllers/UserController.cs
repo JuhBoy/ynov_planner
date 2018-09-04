@@ -7,27 +7,32 @@ using events_planner.Services;
 using events_planner.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Collections.Generic;
+using System.Net;
 using events_planner.PrimitiveExt;
 using CsvHelper;
-using CsvHelper.TypeConversion;
 using CsvHelper.Configuration;
 using Microsoft.AspNetCore.Hosting;
 using System.Net.Http;
-using System.Security.Cryptography;
-using System.Xml.Linq;
 using System.Xml.Serialization;
 using events_planner.Utils;
+using NLog;
 
 namespace events_planner.Controllers {
 
     [Route("api/[controller]")]
     public class UserController : BaseController {
-
+        
+        public static readonly HttpClient HttpClient;
+        
         public IUserServices UserServices;
         public IHostingEnvironment Env;
+
+        static UserController() {
+            HttpClient = new HttpClient();
+            HttpClient.Timeout = new TimeSpan(hours:0, minutes:1, seconds:0);
+        }
 
         public UserController(IUserServices service,
                                 PlannerContext context,
@@ -64,52 +69,60 @@ namespace events_planner.Controllers {
         [HttpPost("sso"), AllowAnonymous]
         public async Task<IActionResult> GetSso([FromBody] UserSsoDeserializer userSso) {
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
-            string token;
+            string xml;
 
-            using (HttpClient client = new HttpClient()) {
-                // TODO: Use Real Connection
-                // var xml = await client.GetStringAsync($"{userSso.SsoUrl}/serviceValidate?service={userSso.Service}&ticket={userSso.Ticket}");
-                var xml = "<?xml version=\"1.0\" encoding=\"UTF - 8\" ?><YnovSSO><SSOID>1</SSOID><Email>viverra.Donec.tempus@ipsumSuspendisse.com</Email></YnovSSO>";
-
-                XmlSerializer parser = new XmlSerializer(typeof(YnovSSO));
-                YnovSSO SSOData;
-                using (var reader = new StringReader(xml)) {
-                    SSOData = parser.Deserialize(reader) as YnovSSO;
-                }
-
-                // TODO: CHECK IF SSO FROM XML IS VALID() /!\
-                var error = false; // TODO
-                if (error) return BadRequest("SSO TICKET INVALID"); // TODO
-
-
-                User user = Context.User.Include(u => u.Role).FirstOrDefault(u => u.SSOID == SSOData.SSOID);
-                List<string> properties;
-
-                try {
-                    if (user == null) {
-                        user = new User() {
-                            Email = SSOData.Email,
-                            SSOID = SSOData.SSOID,
-                            FirstName = "fake",
-                            LastName = "fake",
-                            Password = Guid.NewGuid().ToString(),
-                            PhoneNumber = 0619198695,
-                        };
-                        UserServices.MakeUser(user);
-                        Context.User.Add(user);
-                    } else if (UserServices.ShouldUpdateFromSSO(user, SSOData, out properties)) {
-                        UserServices.UpdateUserFromSsoDate(user, SSOData, properties);
-                        Context.User.Update(user);
-                    }
-
-                    Context.SaveChanges();
-                } catch (DbUpdateException e) {
-                    return BadRequest(e.InnerException.Message);
-                }
-
-                token = UserServices.GenerateToken(ref user);
+            try {
+                xml = await HttpClient.GetStringAsync(
+                    $"{userSso.SsoUrl}/serviceValidate?service={userSso.Service}&ticket={userSso.Ticket}");
+            } catch (HttpRequestException e) {
+                LogManager.GetCurrentClassLogger().Error($"Sso invalid {e.Message}");
+                return BadRequest("Connexion Failed");
             }
 
+            XmlSerializer parser = new XmlSerializer(typeof(ServiceResponse));
+            ServiceResponse serviceResponse;
+            
+            using (var reader = new StringReader(xml)) {
+                try {
+                    serviceResponse = parser.Deserialize(reader) as ServiceResponse;
+                } catch (InvalidOperationException e) {
+                    LogManager.GetCurrentClassLogger().Error($"Sso invalid {e.Message}");
+                    return BadRequest("Connexion Failed");
+                }
+            }
+
+            if (serviceResponse.AuthenticationFailure != null) {
+                LogManager.GetCurrentClassLogger().Error($"Sso invalid: {xml}");
+                return BadRequest("Connexion Failed");
+            }
+
+            User user = Context.User.Include(u => u.Role)
+                .FirstOrDefault(u => u.Email == serviceResponse.AuthenticationSuccess.Attributes.Email);
+            List<string> properties;
+
+            try {
+                if (user == null) {
+                    user = new User() {
+                        Email = serviceResponse.AuthenticationSuccess.Attributes.Email,
+                        SSOID = 1,
+                        FirstName = "FirstName",
+                        LastName = serviceResponse.AuthenticationSuccess.Attributes.LastName,
+                        Password = Guid.NewGuid().ToString(),
+                        PhoneNumber = 0619198695,
+                    };
+                    UserServices.MakeUser(user);
+                    Context.User.Add(user);
+                } else if (UserServices.ShouldUpdateFromSSO(user, serviceResponse, out properties)) {
+                    UserServices.UpdateUserFromSsoData(user, serviceResponse, properties);
+                    Context.User.Update(user);
+                }
+
+                await Context.SaveChangesAsync();
+            } catch (DbUpdateException e) {
+                return BadRequest(e.InnerException.Message);
+            }
+
+            string token = UserServices.GenerateToken(ref user);
             return Ok(token);
         }
 
