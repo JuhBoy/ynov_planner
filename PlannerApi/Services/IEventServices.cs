@@ -8,6 +8,10 @@ namespace events_planner.Services {
 
         void Create(EventDeserializer eventDsl, out Event @event);
 
+        void Update(EventUpdatableDeserializer eventDsl, Event @event);
+
+        void UpdateBookingsValidates(EventUpdatableDeserializer eventDsl, Event @event);
+
         void RemoveAllEventCategoryReferencesFor(int categoryId);
 
         Task<Event[]> GetEVentsFromIds(int[] ids);

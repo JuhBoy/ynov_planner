@@ -24,7 +24,7 @@ namespace events_planner.Deserializers {
 
         public bool? RestrictedEvent { get; set; }
 
-        public int? JuryPoint { get; set; }
+        public float? JuryPoint { get; set; }
 
         public string Location { get; set; }
 
@@ -39,42 +39,5 @@ namespace events_planner.Deserializers {
         public string[] RemoveRestrictedRolesList { get; set; }
 
         public string[] AddRestrictedRolesList { get; set; }
-
-        public void BindWithModel(ref Event model) {
-            if (Title != null)
-                model.Title = Title;
-
-            if (Description != null)
-                model.Description = Description;
-
-            if (SubscribeNumber.HasValue)
-                model.SubscribeNumber = (int)SubscribeNumber;
-
-            if (Status != null)
-                model.Status = Status;
-
-            if (Location != null)
-                model.Location = Location;
-
-            if (CloseAt.HasValue)
-                model.CloseAt = CloseAt;
-
-            if (JuryPoint.HasValue)
-                model.JuryPoint = JuryPoint;
-
-            if (OpenAt.HasValue)
-                model.OpenAt = OpenAt;
-
-            if (ValidationRequired.HasValue && ValidationRequired != model.ValidationRequired) {
-                model.ValidationRequired = (bool) ValidationRequired;
-                model.ValidatedNumber = 0;
-            }
-
-            if (RestrictedEvent.HasValue)
-                model.RestrictedEvent = (bool) RestrictedEvent;
-            
-            model.EndAt = EndAt;
-            model.StartAt = StartAt;
-        }
     }
 }

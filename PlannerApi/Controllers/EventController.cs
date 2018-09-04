@@ -106,43 +106,28 @@ namespace events_planner.Controllers {
         /// <response code="401">User/Admin token is not permitted</response>
         /// <response code="500">if the credential given is not valid or DB update failed</response>
         [HttpPatch("{id}"), Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Update([FromBody] EventUpdatableDeserializer eventReq,
+        public async Task<IActionResult> Update([FromBody] EventUpdatableDeserializer eventDsl,
                                                 int id) {
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
 
-            Event eventModel = await Context.Event
-                                            .FirstOrDefaultAsync((obj) => obj.Id == id);
+            Event @event = await Context.Event.FirstOrDefaultAsync((obj) => obj.Id == id);
+            if (@event == null) return NotFound("Event not found");
 
-            if (eventModel == null) return NotFound("Event not found");
-
-            if (eventReq.ValidationRequired.HasValue && eventReq.ValidationRequired != eventModel.ValidationRequired) {
-                Booking[] bookings = Context.Booking.Where(book => book.EventId == eventModel.Id).ToArray();
-
-                foreach (var book in bookings) {
-                    if (eventReq.ValidationRequired.Value)
-                        book.Validated = false;
-                    else
-                        book.Validated = null;
-                }
-
-                Context.Booking.UpdateRange(bookings);
-            }
-
-            eventReq.BindWithModel(ref eventModel);
+            Services.Update(eventDsl, @event);
             
-            if (!Services.IsTimeWindowValid(ref eventModel)) {
+            if (!Services.IsTimeWindowValid(ref @event)) {
                 var error = new String[] { "Time window is not valid, ensure close start before open" };
                 return BadRequest(new { TimeWindow = error });
             }
 
-            if (eventModel.RestrictedEvent) {
-              Services.AddAndRemoveEventRoles(eventReq.AddRestrictedRolesList, eventReq.RemoveRestrictedRolesList, eventModel);
+            if (@event.RestrictedEvent) {
+              Services.AddAndRemoveEventRoles(eventDsl.AddRestrictedRolesList, eventDsl.RemoveRestrictedRolesList, @event);
             } else {
-              Services.RemoveAllEventRoles(eventModel.Id);
+              Services.RemoveAllEventRoles(@event.Id);
             }
 
             try {
-                Context.Event.Update(eventModel);
+                Context.Event.Update(@event);
                 await Context.SaveChangesAsync();
             } catch (DbUpdateException e) {
                 return BadRequest(e.InnerException.Message);

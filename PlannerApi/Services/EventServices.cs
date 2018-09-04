@@ -50,12 +50,53 @@ namespace Microsoft.Extensions.DependencyInjection {
             @event.Prices = eventDsl.Prices;
         }
 
+        public void Update(EventUpdatableDeserializer eventDsl, Event @event) {
+            if (!string.IsNullOrEmpty(eventDsl.Title)) @event.Title = eventDsl.Title;
+            
+            if (!string.IsNullOrEmpty(eventDsl.Description)) @event.Description = eventDsl.Description;
+            
+            if (eventDsl.SubscribeNumber.HasValue) @event.SubscribeNumber = (int) eventDsl.SubscribeNumber;
+            
+            if (!string.IsNullOrEmpty(eventDsl.Status)) @event.Status = eventDsl.Status;
+            
+            if (!string.IsNullOrEmpty(eventDsl.Location)) @event.Location = eventDsl.Location;
+            
+            if (eventDsl.CloseAt.HasValue) @event.CloseAt = eventDsl.CloseAt;
+            
+            if (eventDsl.JuryPoint.HasValue) @event.JuryPoint = eventDsl.JuryPoint;
+            
+            if (eventDsl.OpenAt.HasValue) @event.OpenAt = eventDsl.OpenAt;
+            
+            if (eventDsl.RestrictedEvent.HasValue) @event.RestrictedEvent = (bool) eventDsl.RestrictedEvent;
+            
+            UpdateBookingsValidates(eventDsl, @event);
+            
+            @event.EndAt = eventDsl.EndAt;
+            @event.StartAt = eventDsl.StartAt;
+        }
+
+        public void UpdateBookingsValidates(EventUpdatableDeserializer eventDsl, Event @event) {
+            if (eventDsl.ValidationRequired.HasValue && eventDsl.ValidationRequired != @event.ValidationRequired) {
+                Booking[] bookings = Context.Booking.Where(book => book.EventId == @event.Id).ToArray();
+                @event.ValidationRequired = (bool) eventDsl.ValidationRequired;
+                @event.ValidatedNumber = 0;
+
+                foreach (var book in bookings) {
+                    if (eventDsl.ValidationRequired.Value)
+                        book.Validated = false;
+                    else
+                        book.Validated = null;
+                }
+                Context.Booking.UpdateRange(bookings);
+            }
+        }
+
         public void RemoveAllEventCategoryReferencesFor(int categoryId) {
             EventCategory[] categories = Context.EventCategory
-                                              .Where((EventCategory ec) => ec.CategoryId == categoryId)
+                                              .Where(ec => ec.CategoryId == categoryId)
                                               .ToArray();
 
-            if (categories == null) { return; }
+            if (categories.Length > 0) { return; }
 
             Context.EventCategory.RemoveRange(categories);
             Context.SaveChanges();
