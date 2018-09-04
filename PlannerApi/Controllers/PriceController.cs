@@ -70,7 +70,7 @@ namespace events_planner.Controllers {
         /// <param name="amount">Amount as an integer</param>
         /// <returns>201</returns>
         [HttpPut("{priceId}/{amount}"), Authorize(Roles = "Admin")]
-        public IActionResult Update(int priceId, int amount) {
+        public IActionResult Update(int priceId, float amount) {
             var mPrice = Context.Price.FirstOrDefault(arg => arg.Id == priceId);
 
             if (mPrice == null) return NotFound();
