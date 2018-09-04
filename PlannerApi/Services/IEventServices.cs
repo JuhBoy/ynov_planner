@@ -1,9 +1,12 @@
 using System.Threading.Tasks;
 using events_planner.Models;
 using System.Linq;
+using events_planner.Deserializers;
 
 namespace events_planner.Services {
     public interface IEventServices {
+
+        void Create(EventDeserializer eventDsl, out Event @event);
 
         void RemoveAllEventCategoryReferencesFor(int categoryId);
 

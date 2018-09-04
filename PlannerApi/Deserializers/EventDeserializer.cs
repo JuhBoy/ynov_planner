@@ -47,31 +47,5 @@ namespace events_planner.Deserializers {
         public Price[] Prices { get; set; }
 
         public string[] AddRestrictedRolesList { get; set; }
-
-        public void BindWithEventModel<T>(out T model) where T : Event {
-            Event modelEvent = new Event() {
-                Title = this.Title,
-                Description = this.Description,
-                SubscribeNumber = this.SubscribeNumber,
-                ValidationRequired = this.ValidationRequired,
-                RestrictedEvent = this.RestrictedEvent,
-                Status = this.Status,
-                JuryPoint = this.JuryPoint,
-                Location = this.Location,
-                StartAt = this.StartAt,
-                CloseAt = this.CloseAt,
-                OpenAt = this.OpenAt,
-                EndAt = this.EndAt,
-                Images = this.Images
-            };
-
-            if (modelEvent.ValidationRequired) {
-                modelEvent.ValidatedNumber = 0;
-            }
-
-            modelEvent.Prices = Prices;
-
-            model = modelEvent as T;
-        }
     }
 }

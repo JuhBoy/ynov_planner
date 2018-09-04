@@ -57,15 +57,10 @@ namespace events_planner.Controllers {
         /// <response code="401">User token is not permitted</response>
         /// <response code="500">if the credential given is not valid or DB update failed</response>
         [HttpPost, Authorize(Roles = "Admin")]
-        public IActionResult Create([FromBody] EventDeserializer eventFromRequest) {
+        public IActionResult Create([FromBody] EventDeserializer eventDsl) {
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
 
-            Event mEvent;
-            eventFromRequest.BindWithEventModel<Event>(out mEvent);
-
-            if (mEvent.RestrictedEvent) {
-                Services.AddAndRemoveEventRoles(eventFromRequest.AddRestrictedRolesList, null, mEvent);
-            }
+            Services.Create(eventDsl, out var mEvent);
 
             if (!Services.IsTimeWindowValid(ref mEvent)) {
                 var error = new String[] { "Time window is not valid, ensure close start before open" };

@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Text.RegularExpressions;
+using events_planner.Deserializers;
 
 namespace Microsoft.Extensions.DependencyInjection {
 
@@ -19,6 +20,34 @@ namespace Microsoft.Extensions.DependencyInjection {
                              ICategoryServices categoryServices) {
             Context = context;
             CategoryServices = categoryServices;
+        }
+
+        public void Create(EventDeserializer eventDsl, out Event @event) {
+            @event = new Event() {
+                Title = eventDsl.Title,
+                Description = eventDsl.Description,
+                SubscribeNumber = eventDsl.SubscribeNumber,
+                ValidationRequired = eventDsl.ValidationRequired,
+                RestrictedEvent = eventDsl.RestrictedEvent,
+                Status = eventDsl.Status,
+                JuryPoint = eventDsl.JuryPoint,
+                Location = eventDsl.Location,
+                StartAt = eventDsl.StartAt,
+                CloseAt = eventDsl.CloseAt,
+                OpenAt = eventDsl.OpenAt,
+                EndAt = eventDsl.EndAt,
+                Images = eventDsl.Images
+            };
+
+            if (@event.ValidationRequired) {
+                @event.ValidatedNumber = 0;
+            }
+            
+            if (@event.RestrictedEvent) {
+                AddAndRemoveEventRoles(eventDsl.AddRestrictedRolesList, null, @event);
+            }
+
+            @event.Prices = eventDsl.Prices;
         }
 
         public void RemoveAllEventCategoryReferencesFor(int categoryId) {
