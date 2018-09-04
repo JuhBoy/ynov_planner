@@ -6,10 +6,12 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using CsvHelper;
 using events_planner.Constants.Services;
 using events_planner.Deserializers;
 using events_planner.Models;
 using events_planner.Services;
+using events_planner.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -103,30 +105,54 @@ namespace Microsoft.Extensions.DependencyInjection {
             return (string)valueObject;
         }
 
-        public User CreateUser(UserCreationDeserializer userFromRequest) {
+        public User CreateUser(UserCreationDeserializer userDsl) {
             int phone;
-            int.TryParse(userFromRequest.PhoneNumber, out phone);
+            int.TryParse(userDsl.PhoneNumber, out phone);
             var promotion = PromotionServices.GetForeignPromotion();
 
             Role role;
             GetRole(null, out role);
 
             string password;
-            GeneratePasswordSha256(userFromRequest.Password, out password);
+            GeneratePasswordSha256(userDsl.Password, out password);
 
             User user = Context.User.Add(new User() {
-                FirstName = userFromRequest.FirstName,
-                LastName = userFromRequest.LastName,
-                Email = userFromRequest.Email,
+                FirstName = userDsl.FirstName,
+                LastName = userDsl.LastName,
+                Email = userDsl.Email,
                 Password = password,
                 PhoneNumber = phone,
                 Promotion = promotion,
-                DateOfBirth = userFromRequest.DateOfBirth,
+                DateOfBirth = userDsl.DateOfBirth,
                 Role = role,
-                Location = userFromRequest.Location
+                Location = userDsl.Location
             }).Entity;
+            
             Context.SaveChanges();
             return user;
+        }
+
+        public void Update(UserUpdatableDeserializer userDsl, User user) {
+            if (userDsl.Password != null && !userDsl.Password.Equals(userDsl.PasswordConfirmation)) {
+                throw new PasswordConfirmationException("Confirmed password is not valid");
+            }
+
+            if (userDsl.LastName != null)
+                user.LastName = userDsl.LastName;
+            if (userDsl.FirstName != null)
+                user.FirstName = userDsl.FirstName;
+            if (userDsl.Email != null)
+                user.Email = userDsl.Email;
+            if (userDsl.Password != null)
+                user.Password = userDsl.Password;
+            if (userDsl.PhoneNumber != null)
+                user.PhoneNumber = int.Parse(userDsl.PhoneNumber);
+            if (userDsl.ImageUrl != null)
+                user.ImageUrl = userDsl.ImageUrl;
+            if (userDsl.Location != null)
+                user.Location = userDsl.Location;
+            if (userDsl.DateOfBirth.HasValue)
+                user.DateOfBirth = userDsl.DateOfBirth;
         }
 
         public void MakeUser(User user) {
@@ -176,6 +202,10 @@ namespace Microsoft.Extensions.DependencyInjection {
             return Context.TemporaryRoles
                           .Any((TemporaryRole arg) => arg.EventId == eventId &&
                                                       arg.UserId == userId);
+        }
+
+        public bool IsStudent(User user) {
+            return (user.Role.Name == "Student");
         }
 
         public bool ShouldUpdateFromSSO(User user, YnovSSO ssoData,

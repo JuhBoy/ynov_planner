@@ -11,4 +11,8 @@ namespace events_planner.Utils {
         public NotFoundUserException(string message): base(message) {}
     }
 
+    public class PasswordConfirmationException : Exception {
+        public PasswordConfirmationException(string message): base(message) {}
+    }
+
 }

@@ -19,6 +19,7 @@ using System.Net.Http;
 using System.Security.Cryptography;
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using events_planner.Utils;
 
 namespace events_planner.Controllers {
 
@@ -226,24 +227,28 @@ namespace events_planner.Controllers {
         /// <response code="404">User not found</response>
         /// <response code="500">if the credential given is not valid</response>
         [HttpPatch("Update"), Authorize(Roles = "Student, Admin, Foreigner")]
-        public async Task<IActionResult> Update([FromBody] UserUpdatableDeserializer userFromRequest) {
+        public async Task<IActionResult> Update([FromBody] UserUpdatableDeserializer userDsl) {
             string email = UserServices.ReadJwtTokenClaims(Request.Headers["Authorization"]);
-            User user = await Context.User.FirstOrDefaultAsync((User u) => u.Email == email);
+            User user = await Context.User
+                                     .Include(i => i.Role)
+                                     .FirstOrDefaultAsync((User u) => u.Email == email);
 
             if (user == null) { return NotFound(); }
 
-            if (!string.IsNullOrEmpty(userFromRequest.Password)) {
-                UserServices.GeneratePasswordSha256(userFromRequest.Password, out var encodedPassword);
-                userFromRequest.Password = encodedPassword;
+            if (!string.IsNullOrEmpty(userDsl.Password) && !UserServices.IsStudent(user)) {
+                UserServices.GeneratePasswordSha256(userDsl.Password, out var encodedPassword);
+                UserServices.GeneratePasswordSha256(userDsl.PasswordConfirmation, out var confirmedPassword);
+                userDsl.Password = encodedPassword;
+                userDsl.PasswordConfirmation = confirmedPassword;
             }
             
             try {
-                userFromRequest.BindWithUser(ref user);
+                UserServices.Update(userDsl, user);
                 Context.Update(user);
                 Context.SaveChanges();
             } catch (DbUpdateException update) {
                 return BadRequest(update.Message);
-            } catch (System.ComponentModel.DataAnnotations.ValidationException e) {
+            } catch (PasswordConfirmationException e) {
                 return BadRequest(e.Message);
             }
 

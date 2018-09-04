@@ -9,10 +9,12 @@ namespace events_planner.Services
     public interface IUserServices
     {
         string GenerateToken(ref User m_user);
-        User CreateUser(UserCreationDeserializer userFromRequest);
+        User CreateUser(UserCreationDeserializer userDsl);
+        void Update(UserUpdatableDeserializer userDsl, User user);
         void MakeUser(User user);
         string ReadJwtTokenClaims(string bearerToken, JwtSelector extractor = JwtSelector.EMAIL);
         bool IsModeratorFor(int eventId, int userId);
+        bool IsStudent(User user);
         bool ShouldUpdateFromSSO(User user, YnovSSO ssoData, out List<string> properties);
         void UpdateUserFromSsoDate(User user, YnovSSO ssoData, List<string> properties);
         void GeneratePasswordSha256(string password, out string encodedPassword);
