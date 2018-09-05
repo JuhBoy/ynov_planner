@@ -104,7 +104,7 @@ namespace events_planner.Controllers {
                 if (user == null) {
                     user = new User() {
                         Email = serviceResponse.AuthenticationSuccess.Attributes.Email,
-                        SSOID = 1,
+                        SSOID = null,
                         FirstName = "FirstName",
                         LastName = serviceResponse.AuthenticationSuccess.Attributes.LastName,
                         Password = Guid.NewGuid().ToString(),

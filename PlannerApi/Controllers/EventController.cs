@@ -182,8 +182,7 @@ namespace events_planner.Controllers {
         /// <response code="200">Event + is Booked data</response>
         /// <response code="500">if the credential given is not valid or DB update failed</response>
         [HttpGet("list/{order}"), AllowAnonymous]
-        public async Task<IActionResult> GetList(string order,
-                                                 [FromServices] ICategoryServices categoryServices) {
+        public async Task<IActionResult> GetList(string order) {
             Event[] events;
             InitializeQuery();
 
