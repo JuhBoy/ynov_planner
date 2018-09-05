@@ -2,6 +2,7 @@ using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using System.IO;
+using System.Reflection;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace events_planner {
@@ -14,7 +15,7 @@ namespace events_planner {
                 });
 
                 var basePath = AppContext.BaseDirectory;
-                var xmlPath = Path.Combine(basePath, "events_planner.xml");
+                var xmlPath = Path.Combine(basePath, $"{Assembly.GetExecutingAssembly().GetName().Name}.xml");
                 c.IncludeXmlComments(xmlPath);
                 c.AddSecurityDefinition("Bearer", new ApiKeyScheme {
                     Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",

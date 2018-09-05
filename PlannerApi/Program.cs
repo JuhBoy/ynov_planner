@@ -16,7 +16,7 @@ namespace events_planner
         public static void Main(string[] args)
         {
             // NLog: setup the logger first to catch all errors
-            var logger = NLogBuilder.ConfigureNLog("../../../nlog.config").GetCurrentClassLogger();
+            var logger = NLogBuilder.ConfigureNLog("nlog.config").GetCurrentClassLogger();
             IWebHost host;
             
             try {
