@@ -44,7 +44,7 @@ namespace Microsoft.Extensions.DependencyInjection {
             }
             
             if (@event.RestrictedEvent) {
-                AddAndRemoveEventRoles(eventDsl.AddRestrictedRolesList, null, @event);
+                AddAndRemoveEventRoles(eventDsl.RestrictedRolesList, @event);
             }
 
             @event.Prices = eventDsl.Prices;
@@ -102,24 +102,22 @@ namespace Microsoft.Extensions.DependencyInjection {
             Context.SaveChanges();
         }
 
-        public void AddAndRemoveEventRoles(string[] adds, string[] removes, Event @event) {
-            if (adds != null && adds.Length > 0) {
-                Role[] roles = Context.Role.Where(role => adds.Contains(role.Name)).ToArray();
-                var evRoles = new List<EventRole>(roles.Length);
+        public void AddAndRemoveEventRoles(int[] roleIds, Event @event) {
+            if (roleIds != null && roleIds.Length > 0) {
+                EventRole[] eventRoles = Context.EventRole.Where(e => e.EventId == @event.Id).ToArray();
 
-                for (int i = 0; i < roles.Length; i++) {
-                    if (Context.EventRole.Any(e => e.EventId == @event.Id && e.RoleId == roles[i].Id)) {
-                        continue;
+                foreach (int roleId in roleIds) {
+                    if (eventRoles.Any(e => e.RoleId == roleId)) { continue; }
+                    
+                    if (Context.Role.Any(e => e.Id == roleId)) {
+                        Context.EventRole.Add(new EventRole() { EventId = @event.Id, RoleId = roleId});    
                     }
-                    evRoles.Add(new EventRole() { Event = @event, RoleId = roles[i].Id });
                 }
 
-                if (evRoles.Count() > 0)
-                    Context.EventRole.AddRange(evRoles);
-            }
-
-            if (removes != null && removes.Length > 0) {
-                Context.EventRole.RemoveRange(GetEventRolesFrom(removes, @event.Id));
+                foreach (EventRole eventRole in eventRoles) {
+                    if (roleIds.Contains(eventRole.RoleId)) { continue; }
+                    Context.EventRole.Remove(eventRole);
+                }
             }
         }
 

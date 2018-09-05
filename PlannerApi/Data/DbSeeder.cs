@@ -65,19 +65,20 @@ namespace events_planner.Data {
 
         public static void InitializeTest(PlannerContext context) {
             context.Database.Migrate();
-            RemoveAdded(context);
 
             string currentDirectory = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName;
             
-            if (!context.User.Any()) {
-                List<Promotion> promotions = JsonConvert.DeserializeObject<List<Promotion>>(File.ReadAllText(currentDirectory + PROMOTIONS_TEST_PATH));
-                List<Role> roles = JsonConvert.DeserializeObject<List<Role>>(File.ReadAllText(currentDirectory + ROLE_TEST_PATH));
-                List<User> users = JsonConvert.DeserializeObject<List<User>>(File.ReadAllText(currentDirectory + USERS_TEST_PATH));
-                List<Event> events = JsonConvert.DeserializeObject<List<Event>>(File.ReadAllText(currentDirectory + EVENTS_TEST_PATH));
-                
-                context.Event.AddRange(events);
+            List<Promotion> promotions = JsonConvert.DeserializeObject<List<Promotion>>(File.ReadAllText(currentDirectory + PROMOTIONS_TEST_PATH));
+            List<Role> roles = JsonConvert.DeserializeObject<List<Role>>(File.ReadAllText(currentDirectory + ROLE_TEST_PATH));
+            List<User> users = JsonConvert.DeserializeObject<List<User>>(File.ReadAllText(currentDirectory + USERS_TEST_PATH));
+            List<Event> events = JsonConvert.DeserializeObject<List<Event>>(File.ReadAllText(currentDirectory + EVENTS_TEST_PATH));
+            
+            context.Event.AddRange(events);
+            
+            if (!context.Role.Any())
                 context.Role.AddRange(roles);
-
+        
+            if (!context.User.Any()) {
                 foreach (User user in users) {
                     user.Promotion = promotions.First();
                     if (user.Email.Contains("admin")) {
@@ -87,16 +88,9 @@ namespace events_planner.Data {
                         user.Role = roles.First();
                     }
                 }
-                context.User.AddRange(users);
-                context.SaveChanges();
             }
-        }
-
-        private static void RemoveAdded(PlannerContext context) {
-            if (context.User.Count() > 2) {
-                context.User.RemoveRange(context.User.ToList());
-                context.SaveChanges();
-            }
+            context.User.AddRange(users);
+            context.SaveChanges();
         }
     }
 }

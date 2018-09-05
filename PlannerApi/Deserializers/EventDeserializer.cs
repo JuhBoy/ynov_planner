@@ -46,6 +46,6 @@ namespace events_planner.Deserializers {
 
         public Price[] Prices { get; set; }
 
-        public string[] AddRestrictedRolesList { get; set; }
+        public int[] RestrictedRolesList { get; set; } = null;
     }
 }

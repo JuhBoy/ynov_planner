@@ -22,7 +22,7 @@ namespace events_planner.Services {
 
         void RemoveAllEventRoles(int event_id);
 
-        void AddAndRemoveEventRoles(string[] adds, string[] removes, Event @event);
+        void AddAndRemoveEventRoles(int[] roleIds, Event @event);
 
         Task<Price> GetPriceForRoleAsync(int roleId, int eventId);
 

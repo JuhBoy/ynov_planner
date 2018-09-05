@@ -121,7 +121,7 @@ namespace events_planner.Controllers {
             }
 
             if (@event.RestrictedEvent) {
-              Services.AddAndRemoveEventRoles(eventDsl.AddRestrictedRolesList, eventDsl.RemoveRestrictedRolesList, @event);
+              Services.AddAndRemoveEventRoles(eventDsl.RestrictedRolesList, @event);
             } else {
               Services.RemoveAllEventRoles(@event.Id);
             }

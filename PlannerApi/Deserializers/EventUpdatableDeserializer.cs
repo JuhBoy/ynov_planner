@@ -36,8 +36,6 @@ namespace events_planner.Deserializers {
 
         public DateTime? EndAt { get; set; }
 
-        public string[] RemoveRestrictedRolesList { get; set; }
-
-        public string[] AddRestrictedRolesList { get; set; }
+        public int[] RestrictedRolesList { get; set; } = null;
     }
 }
