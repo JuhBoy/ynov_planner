@@ -68,6 +68,21 @@ namespace PlannerApi.Tests.FunctionalTests {
                 
                 Assert.Equal(0, result.Length);
             }
+
+            [Fact]
+            public void ShouldAddRestrictedRoles() {
+                int[] roleIds = Context.Role.Select(e => e.Id).ToArray();
+                var @event = Context.Event.First();
+                
+                Services.AddAndRemoveEventRoles(new []{ roleIds[1], roleIds[3] }, @event);
+                Context.SaveChanges();
+
+                var result = Context.EventRole.Where(e => e.EventId == @event.Id).Select(e => e.RoleId).ToArray();
+                
+                Assert.Equal(2, result.Length);
+                Assert.Contains(roleIds[1], result);
+                Assert.Contains(roleIds[3], result);
+            }
         }
     }
 }
