@@ -235,7 +235,8 @@ namespace Microsoft.Extensions.DependencyInjection {
         }
         
         public void IncludeRestrictedRoles<T>(ref IQueryable<T> query) where T : Event {
-            query = query.Include(arg => arg.RestrictedRoles);
+            query = query.Include(arg => arg.RestrictedRoles)
+                         .ThenInclude(arg => arg.Role);
         }
 
         public void FilterByCategories<T>(ref IQueryable<T> query,
