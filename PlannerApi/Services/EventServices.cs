@@ -233,6 +233,10 @@ namespace Microsoft.Extensions.DependencyInjection {
         public void IncludePrices<T>(ref IQueryable<T> query) where T : Event {
             query = query.Include(arg => arg.Prices);
         }
+        
+        public void IncludeRestrictedRoles<T>(ref IQueryable<T> query) where T : Event {
+            query = query.Include(arg => arg.RestrictedRoles);
+        }
 
         public void FilterByCategories<T>(ref IQueryable<T> query,
                                                 string categories) where T : Event {
