@@ -55,6 +55,7 @@ namespace events_planner
             WebHost.CreateDefaultBuilder(args)
                 .UseEnvironment(ENV)
                 .UseStartup<Startup>()
+                .UseUrls("http://0.0.0.0:5000")
                 .ConfigureLogging(logging =>
                 {
                     logging.ClearProviders();
