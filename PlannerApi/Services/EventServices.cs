@@ -42,7 +42,7 @@ namespace Microsoft.Extensions.DependencyInjection {
             if (@event.ValidationRequired) {
                 @event.ValidatedNumber = 0;
             }
-            
+
             if (@event.RestrictedEvent) {
                 AddAndRemoveEventRoles(eventDsl.RestrictedRolesList, @event);
             }
@@ -52,27 +52,26 @@ namespace Microsoft.Extensions.DependencyInjection {
 
         public void Update(EventUpdatableDeserializer eventDsl, Event @event) {
             if (!string.IsNullOrEmpty(eventDsl.Title)) @event.Title = eventDsl.Title;
-            
+
             if (!string.IsNullOrEmpty(eventDsl.Description)) @event.Description = eventDsl.Description;
-            
+
             if (eventDsl.SubscribeNumber.HasValue) @event.SubscribeNumber = (int) eventDsl.SubscribeNumber;
-            
+
             if (!string.IsNullOrEmpty(eventDsl.Status)) @event.Status = eventDsl.Status;
-            
-            if (!string.IsNullOrEmpty(eventDsl.Location)) @event.Location = eventDsl.Location;
-            
+
             if (eventDsl.CloseAt.HasValue) @event.CloseAt = eventDsl.CloseAt;
-            
+
             if (eventDsl.JuryPoint.HasValue) @event.JuryPoint = eventDsl.JuryPoint;
-            
+
             if (eventDsl.OpenAt.HasValue) @event.OpenAt = eventDsl.OpenAt;
-            
+
             if (eventDsl.RestrictedEvent.HasValue) @event.RestrictedEvent = (bool) eventDsl.RestrictedEvent;
-            
+
             UpdateBookingsValidates(eventDsl, @event);
-            
+
             @event.EndAt = eventDsl.EndAt;
             @event.StartAt = eventDsl.StartAt;
+            @event.Location = eventDsl.Location;
         }
 
         public void UpdateBookingsValidates(EventUpdatableDeserializer eventDsl, Event @event) {
@@ -108,9 +107,9 @@ namespace Microsoft.Extensions.DependencyInjection {
 
                 foreach (int roleId in roleIds) {
                     if (eventRoles.Any(e => e.RoleId == roleId)) { continue; }
-                    
+
                     if (Context.Role.Any(e => e.Id == roleId)) {
-                        Context.EventRole.Add(new EventRole() { EventId = @event.Id, RoleId = roleId});    
+                        Context.EventRole.Add(new EventRole() { EventId = @event.Id, RoleId = roleId});
                     }
                 }
 
@@ -233,7 +232,7 @@ namespace Microsoft.Extensions.DependencyInjection {
         public void IncludePrices<T>(ref IQueryable<T> query) where T : Event {
             query = query.Include(arg => arg.Prices);
         }
-        
+
         public void IncludeRestrictedRoles<T>(ref IQueryable<T> query) where T : Event {
             query = query.Include(arg => arg.RestrictedRoles)
                          .ThenInclude(arg => arg.Role);
