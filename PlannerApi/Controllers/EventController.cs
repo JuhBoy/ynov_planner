@@ -117,7 +117,7 @@ namespace events_planner.Controllers {
             if (@event == null) return NotFound("Event not found");
 
             Services.Update(eventDsl, @event);
-            
+
             if (!Services.IsTimeWindowValid(ref @event)) {
                 var error = new String[] { "Time window is not valid, ensure close start before open" };
                 return BadRequest(new { TimeWindow = error });
@@ -378,7 +378,7 @@ namespace events_planner.Controllers {
                 Image image = Context.Images
                                      .FirstOrDefault((arg) => arg.ImageId == imageId);
                 if (image == null) return BadRequest("Image Not Found");
-                
+
                 imageServices.RemoveImages(image.Url);
                 Context.Images.Remove(image);
                 Context.SaveChanges();

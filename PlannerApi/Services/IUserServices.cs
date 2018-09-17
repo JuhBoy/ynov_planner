@@ -11,7 +11,7 @@ namespace events_planner.Services
         string GenerateToken(ref User m_user);
         User CreateUser(UserCreationDeserializer userDsl);
         void Update(UserUpdatableDeserializer userDsl, User user);
-        void MakeUser(User user);
+        void MakeUser(Attributes attributes, out User user);
         string ReadJwtTokenClaims(string bearerToken, JwtSelector extractor = JwtSelector.EMAIL);
         bool IsModeratorFor(int eventId, int userId);
         bool IsStudent(User user);

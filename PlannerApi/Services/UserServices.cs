@@ -17,7 +17,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Microsoft.Extensions.DependencyInjection {
-    
+
     public class UserServices : IUserServices {
         public PlannerContext Context { get; set; }
         public IConfiguration Configuration { get; set; }
@@ -127,7 +127,7 @@ namespace Microsoft.Extensions.DependencyInjection {
                 Role = role,
                 Location = userDsl.Location
             }).Entity;
-            
+
             Context.SaveChanges();
             return user;
         }
@@ -155,10 +155,27 @@ namespace Microsoft.Extensions.DependencyInjection {
                 user.DateOfBirth = userDsl.DateOfBirth;
         }
 
-        public void MakeUser(User user) {
-            GetPromotion(null, out var promotion);
+        public void MakeUser(Attributes attributes, out User user) {
+            user = new User() {
+                        Email = attributes.Email,
+                        SSOID = attributes.SSOID,
+                        FirstName = attributes.FirstName,
+                        LastName = attributes.LastName,
+                        ImageUrl = attributes.ImageUrl,
+                        Password = Guid.NewGuid().ToString(),
+                        PhoneNumber = 0
+                    };
+
+            GetPromotion(attributes.Name, out var promotion);
             GetRole("Student", out var role);
             GeneratePasswordSha256(user.Password, out var password);
+            if (promotion == null) {
+                promotion = new Promotion() {
+                    Name = attributes.Name,
+                    Description = attributes.Description,
+                    Year = attributes.Year
+                };
+            }
 
             user.Promotion = promotion;
             user.Role = role;
@@ -176,11 +193,15 @@ namespace Microsoft.Extensions.DependencyInjection {
                                  .Select((arg) => arg.Role.Name)
                                  .ToArray();
             List<Claim> claims = roles.Distinct().Select((arg) => new Claim("pk_user", arg)).ToList();
-            
+
             if (role != null)
                 claims.Add(new Claim("pk_user", role));
-            
+
             return claims;
+        }
+
+        private void GetPromotion(string promotionName, out Promotion promotion) {
+            promotion = PromotionServices.GetPromotionByName(promotionName);
         }
 
         private void GetPromotion(int? promotionId, out Promotion promotion) {
@@ -207,22 +228,33 @@ namespace Microsoft.Extensions.DependencyInjection {
         public bool IsStudent(User user) {
             return (user.Role.Name == "Student");
         }
-        
+
         public bool ShouldUpdateFromSSO(User user, ServiceResponse serviceResponse,
                                         out List<string> properties) {
+            if (user.Promotion == null) { throw new MissingMemberException("Promotion has not been loaded or initialized"); }
+
             var ssoData = serviceResponse.AuthenticationSuccess.Attributes;
             Type typeUser = user.GetType();
             Type typeSSO = ssoData.GetType();
+            Type typePromotion = user.Promotion.GetType();
+
             properties = new List<string>();
 
             foreach (var prop in typeSSO.GetProperties()) {
-                var sValue = prop.GetValue(ssoData);
-                var uValue = typeUser.GetProperty(prop.Name).GetValue(user) ?? "";
+                 object sValue = prop.GetValue(ssoData);;
+                 object uValue;
+
+                if (typeUser.GetProperty(prop.Name) != null) {
+                   uValue = typeUser.GetProperty(prop.Name).GetValue(user);
+                } else {
+                   uValue = typePromotion.GetProperty(prop.Name).GetValue(user.Promotion);
+                }
 
                 if (sValue != uValue) {
                     properties.Add(prop.Name);
                 }
             }
+
             return properties.Count > 0;
         }
 
@@ -231,10 +263,16 @@ namespace Microsoft.Extensions.DependencyInjection {
             var ssoData = serviceResponse.AuthenticationSuccess.Attributes;
             Type typeUser = user.GetType();
             Type typeSSO = ssoData.GetType();
+            Type typePromotion = user.Promotion.GetType();
 
             foreach (var prop in properties) {
                 var value = typeSSO.GetProperty(prop).GetValue(ssoData);
-                typeUser.GetProperty(prop).SetValue(user, value);
+                if (typeUser.GetProperty(prop) != null) {
+                    typeUser.GetProperty(prop).SetValue(user, value);
+                    continue;
+                }
+
+                typePromotion.GetProperty(prop).SetValue(user.Promotion, value);
             }
         }
 
@@ -259,7 +297,7 @@ namespace Microsoft.Extensions.DependencyInjection {
         public void WithouStaffMembers(ref IQueryable<User> query) {
             query = query.Where(arg => arg.Promotion.Name != "STAFF");
         }
-        
+
         #endregion
     }
 }

@@ -23,9 +23,9 @@ namespace events_planner.Controllers {
 
     [Route("api/[controller]")]
     public class UserController : BaseController {
-        
+
         public static readonly HttpClient HttpClient;
-        
+
         public IUserServices UserServices;
         public IHostingEnvironment Env;
 
@@ -81,13 +81,13 @@ namespace events_planner.Controllers {
 
             XmlSerializer parser = new XmlSerializer(typeof(ServiceResponse));
             ServiceResponse serviceResponse;
-            
+
             using (var reader = new StringReader(xml)) {
                 try {
                     serviceResponse = parser.Deserialize(reader) as ServiceResponse;
                 } catch (InvalidOperationException e) {
                     LogManager.GetCurrentClassLogger().Error($"Sso invalid {e.Message}");
-                    return BadRequest("Connexion Failed");
+                    return BadRequest("Connexion Failed" + e.InnerException.Message);
                 }
             }
 
@@ -97,22 +97,13 @@ namespace events_planner.Controllers {
             }
 
             User user = Context.User.Include(u => u.Role)
-                .FirstOrDefault(u => u.Email == serviceResponse.AuthenticationSuccess.Attributes.Email);
-            List<string> properties;
-
+                                    .Include(u => u.Promotion)
+                                    .FirstOrDefault(u => u.Email == serviceResponse.AuthenticationSuccess.Attributes.Email);
             try {
                 if (user == null) {
-                    user = new User() {
-                        Email = serviceResponse.AuthenticationSuccess.Attributes.Email,
-                        SSOID = null,
-                        FirstName = "FirstName",
-                        LastName = serviceResponse.AuthenticationSuccess.Attributes.LastName,
-                        Password = Guid.NewGuid().ToString(),
-                        PhoneNumber = 0619198695,
-                    };
-                    UserServices.MakeUser(user);
-                    Context.User.Add(user);
-                } else if (UserServices.ShouldUpdateFromSSO(user, serviceResponse, out properties)) {
+                    UserServices.MakeUser(serviceResponse.AuthenticationSuccess.Attributes, out var userC);
+                    Context.User.Add(userC);
+                } else if (UserServices.ShouldUpdateFromSSO(user, serviceResponse, out var properties)) {
                     UserServices.UpdateUserFromSsoData(user, serviceResponse, properties);
                     Context.User.Update(user);
                 }
@@ -254,7 +245,7 @@ namespace events_planner.Controllers {
                 userDsl.Password = encodedPassword;
                 userDsl.PasswordConfirmation = confirmedPassword;
             }
-            
+
             try {
                 UserServices.Update(userDsl, user);
                 Context.Update(user);
@@ -393,7 +384,7 @@ namespace events_planner.Controllers {
             return Ok(fileName);
         }
     }
-    
+
     // =========================================
     // Used to provide a mapping for CSV export
     // =========================================

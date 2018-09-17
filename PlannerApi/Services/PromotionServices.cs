@@ -19,5 +19,9 @@ namespace Microsoft.Extensions.DependencyInjection {
         public Promotion GetPromotionById(int id) {
             return Context.Promotion.FirstOrDefault((Promotion arg) => arg.Id == id);
         }
+
+        public Promotion GetPromotionByName(string name) {
+            return Context.Promotion.FirstOrDefault((Promotion arg) => arg.Name == name);
+        }
     }
 }
