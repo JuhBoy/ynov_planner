@@ -74,6 +74,7 @@ namespace events_planner.Controllers {
             try {
                 xml = await HttpClient.GetStringAsync(
                     $"{userSso.SsoUrl}/serviceValidate?service={userSso.Service}&ticket={userSso.Ticket}");
+                LogManager.GetCurrentClassLogger().Warn($"sso: {xml}");
             } catch (HttpRequestException e) {
                 LogManager.GetCurrentClassLogger().Error($"Sso invalid {e.Message}");
                 return BadRequest("Connexion Failed");
