@@ -24,6 +24,7 @@ namespace events_planner.Deserializers {
 
         public bool? RestrictedEvent { get; set; }
 
+        [Range(0, int.MaxValue, ErrorMessage = "The Jury Points must be superior to 0")]
         public float? JuryPoint { get; set; }
 
         public string Location { get; set; }
