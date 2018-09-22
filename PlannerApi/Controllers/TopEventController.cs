@@ -29,6 +29,8 @@ namespace events_planner.Controllers {
                 return NotFound("Event not found");
             else if (Context.Tops.Any<TopEvents>((TopEvents arg) => arg.EventId == eventId))
                 return BadRequest("Event has been already add to the top list");
+            else if (@event.Status == Status.DONE)
+                return BadRequest("Event is already done");
 
             TopEvents newTopEvent = new TopEvents() {
                 Event = @event,
@@ -55,6 +57,7 @@ namespace events_planner.Controllers {
                                         .Include(args => args.Event)
                                             .ThenInclude(ev => ev.Images)
                                         .OrderBy(arg => arg.Index)
+                                        .Where(ev => ev.Event.Status != Status.DONE)
                                         .ToArray();
             return Ok(events);
         }
