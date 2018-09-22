@@ -58,7 +58,7 @@ namespace events_planner.Controllers {
                                        .FirstOrDefaultAsync((User user) => user.Password == passwordEncoded
                                                                         && user.Email == userCredential.Login);
 
-            if (m_user == null) { return NotFound(userCredential); }
+            if (m_user == null) { return NotFound(); }
 
             string token = UserServices.GenerateToken(ref m_user);
 
