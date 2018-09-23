@@ -13,8 +13,7 @@ namespace events_planner.Models {
         [Key]
         public int Id { get; set; }
 
-        [Column("name"), StringLength(20, MinimumLength = 2)]
-        [MaxLength(20, ErrorMessage = "Name must be under 20 characters")]
+        [Column("name")]
         [MinLength(2, ErrorMessage = "Name must be at least 2 characters")]
         public string Name { get; set; }
 
