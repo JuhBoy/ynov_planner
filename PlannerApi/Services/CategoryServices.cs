@@ -6,9 +6,9 @@ using events_planner.Deserializers;
 using System.Threading.Tasks;
 
 namespace Microsoft.Extensions.DependencyInjection {
-    
+
     public class CategoryServices : ICategoryServices {
-        
+
         private PlannerContext Context { get; set; }
 
         public CategoryServices(PlannerContext context) {
@@ -40,7 +40,7 @@ namespace Microsoft.Extensions.DependencyInjection {
                 int parentId = (int) deserializer.ParentCategory;
                 var parent = Context.Category.FirstOrDefault(arg => arg.Id == parentId);
 
-                if (!parent.ParentCategory.HasValue) {
+                if (parent != null && !parent.ParentCategory.HasValue) {
                     category.ParentCategory = parentId;
                 }
             }
