@@ -71,7 +71,6 @@ namespace events_planner.Controllers {
             }
 
             try {
-                Context.Event.Add(mEvent);
                 Context.SaveChanges();
             } catch (DbUpdateException e) {
                 return BadRequest(e.InnerException.Message);

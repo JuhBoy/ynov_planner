@@ -36,18 +36,19 @@ namespace Microsoft.Extensions.DependencyInjection {
                 CloseAt = eventDsl.CloseAt,
                 OpenAt = eventDsl.OpenAt,
                 EndAt = eventDsl.EndAt,
-                Images = eventDsl.Images
+                Images = eventDsl.Images,
+                Prices = eventDsl.Prices
             };
 
             if (@event.ValidationRequired) {
                 @event.ValidatedNumber = 0;
             }
-
+            
+            Context.Event.Add(@event);
+            
             if (@event.RestrictedEvent) {
                 AddAndRemoveEventRoles(eventDsl.RestrictedRolesList, @event);
             }
-
-            @event.Prices = eventDsl.Prices;
         }
 
         public void Update(EventUpdatableDeserializer eventDsl, Event @event) {
