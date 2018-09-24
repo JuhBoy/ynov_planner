@@ -46,7 +46,7 @@ namespace Microsoft.Extensions.DependencyInjection {
                 audience: Configuration["TokenAuthentication:Audience"],
                 issuer: Configuration["TokenAuthentication:Issuer"],
                 claims: claims,
-                expires: DateTime.UtcNow.AddDays(2),
+                expires: DateTime.UtcNow.AddHours(int.Parse(Configuration["TokenAuthentication:TokenLifeInHours"])),
                 notBefore: DateTime.UtcNow,
                 signingCredentials: new SigningCredentials(
                 new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["TokenAuthentication:Secret"])), SecurityAlgorithms.HmacSha256
