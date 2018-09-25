@@ -41,7 +41,7 @@ namespace events_planner.Controllers {
         /// </remarks>
         /// <param name="eventId">The event Id</param>
         /// <returns>204 no Content</returns>
-        [HttpGet("subscribe/{eventId}"), Authorize(Roles = "Student, Admin, Foreigner")]
+        [HttpGet("subscribe/{eventId}"), Authorize(Roles = "Student, Admin, Foreigner, Staff")]
         public async Task<IActionResult> Subscribe(int eventId) {
             Event @event = await EventServices.GetEventByIdAsync(eventId);
 
@@ -102,7 +102,7 @@ namespace events_planner.Controllers {
         /// Unsubscribe from an event
         /// </summary>
         /// <returns>204 No Content</returns>
-        [HttpGet("unsubscribe/{eventId}"), Authorize(Roles = "Student, Admin, Foreigner")]
+        [HttpGet("unsubscribe/{eventId}"), Authorize(Roles = "Student, Admin, Foreigner, Staff")]
         public async Task<IActionResult> UnSubscribe(int eventId) {
             Event @event = await EventServices.GetEventByIdAsync(eventId);
             Booking booking = await Context.Booking.FirstOrDefaultAsync(
@@ -136,7 +136,7 @@ namespace events_planner.Controllers {
         /// The list doesn't contains the past events
         /// </summary>
         /// <returns>A list of events</returns>
-        [HttpGet, Authorize(Roles = "Student, Admin, Foreigner")]
+        [HttpGet, Authorize(Roles = "Student, Admin, Foreigner, Staff")]
         public async Task<IActionResult> GetBookedEvents() {
             Booking[] events = await Context.Booking
                                           .AsTracking()
