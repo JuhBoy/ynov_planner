@@ -19,7 +19,7 @@ namespace events_planner.Models
         public string Description { get; set; }
 
         [Column("year"), Required]
-        public string Year { get; set; }
+        public string Year { get; set; } = DateTime.Now.Year.ToString();
 
         [Column("created_at")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

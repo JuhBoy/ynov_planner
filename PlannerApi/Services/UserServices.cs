@@ -167,7 +167,7 @@ namespace Microsoft.Extensions.DependencyInjection {
                     };
 
             GetPromotion(attributes.Name, out var promotion);
-            GetRole("Student", out var role);
+            GetRole(GetRoleForCategories(attributes.Categories), out var role);
             GeneratePasswordSha256(user.Password, out var password);
             if (promotion == null) {
                 promotion = new Promotion() {
@@ -274,6 +274,17 @@ namespace Microsoft.Extensions.DependencyInjection {
 
                 typePromotion.GetProperty(prop).SetValue(user.Promotion, value);
             }
+        }
+
+        private string GetRoleForCategories(string categories) {
+            string roleName = "Student";
+            string[] staff = Configuration["UserAsStaffMember:Staff"].Split(',', StringSplitOptions.RemoveEmptyEntries);
+            foreach (string staffed in staff) {
+                if (!categories.Contains(staffed)) { continue; }
+                roleName = "Staff";
+                break;
+            }
+            return roleName;
         }
 
         #region Queries
