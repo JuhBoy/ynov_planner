@@ -9,22 +9,16 @@ namespace events_planner.Models
     [Table("promotion")]
     public class Promotion
     {
-        [Column("promotion_id")]
-        [Key]
+        [Column("promotion_id"), Key]
         public int Id { get; set; }
 
-        [Column("name")]
-        [StringLength(40, MinimumLength = 3)]
-        [MaxLength(40, ErrorMessage = "Name's Promotion must be under 40 characters")]
-        [MinLength(3, ErrorMessage = "Name's Promotion must be at least 3 characters")]
-        [Required]
+        [Column("name"), Required]
         public string Name { get; set; }
 
         [Column("description")]
         public string Description { get; set; }
 
-        [Column("year")]
-        [Required]
+        [Column("year"), Required]
         public string Year { get; set; }
 
         [Column("created_at")]

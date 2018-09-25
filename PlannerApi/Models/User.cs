@@ -17,18 +17,11 @@ namespace events_planner.Models
         [Column("sso_id")]
         public int? SSOID { get; set; }
 
-        [Column("first_name")]
-        [StringLength(20, MinimumLength = 3)]
-        [MaxLength(20, ErrorMessage = "First Name must be under 20 characters")]
+        [Column("first_name"), Required]
         [MinLength(3, ErrorMessage = "First Name must be at least 3 characters")]
-        [Required]
         public string FirstName { get; set; }
 
-        [Column("last_name")]
-        [StringLength(20, MinimumLength = 3)]
-        [MaxLength(20, ErrorMessage = "Last Name must be under 20 characters")]
-        [MinLength(3, ErrorMessage = "Last Name must be at least 3 characters")]
-        [Required]
+        [Column("last_name"), Required]
         public string LastName { get; set; }
 
         [Column("email"), EmailAddress, ConcurrencyCheck, Required]
@@ -37,9 +30,8 @@ namespace events_planner.Models
         [Column("date_of_birth")]
         public DateTime? DateOfBirth { get; set; }
 
-        [Column("password")]
+        [Column("password"), Required]
         [MinLength(8, ErrorMessage = "Password must be at least 8 characters")]
-        [Required]
         public string Password { get; set; }
 
         [Column("phone_number")]

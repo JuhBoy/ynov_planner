@@ -6,12 +6,10 @@ namespace events_planner.Deserializers
     public class UserCreationDeserializer
     {
         [StringLength(20, MinimumLength = 3), Required]
-        [MaxLength(20, ErrorMessage = "First Name must be under 20 characters")]
         [MinLength(3, ErrorMessage = "First Name must be at least 3 characters")]
         public string FirstName { get; set; }
 
         [StringLength(20, MinimumLength = 3), Required]
-        [MaxLength(20, ErrorMessage = "Last Name must be under 20 characters")]
         [MinLength(3, ErrorMessage = "Last Name must be at least 3 characters")]
         public string LastName { get; set; }
 
@@ -28,7 +26,7 @@ namespace events_planner.Deserializers
 
         [Required]
         public DateTime? DateOfBirth { get; set; }
-        
+
         public string Location { get; set; }
     }
 }
