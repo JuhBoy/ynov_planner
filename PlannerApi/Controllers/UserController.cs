@@ -102,8 +102,9 @@ namespace events_planner.Controllers {
                                     .FirstOrDefault(u => u.Email == serviceResponse.AuthenticationSuccess.Attributes.Email);
             try {
                 if (user == null) {
-                    UserServices.MakeUser(serviceResponse.AuthenticationSuccess.Attributes, out var userC);
-                    Context.User.Add(userC);
+                    UserServices.MakeUser(serviceResponse.AuthenticationSuccess.Attributes, out var nUser);
+                    user = nUser;
+                    Context.User.Add(user);
                 } else if (UserServices.ShouldUpdateFromSSO(user, serviceResponse, out var properties)) {
                     UserServices.UpdateUserFromSsoData(user, serviceResponse, properties);
                     Context.User.Update(user);
