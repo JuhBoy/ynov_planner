@@ -7,6 +7,7 @@ using MimeKit.Text;
 using Microsoft.AspNetCore.Hosting;
 using events_planner.Utils;
 using events_planner.Models;
+using System.Threading;
 
 namespace Microsoft.Extensions.DependencyInjection {
 
@@ -68,14 +69,16 @@ namespace Microsoft.Extensions.DependencyInjection {
                 return;
             }
 
-            string mailContent = _generator.GenerateFor(template, ref user, ref @event);
-            var message = new EmailMessage();
-            message.ToAddresses.Add(new EmailAddress() { Name = user.FullName, Address = user.Email });
-            message.FromAddresses.Add(new EmailAddress() { Name = _emailConfiguration.SenderName,
-                                                           Address = _emailConfiguration.SenderEmail });
-            message.Content = mailContent;
-            message.Subject = "Ynov Event Informations";
-            SendInternal(message);
+            ThreadPool.QueueUserWorkItem(new WaitCallback((a) => {
+                string mailContent = _generator.GenerateFor(template, ref user, ref @event);
+                var message = new EmailMessage();
+                message.ToAddresses.Add(new EmailAddress() { Name = user.FullName, Address = user.Email });
+                message.FromAddresses.Add(new EmailAddress() { Name = _emailConfiguration.SenderName,
+                                                               Address = _emailConfiguration.SenderEmail });
+                message.Content = mailContent;
+                message.Subject = "Ynov Event Informations";
+                SendInternal(message);
+            }));
         }
     }
 }
