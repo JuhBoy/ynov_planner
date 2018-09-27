@@ -74,7 +74,7 @@ namespace events_planner.Utils {
             content = content.Replace("{{logo}}", Path.Combine(root, "images/logo.png"));
 
             content = content.Replace("{{user_firstname}}", user.FirstName);
-            content = content.Replace("{{event_name}}", "iam the name of an event");
+            content = content.Replace("{{event_name}}", @event.Title);
 
             mainIconPath = "images/" + template.ToString().ToLower() + ".png";
 
@@ -110,10 +110,15 @@ namespace events_planner.Utils {
         }
 
         private void AddEventInfos(ref string content, ref Event @event) {
-            content = content.Replace("{{event_date}}", @event.OpenAt.ToString());
+            content = content.Replace("{{event_date}}", @event.OpenAt?.ToString());
             content = content.Replace("{{event_open_at_hour}}", @event.OpenAt?.ToShortTimeString());
             content = content.Replace("{{event_close_at_hour}}", @event.CloseAt?.ToShortTimeString());
-            content = content.Replace("{{event_address}}", @event.Location);
+
+            if (!string.IsNullOrEmpty(@event.Location)) {
+                int start = @event.Location.IndexOf("?q=") + 3;
+                String location = @event.Location.Substring(start, @event.Location.Length - start);
+                content = content.Replace("{{event_address}}", location);
+            }
         }
     }
 }
