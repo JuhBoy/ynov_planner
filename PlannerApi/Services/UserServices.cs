@@ -165,10 +165,12 @@ namespace Microsoft.Extensions.DependencyInjection {
                         Password = Guid.NewGuid().ToString(),
                         PhoneNumber = 0
                     };
-
-            GetPromotion(attributes.Name, out var promotion);
-            GetRole(GetRoleForCategories(attributes.Categories), out var role);
+            string roleName = GetRoleForCategories(attributes.Categories);
+            
+            GetPromotion(attributes.Name ?? roleName, out var promotion);
+            GetRole(roleName, out var role);
             GeneratePasswordSha256(user.Password, out var password);
+            
             if (promotion == null) {
                 promotion = new Promotion() {
                     Name = attributes.Name,
@@ -272,6 +274,7 @@ namespace Microsoft.Extensions.DependencyInjection {
                     continue;
                 }
 
+                
                 typePromotion.GetProperty(prop).SetValue(user.Promotion, value);
             }
         }
