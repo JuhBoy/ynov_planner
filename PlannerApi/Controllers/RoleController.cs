@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace events_planner.Controllers {
+    
+    [Route("api/[controller]")]
     public class RoleController : BaseController {
 
         public RoleController(PlannerContext context) {
@@ -15,7 +17,7 @@ namespace events_planner.Controllers {
         /// Get The list of all roles
         /// </summary>
         /// <returns>Array[Role]</returns>
-        [HttpGet("/list"), Authorize(Roles = "Admin")]
+        [HttpGet("list"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetRoles() {
             return Ok(await Context.Role.ToArrayAsync());
         }
