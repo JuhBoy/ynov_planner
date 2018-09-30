@@ -48,6 +48,7 @@ namespace events_planner {
             services.AddScoped<IEventServices, EventServices>();
             services.AddScoped<ICategoryServices, CategoryServices>();
             services.AddScoped<ITopEventServices, TopEventServices>();
+            services.AddScoped<IBookingServices, BookingServices>();
 
             if (Configuration.GetValue<bool>("SechduleActivation")) {
                 // Background tasks

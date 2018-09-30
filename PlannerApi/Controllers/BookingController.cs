@@ -20,12 +20,16 @@ namespace events_planner.Controllers {
 
         public IEmailService EmailServices;
 
+        public IBookingServices BookingServices;
+
         public BookingController(PlannerContext context,
                                 IEventServices eventServices,
-                                IEmailService mailServices) {
+                                IEmailService mailServices,
+                                IBookingServices bookingServices) {
             Context = context;
             EventServices = eventServices;
             EmailServices = mailServices;
+            BookingServices = bookingServices;
         }
 
         /// <summary>
@@ -105,10 +109,7 @@ namespace events_planner.Controllers {
         [HttpGet("unsubscribe/{eventId}"), Authorize(Roles = "Student, Admin, Foreigner, Staff")]
         public async Task<IActionResult> UnSubscribe(int eventId) {
             Event @event = await EventServices.GetEventByIdAsync(eventId);
-            Booking booking = await Context.Booking.FirstOrDefaultAsync(
-                (Booking book) => book.UserId == CurrentUser.Id &&
-                                  book.EventId == eventId
-            );
+            Booking booking = await BookingServices.GetByIdsAsync(CurrentUser.Id, eventId);
 
             if (@event == null || booking == null || !@event.Forward() ||
                 !@event.SubscribtionOpen()) {
@@ -138,18 +139,8 @@ namespace events_planner.Controllers {
         /// <returns>A list of events</returns>
         [HttpGet, Authorize(Roles = "Student, Admin, Foreigner, Staff")]
         public async Task<IActionResult> GetBookedEvents() {
-            Booking[] events = await Context.Booking
-                                          .AsTracking()
-                                          .Include(inc => inc.Event)
-                                            .ThenInclude(tinc => tinc.Images)
-                                          .Include(iii => iii.Event)
-                                            .ThenInclude(tinc => tinc.EventCategory)
-                                                .ThenInclude(evcat => evcat.Category)
-                                          .Where(arg => arg.UserId == CurrentUser.Id
-                                                        && !arg.Present)
-                                          .ToArrayAsync();
-            Booking[] result = events.Where((arg) => arg.Event.Forward())
-                                     .ToArray();
+            Booking[] events = await BookingServices.GetBookedEventForUserAsync(CurrentUser.Id);
+            Booking[] result = events.Where((arg) => arg.Event.Forward()).ToArray();
             return Ok(result);
         }
 
@@ -176,16 +167,10 @@ namespace events_planner.Controllers {
                 return BadRequest("Not Allowed to moderate this event");
             }
 
-            // RETRIEVE THE BOOKING CORRESPONDIG TO USER + EVENT
-            Expression<Func<Booking, bool>> action =
-                (Booking arg) => arg.UserId == bookingValidation.UserId &&
-                                 arg.EventId == bookingValidation.EventId;
+            var query = BookingServices.WithUserAndEvent(Context.Booking);
 
-            Booking book = await Context.Booking
-                                        .AsTracking()
-                                        .Include(inc => inc.User)
-                                        .Include(inc => inc.Event)
-                                        .FirstOrDefaultAsync(action);
+            Booking book =
+                await BookingServices.GetByIdsAsync(bookingValidation.UserId, bookingValidation.EventId, query);
 
             if (book == null)
                 return NotFound("Booking not found");
@@ -202,11 +187,7 @@ namespace events_planner.Controllers {
 
             // CREATE THE PointJury ASSOCIATED
             if (book.Event.JuryPoint != null) {
-                JuryPoint juryPoint = new JuryPoint() {
-                    Points = (int)book.Event.JuryPoint,
-                    UserId = bookingValidation.UserId
-                };
-                Context.JuryPoints.Update(juryPoint);
+                BookingServices.CreateJuryPoint((float) book.Event.JuryPoint, bookingValidation.UserId);
             }
 
             try {
@@ -218,6 +199,35 @@ namespace events_planner.Controllers {
                 return BadRequest(e.InnerException.Message);
             }
 
+            return NoContent();
+        }
+
+        [HttpPatch("change-validation/{validation}"), Authorize(Roles = "Admin")]
+        public async Task<IActionResult> ChangeValidation([FromBody] BookingValidationDeserializer bookingValidationDsl, 
+                                              [FromRoute] bool validation) {
+            Booking booking = await BookingServices.GetByIdsAsync(bookingValidationDsl.UserId,
+                bookingValidationDsl.EventId, BookingServices.WithUserAndEvent(Context.Booking));
+            
+            if (booking == null) { return NotFound("Booking not found"); }
+
+            booking.Present = validation;
+
+            if (!validation && booking.Event.JuryPoint.HasValue) {
+                BookingServices.RemoveJuryPoints(
+                    BookingServices.GetJuryPoint(bookingValidationDsl.UserId, (float) booking.Event.JuryPoint)
+                );
+            } else if (booking.Event.JuryPoint.HasValue) {
+                BookingServices.CreateJuryPoint((float) booking.Event.JuryPoint, bookingValidationDsl.UserId);
+                EmailServices.SendFor(booking.User, booking.Event, BookingTemplate.PRESENT);
+            }
+
+            try {
+                Context.Booking.Update(booking);
+                await Context.SaveChangesAsync();
+            } catch (DbUpdateException ex) {
+                return BadRequest(ex);
+            }
+            
             return NoContent();
         }
 

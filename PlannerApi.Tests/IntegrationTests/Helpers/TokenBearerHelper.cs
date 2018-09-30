@@ -37,6 +37,8 @@ namespace PlannerApi.Tests.IntegrationTests.Helpers
                 .Returns("localhost:5000");
             Configuration.Setup(conf => conf["TokenAuthentication:Secret"])
                 .Returns("SECRETE_DEMO_KEY_FOR_DEVELOPMENT_ONLY");
+            Configuration.Setup(conf => conf["TokenAuthentication:TokenLifeInHours"])
+                .Returns("3");
         }
     }
 }
