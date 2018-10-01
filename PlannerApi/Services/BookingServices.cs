@@ -1,4 +1,6 @@
+using System;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using events_planner.Models;
 using Microsoft.AspNetCore.Identity;
@@ -52,7 +54,9 @@ namespace events_planner.Services {
         }
 
         public JuryPoint GetJuryPoint(int userId, float points) {
-            return Context.JuryPoints.FirstOrDefault(jp => jp.UserId == userId && jp.Points.Equals(points));
+            double epsilon = 0.01;
+            return Context.JuryPoints.FirstOrDefault(jp => jp.UserId == userId &&
+                                                           (jp.Points - points) < epsilon);
         }
 
         public void RemoveJuryPoints(JuryPoint juryPoint) {

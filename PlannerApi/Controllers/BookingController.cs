@@ -202,7 +202,7 @@ namespace events_planner.Controllers {
             return NoContent();
         }
 
-        [HttpPatch("change-validation/{validation}"), Authorize(Roles = "Admin")]
+        [HttpPut("change-validation/{validation}"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> ChangeValidation([FromBody] BookingValidationDeserializer bookingValidationDsl, 
                                               [FromRoute] bool validation) {
             Booking booking = await BookingServices.GetByIdsAsync(bookingValidationDsl.UserId,

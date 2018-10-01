@@ -32,9 +32,15 @@ namespace PlannerApi.Tests.IntegrationTests
         {
             var books = Context.Booking.ToArray();
             if (!books.IsNullOrEmpty()) {
-                Context.Booking.RemoveRange();
-                Context.SaveChanges();    
+                Context.Booking.RemoveRange(books);
             }
+
+            var juryPoints = Context.JuryPoints.ToArray();
+            if (!juryPoints.IsNullOrEmpty()) {
+                Context.JuryPoints.RemoveRange(juryPoints);
+            }
+            
+            Context.SaveChanges();
         }
 
         public class Subscriptions : BookingControllerTests
@@ -73,33 +79,105 @@ namespace PlannerApi.Tests.IntegrationTests
         {
             public Validation(ServerFixtures server) : base(server) { }
 
-            [Theory, InlineData("email@admin.com")]
-            public async void ShouldValidateWithourModeratorRoles(string email)
-            {
-                User user = Context.User.Include(e => e.Role).FirstOrDefault(u => u.Email == email);
-                Event @event = Context.Event.Find(1);
+            private void CreateFixture(string email, bool present, out Event @event, out User user, out Booking book) {
+                user = Context.User.Include(e => e.Role).FirstOrDefault(u => u.Email == email);
+                @event = Context.Event.Find(1);
                 
                 @event.OpenAt = DateTime.Now.AddDays(-1);
                 @event.CloseAt = DateTime.Now.AddDays(1);
                 @event.Status = Status.ONGOING;
-                var book = new Booking() { UserId = user.Id, EventId = @event.Id, Present = false };
+                book = new Booking() { UserId = user.Id, EventId = @event.Id, Present = present };
                 
+                // Add Fake JuryPoints
+                if (present) {
+                    @event.JuryPoint = 1345.13F;
+                    JuryPoint jp = new JuryPoint() { Points = (float)@event.JuryPoint, UserId = user.Id };
+                    Context.JuryPoints.Add(jp);
+                }
+                JuryPoint jp2 = new JuryPoint() { Points = 1345.14F, UserId = user.Id };
+                
+                Context.JuryPoints.Add(jp2);
                 Context.Booking.Add(book);
                 Context.Event.Update(@event);
                 Context.SaveChanges();
+            }
+
+            private void MakeRequest(BookingValidationDeserializer dsl, User user, out StringContent content) {
+                string json = JsonConvert.SerializeObject(dsl);
+                content = new StringContent(json, Encoding.UTF8, "application/json");
+                
+                HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer",
+                    TokenBearerHelper.GetTokenFor(user, Context));
+            }
+
+            [Theory, InlineData("email@admin.com")]
+            public async void ShouldValidateWithoutModeratorRoles(string email) {
+                CreateFixture(email, false, out var @event, out var user, out var book);
                 
                 var deserializer = new BookingValidationDeserializer() {
                     EventId = @event.Id,
                     UserId = user.Id
                 };
-                string json = JsonConvert.SerializeObject(deserializer);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-                
-                HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenBearerHelper.GetTokenFor(user, Context));
+                MakeRequest(deserializer, user, out var content);
                 HttpResponseMessage body = await HttpClient.PostAsync("api/booking/validate", content);
                 
                 Assert.Equal("", body.Content.ReadAsStringAsync().Result);
                 Assert.Equal(HttpStatusCode.NoContent, body.StatusCode);
+            }
+            
+            [Theory, InlineData("email@admin.com")]
+            public async void ShouldInvalidUser_WhenHasBeenSetAsPresent(string email) {
+                CreateFixture(email, true, out var @event, out var user, out var book);
+                
+                var deserializer = new BookingValidationDeserializer() {
+                    EventId = @event.Id,
+                    UserId = user.Id
+                };
+                MakeRequest(deserializer, user, out var content);
+                HttpResponseMessage body = await HttpClient.PutAsync($"api/booking/change-validation/{false}", content);
+                
+                Assert.Equal("", body.Content.ReadAsStringAsync().Result);
+                Assert.Equal(HttpStatusCode.NoContent, body.StatusCode);
+
+                var bookAssertion = Context.Booking.AsNoTracking()
+                    .FirstOrDefault(e => e.UserId == user.Id && e.EventId == @event.Id);
+                Assert.Equal(false, bookAssertion.Present);
+            }
+            
+            [Theory, InlineData("email@admin.com")]
+            public async void ShouldRemoveJuryPoints_WhenUserHasBeenRevoked(string email) {
+                CreateFixture(email, true, out var @event, out var user, out var book);
+                
+                var deserializer = new BookingValidationDeserializer() {
+                    EventId = @event.Id,
+                    UserId = user.Id
+                };
+                MakeRequest(deserializer, user, out var content);
+                HttpResponseMessage body = await HttpClient.PutAsync($"api/booking/change-validation/{false}", content);
+                
+                Assert.Equal("", body.Content.ReadAsStringAsync().Result);
+                Assert.Equal(HttpStatusCode.NoContent, body.StatusCode);
+
+                var bookAssertion = Context.JuryPoints.Where(e => e.UserId == user.Id).ToArray();
+                Assert.True(!bookAssertion.Any(a => a.Points.Equals(1345.13F)));
+            }
+            
+            [Theory, InlineData("email@admin.com")]
+            public async void ShouldAddJuryPoints_WhenUserHasBeenAdmited(string email) {
+                CreateFixture(email, false, out var @event, out var user, out var book);
+                
+                var deserializer = new BookingValidationDeserializer() {
+                    EventId = @event.Id,
+                    UserId = user.Id
+                };
+                MakeRequest(deserializer, user, out var content);
+                HttpResponseMessage body = await HttpClient.PutAsync($"api/booking/change-validation/{true}", content);
+                
+                Assert.Equal("", body.Content.ReadAsStringAsync().Result);
+                Assert.Equal(HttpStatusCode.NoContent, body.StatusCode);
+
+                var bookAssertion = Context.JuryPoints.Where(e => e.UserId == user.Id).ToArray();
+                Assert.True(bookAssertion.Any(a => a.Points.Equals(1345.13F)));
             }
         }
 
