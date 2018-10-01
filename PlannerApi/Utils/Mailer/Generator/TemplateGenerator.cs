@@ -38,12 +38,16 @@ namespace events_planner.Utils {
                                        template.ToString().ToLower() + FILE_EXT);
             string[] templates = new string[users.Length];
 
-            using (var stream = new StreamReader(File.Open(path, FileMode.Open))) {
-                string fileContent = stream.ReadToEnd();
-                if (string.IsNullOrEmpty(fileContent)) {
-                    throw new TemplateEmptyException("File content is null or empty");
+            using (var file = File.Open(path, FileMode.Open)) {
+                
+                using (var stream = new StreamReader(file)) {
+                    string fileContent = stream.ReadToEnd();
+                    if (string.IsNullOrEmpty(fileContent)) {
+                        throw new TemplateEmptyException("File content is null or empty");
+                    }
+                    templaseAsUtf8String = fileContent;
                 }
-                templaseAsUtf8String = fileContent;
+                
             }
 
             for (int i = 0; i < users.Length; i++) {
