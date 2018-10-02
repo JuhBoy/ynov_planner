@@ -243,7 +243,7 @@ namespace Microsoft.Extensions.DependencyInjection {
             properties = new List<string>();
 
             foreach (var prop in typeSSO.GetProperties()) {
-                 object sValue = prop.GetValue(ssoData);;
+                 object sValue = prop.GetValue(ssoData);
                  object uValue;
 
                 if (typeUser.GetProperty(prop.Name) != null) {
@@ -252,7 +252,7 @@ namespace Microsoft.Extensions.DependencyInjection {
                    uValue = typePromotion.GetProperty(prop.Name).GetValue(user.Promotion);
                 }
 
-                if (sValue != uValue) {
+                if (sValue != null && uValue != null && !sValue.Equals(uValue)) {
                     properties.Add(prop.Name);
                 }
             }
