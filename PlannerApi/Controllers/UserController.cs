@@ -178,6 +178,8 @@ namespace events_planner.Controllers {
         public IActionResult ReadAll() {
             string search = HttpContext.Request.Query["search"];
             string range = HttpContext.Request.Query["range"];
+            bool withStaff = HttpContext.Request.Query["staff"] == bool.TrueString;
+            
             IQueryable<User> query = UserServices.AllForeignKeysQuery();
 
             if (search != null) {
@@ -198,7 +200,9 @@ namespace events_planner.Controllers {
                 }
             }
 
-            UserServices.WithouStaffMembers(ref query);
+            if (!withStaff) {
+                UserServices.WithouStaffMembers(ref query);
+            }
             UserServices.IncludeBookings(ref query);
 
             User[] users = query.AsNoTracking().ToArray();
