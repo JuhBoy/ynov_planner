@@ -45,7 +45,7 @@ namespace events_planner.Data {
                     foreach (var user in users) {
                         if (user.Email.Contains("admin")) {
                             user.Role = roles.FirstOrDefault(e => e.Name.Equals("Admin"));
-                            user.Promotion = promotions.FirstOrDefault(e => e.Name == "STAFF");
+                            user.Promotion = promotions.FirstOrDefault(e => e.Name == "Staff");
                         } else {
                             user.Role = roles.FirstOrDefault(e => e.Name.Equals("Student"));
                             user.Promotion = promotions.FirstOrDefault(e => e.Name == "YNOV-Student");
