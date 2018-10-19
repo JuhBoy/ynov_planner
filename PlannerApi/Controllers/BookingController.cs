@@ -108,22 +108,22 @@ namespace events_planner.Controllers {
         /// <returns>204 No Content</returns>
         [HttpGet("unsubscribe/{eventId}"), Authorize(Roles = "Student, Admin, Foreigner, Staff")]
         public async Task<IActionResult> UnSubscribe(int eventId) {
-            Event @event = await EventServices.GetEventByIdAsync(eventId);
-            Booking booking = await BookingServices.GetByIdsAsync(CurrentUser.Id, eventId);
+            var book = await BookingServices.GetByIdsAsync(CurrentUser.Id, eventId, BookingServices.WithUserAndEvent());
 
-            if (@event == null || booking == null || !@event.Forward() ||
-                !@event.SubscribtionOpen()) {
+            if (book == null) {
                 return BadRequest("Can't unsubscribe to the event");
             }
 
-            @event.SubscribedNumber--;
+            book.Event.SubscribedNumber--;
 
-            if (@event.ValidationRequired && (bool) booking.Validated)
-                @event.ValidatedNumber--;
+            if (book.Event.ValidationRequired && (bool) book.Validated)
+                book.Event.ValidatedNumber--;
+            if (book.Present)
+                await BookingServices.SetBookingPresence(book, false);
 
             try {
-                Context.Update(@event);
-                Context.Remove(booking);
+                Context.Update(book.Event);
+                Context.Remove(book);
                 await Context.SaveChangesAsync();
             } catch (DbUpdateException e) {
                 return BadRequest(e.InnerException.Message);
@@ -157,44 +157,22 @@ namespace events_planner.Controllers {
         /// </remarks>
         /// <returns>201 No content</returns>
         [HttpPost("validate"), Authorize(Roles = "Admin, Moderator")]
-        public async Task<IActionResult> ValidatePresence(
-            [FromBody] BookingValidationDeserializer bookingValidation,
-            [FromServices] IUserServices userServices) {
+        public async Task<IActionResult> ValidatePresence([FromBody] BookingValidationDeserializer bookDsl) {
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
-            if (!CurrentUser.Role.Name.Equals("Admin") &&
-                !userServices.IsModeratorFor(bookingValidation.EventId,
-                                            CurrentUser.Id)) {
-                return BadRequest("Not Allowed to moderate this event");
+            if (BookingServices.EnsureModerationCapability(CurrentUser, bookDsl.EventId)) {
+                return BadRequest("User Not Allowed to moderate this event");
             }
 
-            var query = BookingServices.WithUserAndEvent(Context.Booking);
-
-            Booking book =
-                await BookingServices.GetByIdsAsync(bookingValidation.UserId, bookingValidation.EventId, query);
+            Booking book = await BookingServices.GetByIdsAsync(bookDsl.UserId, bookDsl.EventId,
+                BookingServices.WithUserAndEvent());
 
             if (book == null)
                 return NotFound("Booking not found");
-            else if (!book.Event.OnGoingWindow() ||
-               !book.Event.Status.Equals(Status.ONGOING))
-                return BadRequest("Can't validate presence outside of open window");
-            else if (book.Present)
-                return BadRequest("Presence Already validated");
-            else if (book.Event.ValidationRequired && (bool) !book.Validated)
-                return BadRequest("User hasn't been validated");
-
-            // VALIDATE THE PRESENCE
-            book.Present = true;
-
-            // CREATE THE PointJury ASSOCIATED
-            if (book.Event.JuryPoint != null) {
-                BookingServices.CreateJuryPoint((float) book.Event.JuryPoint, bookingValidation.UserId);
-            }
+            if (book.Event.ValidationRequired && (bool) !book.Validated)
+                return BadRequest("User must be confirmed to the event");
 
             try {
-                Context.Booking.Update(book);
-                await Context.SaveChangesAsync();
-                EmailServices.SendFor(book.User, book.Event,
-                                          BookingTemplate.PRESENT);
+                await BookingServices.SetBookingPresence(book, bookDsl.Presence);
             } catch (DbUpdateException e) {
                 return BadRequest(e.InnerException.Message);
             }
@@ -202,17 +180,17 @@ namespace events_planner.Controllers {
             return NoContent();
         }
 
-        [HttpPut("change-validation/{validation}"), Authorize(Roles = "Admin")]
-        public async Task<IActionResult> ChangeValidation([FromBody] BookingValidationDeserializer bookingValidationDsl, 
-                                              [FromRoute] bool validation) {
+        [HttpPut("change-validation"), Authorize(Roles = "Admin"), Obsolete]
+        public async Task<IActionResult> ChangeValidation([FromBody] BookingValidationDeserializer bookingValidationDsl) 
+        {
             Booking booking = await BookingServices.GetByIdsAsync(bookingValidationDsl.UserId,
                 bookingValidationDsl.EventId, BookingServices.WithUserAndEvent(Context.Booking));
             
             if (booking == null) { return NotFound("Booking not found"); }
 
-            booking.Present = validation;
+            booking.Present = bookingValidationDsl.Presence;
 
-            if (!validation && booking.Event.JuryPoint.HasValue) {
+            if (!bookingValidationDsl.Presence && booking.Event.JuryPoint.HasValue) {
                 BookingServices.RemoveJuryPoints(
                     BookingServices.GetJuryPoint(bookingValidationDsl.UserId, (float) booking.Event.JuryPoint)
                 );
@@ -237,23 +215,16 @@ namespace events_planner.Controllers {
         /// <returns>204</returns>
         /// <param name="userId">User identifier.</param>
         /// <param name="eventId">Event identifier.</param>
-        /// <param name="confirm">If set to <c>true</c> confirm the user,
+        /// <param name="confirm">If set to <c>true</c> validate the user,
         /// otherwise it remove the booking</param>
         [HttpPost("confirm/{userId}/{eventId}/{confirm}"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> ConfirmUser(int userId,
                                                      int eventId,
                                                      bool confirm) {
-            Booking booking = await Context.Booking
-                                           .Include(arg => arg.User)
-                                           .Include(arg => arg.Event)
-                                           .FirstOrDefaultAsync(arg =>
-                                                                arg.UserId == userId
-                                                                && arg.EventId == eventId);
+            Booking booking = await BookingServices.GetByIdsAsync(userId, eventId, BookingServices.WithUserAndEvent());
 
             if (booking == null)
                 return BadRequest("Booking Not found");
-            else if (!booking.Event.Forward())
-                return BadRequest("Event expired");
             else if (!booking.Event.ValidationRequired)
                 return BadRequest("Event doesn't need validation");
 
@@ -261,20 +232,7 @@ namespace events_planner.Controllers {
             booking.Validated = confirm;
 
             try {
-                BookingTemplate template;
-                if (!confirm) {
-                    if (tmpValidate) { booking.Event.ValidatedNumber--; }
-                    booking.Event.SubscribedNumber--;
-                    Context.Event.Update(booking.Event);
-                    Context.Booking.Remove(booking);
-                    template = BookingTemplate.AWAY;
-                } else {
-                    booking.Event.ValidatedNumber++;
-                    Context.Booking.Update(booking);
-                    template = BookingTemplate.SUBSCRIPTION_VALIDATED;
-                }
-                await Context.SaveChangesAsync();
-                EmailServices.SendFor(booking.User, booking.Event, template);
+                await BookingServices.SetBookingConfirmation(tmpValidate, booking);
             } catch (DbUpdateException e) {
                 return BadRequest(e.InnerException.Message);
             }

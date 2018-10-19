@@ -51,6 +51,11 @@ namespace PlannerApi.Tests.IntegrationTests
             public async void ShouldSubscribeToNoWindowEvent(string eventName, string email)
             {
                 var @event = Context.Event.FirstOrDefault(e => e.Title == eventName);
+                @event.OpenAt = DateTime.Now.Add(TimeSpan.FromDays(1));
+                @event.CloseAt = DateTime.Now.Add(TimeSpan.FromDays(2));
+                Context.Update(@event);
+                Context.SaveChanges();
+                
                 var admin = Context.User.Include(e => e.Role).FirstOrDefault(e => e.Email == email);
                 var id = @event.Id;
 
@@ -110,19 +115,23 @@ namespace PlannerApi.Tests.IntegrationTests
                     TokenBearerHelper.GetTokenFor(user, Context));
             }
 
-            [Theory, InlineData("email@admin.com")]
-            public async void ShouldValidateWithoutModeratorRoles(string email) {
+            [Theory, InlineData("email@admin.com", true), InlineData("email@admin.com", false)]
+            public async void ShouldValidate_WithoutModeratorRoles(string email, bool presence) {
                 CreateFixture(email, false, out var @event, out var user, out var book);
                 
                 var deserializer = new BookingValidationDeserializer() {
                     EventId = @event.Id,
-                    UserId = user.Id
+                    UserId = user.Id,
+                    Presence = presence
                 };
                 MakeRequest(deserializer, user, out var content);
-                HttpResponseMessage body = await HttpClient.PostAsync("api/booking/validate", content);
+                HttpResponseMessage body = await HttpClient.PostAsync($"api/booking/validate", content);
+                var present = Context.Booking.AsNoTracking().FirstOrDefault(p => p.EventId == @event.Id && 
+                                                                                 p.UserId == user.Id).Present;
                 
                 Assert.Equal("", body.Content.ReadAsStringAsync().Result);
                 Assert.Equal(HttpStatusCode.NoContent, body.StatusCode);
+                Assert.True(present == presence);
             }
             
             [Theory, InlineData("email@admin.com")]
@@ -131,10 +140,11 @@ namespace PlannerApi.Tests.IntegrationTests
                 
                 var deserializer = new BookingValidationDeserializer() {
                     EventId = @event.Id,
-                    UserId = user.Id
+                    UserId = user.Id,
+                    Presence = false
                 };
                 MakeRequest(deserializer, user, out var content);
-                HttpResponseMessage body = await HttpClient.PutAsync($"api/booking/change-validation/{false}", content);
+                HttpResponseMessage body = await HttpClient.PutAsync($"api/booking/change-validation", content);
                 
                 Assert.Equal("", body.Content.ReadAsStringAsync().Result);
                 Assert.Equal(HttpStatusCode.NoContent, body.StatusCode);
@@ -150,10 +160,11 @@ namespace PlannerApi.Tests.IntegrationTests
                 
                 var deserializer = new BookingValidationDeserializer() {
                     EventId = @event.Id,
-                    UserId = user.Id
+                    UserId = user.Id,
+                    Presence = false
                 };
                 MakeRequest(deserializer, user, out var content);
-                HttpResponseMessage body = await HttpClient.PutAsync($"api/booking/change-validation/{false}", content);
+                HttpResponseMessage body = await HttpClient.PutAsync($"api/booking/change-validation", content);
                 
                 Assert.Equal("", body.Content.ReadAsStringAsync().Result);
                 Assert.Equal(HttpStatusCode.NoContent, body.StatusCode);
@@ -168,10 +179,11 @@ namespace PlannerApi.Tests.IntegrationTests
                 
                 var deserializer = new BookingValidationDeserializer() {
                     EventId = @event.Id,
-                    UserId = user.Id
+                    UserId = user.Id,
+                    Presence = true
                 };
                 MakeRequest(deserializer, user, out var content);
-                HttpResponseMessage body = await HttpClient.PutAsync($"api/booking/change-validation/{true}", content);
+                HttpResponseMessage body = await HttpClient.PutAsync($"api/booking/change-validation", content);
                 
                 Assert.Equal("", body.Content.ReadAsStringAsync().Result);
                 Assert.Equal(HttpStatusCode.NoContent, body.StatusCode);

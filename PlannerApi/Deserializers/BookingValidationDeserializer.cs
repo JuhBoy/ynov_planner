@@ -9,6 +9,9 @@ namespace events_planner.Deserializers {
 
         [Required]
         public int UserId { get; set; }
+        
+        [Required]
+        public bool Presence { get; set; }
 
     }
 }
