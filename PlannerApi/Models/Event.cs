@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
+using events_planner.Utils.Attributs;
 
 namespace events_planner.Models {
 
@@ -36,6 +37,7 @@ namespace events_planner.Models {
 
         [Column("subscribed_number"),
         JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        [SubscriptionNumberAttribute("SubscribeNumber")]
         public int SubscribedNumber { get; set; } = 0;
 
         [Column("validation_number"),
