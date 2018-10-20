@@ -1,13 +1,10 @@
-using System;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using events_planner.Constants;
 using events_planner.Models;
 using events_planner.Utils;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace events_planner.Services {
@@ -34,6 +31,32 @@ namespace events_planner.Services {
         
         public async Task<Booking> GetByIdsAsync(int userId, int eventId, IQueryable<Booking> query) {
             return await query.FirstOrDefaultAsync(b => b.UserId == userId && b.EventId == eventId);
+        }
+
+        public async Task<Booking> MakeBookingAsync(User user, Event @event) {
+            Booking book = new Booking() {
+                Present = false,
+                User = user,
+                Event = @event
+            };
+            @event.SubscribedNumber++;
+            book.Validated &= !@event.ValidationRequired;
+
+            Context.Booking.Add(book);
+            Context.Event.Update(@event);
+            await Context.SaveChangesAsync();
+            
+            return book;
+        }
+
+        public void SendEmailForNewBooking(Booking booking) {
+            BookingTemplate template;
+            if (!booking.Validated.HasValue) {
+                template = BookingTemplate.AUTO_VALIDATED;
+            } else {
+                template = BookingTemplate.PENDING_VALIDATION;
+            }
+            EmailService.SendFor(booking.User, booking.Event, template);
         }
 
         public async Task<Booking[]> GetBookedEventForUserAsync(int userId) {
@@ -87,6 +110,48 @@ namespace events_planner.Services {
             
             Context.Booking.Update(booking);
             await Context.SaveChangesAsync();
+        }
+        
+        public async Task SubscribeUserToEvent(User user, Event @event)
+        {
+            bool l = IsAllowedToSubscribe(user, @event);
+        }
+
+        public bool IsAllowedToSubscribe(User user, Event @event) {
+            int roleId = user.RoleId;
+            int eventID = @event.Id;
+            
+            return !@event.RestrictedEvent || Context.EventRole.Any(ev => ev.RoleId == roleId && ev.EventId == eventID);
+        }
+
+        public async Task<bool> IsBookedToEvent(User user, Event @event) {
+            int eventId = @event.Id;
+            int userId = user.Id;
+            return await Context.Booking.AnyAsync((Booking booking) => booking.EventId == eventId && booking.UserId == userId);
+        }
+
+        public async Task<BadRequestObjectResult> IsBookableAsync(Event @event, User user) {
+            if (@event == null || @event.SubscribedNumber >= @event.SubscribeNumber) {
+                return new BadRequestObjectResult(ApiErrors.SubscriptionOverFlow);
+            }
+                
+            if (await IsBookedToEvent(user, @event)) {
+                return new BadRequestObjectResult(ApiErrors.AlreadyBooked);
+            }
+
+            if (!@event.HasSubscriptionWindow() && !@event.Forward()) {
+                return new BadRequestObjectResult(ApiErrors.EventExpired);
+            }
+
+            if (!@event.SubscribtionOpen()) {
+                return new BadRequestObjectResult(ApiErrors.SubscriptionNotOpen);
+            }
+
+            if (!IsAllowedToSubscribe(user, @event)) {
+                return new BadRequestObjectResult(ApiErrors.SubscriptionNotPermitted);
+            }
+
+            return null;
         }
         
         #region JuryPoints

@@ -8,6 +8,7 @@ using events_planner.Models;
 using System.Linq;
 using System;
 using System.Linq.Expressions;
+using events_planner.Constants;
 using Microsoft.Extensions.DependencyInjection;
 using events_planner.Utils;
 
@@ -49,54 +50,14 @@ namespace events_planner.Controllers {
         public async Task<IActionResult> Subscribe(int eventId) {
             Event @event = await EventServices.GetEventByIdAsync(eventId);
 
-            if (@event == null || @event.SubscribedNumber >= @event.SubscribeNumber)
-                return BadRequest("Unprocessable, Max Subscriber reach or event not found");
-
-            // Don't force lambda to request Db for other scops.
-            int userId = CurrentUser.Id;
-            int roleId = CurrentUser.RoleId;
-            int eventID = @event.Id;
-
-            if (Context.Booking.Any((Booking booking) => booking.EventId == eventId
-                && booking.UserId == userId)) {
-                return BadRequest("User Already Booked");
-            }
-
-            if (!@event.HasSubscriptionWindow() && !@event.Forward()) {
-                return BadRequest("Event Expired, can't subscribe");
-            }
-
-            if (!@event.SubscribtionOpen()) {
-                return BadRequest("Subscriptions are not open");
-            }
-
-            if (@event.RestrictedEvent &&
-                !Context.EventRole.Any((EventRole ev) => ev.RoleId == roleId && ev.EventId == eventID)) {
-                return BadRequest("Sorry you are not allowed to subscribe");
-            }
-
-            Booking book = new Booking() {
-                Present = false,
-                User = CurrentUser,
-                Event = @event
-            };
-            @event.SubscribedNumber++;
-            book.Validated &= !@event.ValidationRequired;
+            var requestObjectError = await BookingServices.IsBookableAsync(@event, CurrentUser);
+            if (requestObjectError != null) return requestObjectError;
 
             try {
-                Context.Booking.Add(book);
-                Context.Event.Update(@event);
-                await Context.SaveChangesAsync();
-
-                BookingTemplate template;
-                if (!book.Validated.HasValue) {
-                    template = BookingTemplate.AUTO_VALIDATED;
-                } else {
-                    template = BookingTemplate.PENDING_VALIDATION;
-                }
-                EmailServices.SendFor(CurrentUser, @event, template);
-            } catch (DbUpdateException e) {
-                return BadRequest(e.InnerException.Message);
+                var book = await BookingServices.MakeBookingAsync(CurrentUser, @event);
+                BookingServices.SendEmailForNewBooking(book);
+            } catch (DbUpdateException ex) {
+                return BadRequest(ex.InnerException.Message);
             }
 
             return NoContent();

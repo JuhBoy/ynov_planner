@@ -16,6 +16,9 @@ namespace events_planner.Services
 
         Task SetBookingPresence(Booking booking, bool presence);
         bool EnsureModerationCapability(User user, int eventId);
+        Task<Booking> MakeBookingAsync(User user, Event @event);
+        void SendEmailForNewBooking(Booking booking);
+        Task<BadRequestObjectResult> IsBookableAsync(Event @event, User user);
 
         /// <summary>
         /// Process to Booking confirmation with the booking already updated (in memory)
@@ -24,6 +27,22 @@ namespace events_planner.Services
         /// <param name="booking">The booking targeted</param>
         /// <exception cref="InvalidCastException">If booking.Validate is null</exception>
         Task SetBookingConfirmation(bool previsousConfirm, Booking booking);
+
+        /// <summary>
+        /// Verify that the user can subscribe to the given event
+        /// </summary>
+        /// <param name="user">The user model</param>
+        /// <param name="event">The event model</param>
+        /// <returns>True:False</returns>
+        bool IsAllowedToSubscribe(User user, Event @event);
+
+        /// <summary>
+        /// Check if use is booked with the given event
+        /// </summary>
+        /// <param name="user">The user model</param>
+        /// <param name="event">The event model</param>
+        /// <returns>True:False</returns>
+        Task<bool> IsBookedToEvent(User user, Event @event);
         
         #region JuryPoints
         JuryPoint CreateJuryPoint(float points, int userId);
