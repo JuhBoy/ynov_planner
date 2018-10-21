@@ -23,14 +23,18 @@ namespace events_planner.Controllers {
 
         public IBookingServices BookingServices;
 
+        public IUserServices UserServices;
+
         public BookingController(PlannerContext context,
                                 IEventServices eventServices,
                                 IEmailService mailServices,
-                                IBookingServices bookingServices) {
+                                IBookingServices bookingServices,
+                                IUserServices userServices) {
             Context = context;
             EventServices = eventServices;
             EmailServices = mailServices;
             BookingServices = bookingServices;
+            UserServices = userServices;
         }
 
         /// <summary>
@@ -120,7 +124,7 @@ namespace events_planner.Controllers {
         [HttpPost("validate"), Authorize(Roles = "Admin, Moderator")]
         public async Task<IActionResult> ValidatePresence([FromBody] BookingValidationDeserializer bookDsl) {
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
-            if (BookingServices.EnsureModerationCapability(CurrentUser, bookDsl.EventId)) {
+            if (UserServices.EnsureModerationCapability(CurrentUser, bookDsl.EventId)) {
                 return BadRequest("User Not Allowed to moderate this event");
             }
 
@@ -231,6 +235,29 @@ namespace events_planner.Controllers {
                                .Where(boks => boks.EventId == eventId)
                                .ToArray();
             return Ok(books);
+        }
+        
+        /// <summary>
+        /// Subscribe a given user to the specified event
+        /// </summary>
+        /// <param name="userToEventDsl">Event to user model</param>
+        /// <returns>204 or 400</returns>
+        [HttpPost("user"), AllowAnonymous]
+        public async Task<IActionResult> AddUserToEvent([FromBody] UserToEventDeserializer userToEventDsl) {
+            var @event = await EventServices.GetEventByIdAsync(userToEventDsl.eventId);
+            var user = await UserServices.GetUserByIdAsync(userToEventDsl.userId);
+
+            var badObjRslt = await BookingServices.IsBookableAsync(@event, user);
+            if (badObjRslt != null) return badObjRslt;
+
+            try {
+                await BookingServices.SubscribeUserToEvent(@event, user);
+            }
+            catch (DbUpdateException ex) {
+                return BadRequest(ex);
+            }
+
+            return NoContent();
         }
     }
 }

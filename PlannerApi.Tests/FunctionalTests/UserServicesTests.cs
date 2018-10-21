@@ -24,6 +24,7 @@ namespace PlannerApi.Tests.FunctionalTests
         protected Mock<PlannerContext> Pc;
         protected Mock<IRoleServices> Irs;
         protected Mock<IPromotionServices> Ips;
+        protected Mock<IBookingServices> Bs;
 
         public UserServicesTests() {
             Context = new PlannerContext((new DbContextOptionsBuilder()).UseMySql(DbConnection).Options);
@@ -48,9 +49,9 @@ namespace PlannerApi.Tests.FunctionalTests
             [Fact]
             public void GetRoleWithNullShouldReturnForeigner()
             {
-                TokenBearerHelper.MockUserServices(out Cfg, out Pc, out Irs, out Ips);
+                TokenBearerHelper.MockUserServices(out Cfg, out Pc, out Irs, out Ips, out Bs);
                 SetIrsToSuccessReturn();
-                UserServices service = new Mock<UserServices>(Context, Cfg.Object, Ips.Object, Irs.Object).Object;
+                UserServices service = new Mock<UserServices>(Context, Cfg.Object, Ips.Object, Irs.Object, Bs.Object).Object;
 
                 Role role = new Role();
                 var args = new Object[] {null, role};
@@ -66,9 +67,9 @@ namespace PlannerApi.Tests.FunctionalTests
             [Fact]
             public void GetRoleWithSpecificValueShouldReturnTheRole()
             {
-                TokenBearerHelper.MockUserServices(out Cfg, out Pc, out Irs, out Ips);
+                TokenBearerHelper.MockUserServices(out Cfg, out Pc, out Irs, out Ips, out Bs);
                 SetIrsToSuccessReturn();
-                UserServices service = new Mock<UserServices>(Context, Cfg.Object, Ips.Object, Irs.Object).Object;
+                UserServices service = new Mock<UserServices>(Context, Cfg.Object, Ips.Object, Irs.Object, Bs.Object).Object;
 
                 Role role = new Role();
                 var args = new Object[] {"Student", role};
@@ -84,9 +85,9 @@ namespace PlannerApi.Tests.FunctionalTests
             [Fact]
             public void GetRoleWithwrongValueShouldReturnNull()
             {
-                TokenBearerHelper.MockUserServices(out Cfg, out Pc, out Irs, out Ips);
+                TokenBearerHelper.MockUserServices(out Cfg, out Pc, out Irs, out Ips, out Bs);
                 SetIrsToSuccessReturn();
-                UserServices service = new Mock<UserServices>(Context, Cfg.Object, Ips.Object, Irs.Object).Object;
+                UserServices service = new Mock<UserServices>(Context, Cfg.Object, Ips.Object, Irs.Object, Bs.Object).Object;
 
                 Role role = new Role();
                 var args = new Object[] {"unknown_value", role};
@@ -112,7 +113,7 @@ namespace PlannerApi.Tests.FunctionalTests
 
             [Theory, InlineData("julien@gmail.com")]
             public void GetRolesShouldReturnDistinctRoles(string userMail) {
-                TokenBearerHelper.MockUserServices(out Cfg, out Pc, out Irs, out Ips);
+                TokenBearerHelper.MockUserServices(out Cfg, out Pc, out Irs, out Ips, out Bs);
                 User user = Context.User.FirstOrDefault(u => u.Email == userMail);
                 Role role = Context.Role.FirstOrDefault(r => r.Name == "Moderator");
                 Queue<Event> evQueue = new Queue<Event>(Context.Event.Take(3).ToArray());
@@ -125,7 +126,7 @@ namespace PlannerApi.Tests.FunctionalTests
                 }
                 Context.SaveChanges();
 
-                var service = new UserServices(Context, Cfg.Object, Ips.Object, Irs.Object);
+                var service = new UserServices(Context, Cfg.Object, Ips.Object, Irs.Object, Bs.Object);
                 var claims = service.GetRoles(user.Id);
                 
                 Assert.NotNull(claims);

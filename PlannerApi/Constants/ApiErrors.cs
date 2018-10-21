@@ -26,5 +26,15 @@ namespace events_planner.Constants
         /// When Subscription are actually at maximum capacity
         /// </summary>
         internal static readonly string SubscriptionOverFlow = "Booking:SubscriptionOverflow";
+
+        /// <summary>
+        /// When User model is null
+        /// </summary>
+        internal static readonly string UserNotFound = "User:NotFound";
+        
+        /// <summary>
+        /// When Event model is null
+        /// </summary>
+        internal static readonly string EventNotFound = "Event:NotFound";
     }
 }

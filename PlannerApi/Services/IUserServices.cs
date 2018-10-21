@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using events_planner.Deserializers;
 using events_planner.Models;
 using events_planner.Constants.Services;
@@ -18,6 +19,9 @@ namespace events_planner.Services
         bool ShouldUpdateFromSSO(User user, ServiceResponse ssoData, out List<string> properties);
         void UpdateUserFromSsoData(User user, ServiceResponse ssoData, List<string> properties);
         void GeneratePasswordSha256(string password, out string encodedPassword);
+        bool EnsureModerationCapability(User user, int eventId);
+
+        Task<User> GetUserByIdAsync(int id, IQueryable<User> bQuery = null);
 
         #region QUERIES
 

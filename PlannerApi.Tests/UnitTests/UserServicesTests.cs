@@ -21,10 +21,12 @@ namespace PlannerApi.Tests.UnitTests
             private Mock<PlannerContext> PlannerContext;
             private Mock<IRoleServices> RoleServices;
             private Mock<IPromotionServices> PromotionServices;
+            private Mock<IBookingServices> BookingServices;
 
-            public GetToken() {
+            public GetToken()
+            {
                 TokenBearerHelper.MockUserServices(out Configuration, out PlannerContext, out RoleServices,
-                                                   out PromotionServices);
+                    out PromotionServices, out BookingServices); 
             }
 
             public void Dispose()
@@ -44,7 +46,7 @@ namespace PlannerApi.Tests.UnitTests
                     Email = "email@dqsd.fr",
                     Role = new Role() { Name = "Student" }
                 };
-                var us = new Mock<UserServices>(PlannerContext.Object, Configuration.Object, PromotionServices.Object, RoleServices.Object);
+                var us = new Mock<UserServices>(PlannerContext.Object, Configuration.Object, PromotionServices.Object, RoleServices.Object, BookingServices.Object);
                 us.Setup(svces => svces.GetRoles(1, "Student")).Returns(new List<Claim>());
 
                 string token = us.Object.GenerateToken(ref user);
@@ -57,7 +59,8 @@ namespace PlannerApi.Tests.UnitTests
             [Theory, InlineData("myPassword")]
             public void ShouldHashSHA256Password(string password) 
             {
-                var service = new Mock<UserServices>(PlannerContext.Object, Configuration.Object, PromotionServices.Object, RoleServices.Object).Object;
+                var service = new Mock<UserServices>(PlannerContext.Object, Configuration.Object, PromotionServices.Object,
+                    RoleServices.Object, BookingServices.Object).Object;
                 string encodedPWD, encodedPWD2;
                 service.GeneratePasswordSha256(password, out encodedPWD);
                 service.GeneratePasswordSha256(password, out encodedPWD2);

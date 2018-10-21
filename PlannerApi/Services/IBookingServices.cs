@@ -15,10 +15,10 @@ namespace events_planner.Services
         Task<Booking[]> GetBookedEventForUserAsync(int userId);
 
         Task SetBookingPresence(Booking booking, bool presence);
-        bool EnsureModerationCapability(User user, int eventId);
         Task<Booking> MakeBookingAsync(User user, Event @event);
         void SendEmailForNewBooking(Booking booking);
         Task<BadRequestObjectResult> IsBookableAsync(Event @event, User user);
+        Task SubscribeUserToEvent(Event @event, User user);
 
         /// <summary>
         /// Process to Booking confirmation with the booking already updated (in memory)

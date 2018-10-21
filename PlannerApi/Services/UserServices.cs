@@ -6,12 +6,14 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using CsvHelper;
 using events_planner.Constants.Services;
 using events_planner.Deserializers;
 using events_planner.Models;
 using events_planner.Services;
 using events_planner.Utils;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -23,15 +25,18 @@ namespace Microsoft.Extensions.DependencyInjection {
         public IConfiguration Configuration { get; set; }
         public IPromotionServices PromotionServices { get; set; }
         public IRoleServices RoleServices { get; set; }
+        public IBookingServices BookingServices { get; }
 
         public UserServices(PlannerContext context,
                             IConfiguration configuration,
                             IPromotionServices promotionServices,
-                            IRoleServices roleServices) {
+                            IRoleServices roleServices,
+                            IBookingServices bookingServices) {
             Context = context;
             Configuration = configuration;
             PromotionServices = promotionServices;
             RoleServices = roleServices;
+            BookingServices = bookingServices;
         }
 
         public string GenerateToken(ref User m_user) {
@@ -226,6 +231,10 @@ namespace Microsoft.Extensions.DependencyInjection {
                           .Any((TemporaryRole arg) => arg.EventId == eventId &&
                                                       arg.UserId == userId);
         }
+        
+        public bool EnsureModerationCapability(User user, int eventId) {
+            return !user.Role.Name.Equals("Admin") && !IsModeratorFor(eventId, user.Id);
+        }
 
         public bool IsStudent(User user) {
             return (user.Role.Name == "Student");
@@ -274,11 +283,15 @@ namespace Microsoft.Extensions.DependencyInjection {
                     continue;
                 }
 
-                
                 typePromotion.GetProperty(prop).SetValue(user.Promotion, value);
             }
         }
 
+        public async Task<User> GetUserByIdAsync(int id, IQueryable<User> bQuery = null) {
+            var query = bQuery ?? Context.User;
+            return await query.FirstOrDefaultAsync(user => user.Id == id);
+        }
+        
         private string GetRoleForCategories(string categories) {
             string roleName = "Student";
             string[] staff = Configuration["UserAsStaffMember:Staff"].Split(',', StringSplitOptions.RemoveEmptyEntries);
