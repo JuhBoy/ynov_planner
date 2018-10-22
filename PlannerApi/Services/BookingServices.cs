@@ -75,7 +75,10 @@ namespace events_planner.Services {
             BookingTemplate template;
             
             if (!(bool)booking.Validated) {
-                if (previsousConfirm) { booking.Event.ValidatedNumber--; }
+                if (previsousConfirm) {
+                    booking.Event.ValidatedNumber--;
+                    await SetBookingPresence(booking, false);
+                }
                 booking.Event.SubscribedNumber--;
                 Context.Event.Update(booking.Event);
                 Context.Booking.Remove(booking);
@@ -109,7 +112,7 @@ namespace events_planner.Services {
         
         public async Task SubscribeUserToEvent(Event @event, User user) {
             var book = await MakeBookingAsync(user, @event);
-            book.Validated = true;
+            book.Validated |= @event.ValidationRequired;
             await SetBookingConfirmation(false, book);
         }
 
@@ -135,7 +138,7 @@ namespace events_planner.Services {
                 return new BadRequestObjectResult(ApiErrors.SubscriptionOverFlow);
             if (await IsBookedToEvent(user, @event))
                 return new BadRequestObjectResult(ApiErrors.AlreadyBooked);
-            if (!@event.HasSubscriptionWindow() && !@event.Forward())
+            if (!@event.Forward())
                 return new BadRequestObjectResult(ApiErrors.EventExpired);
             if (!@event.SubscribtionOpen())
                 return new BadRequestObjectResult(ApiErrors.SubscriptionNotOpen);
@@ -143,7 +146,21 @@ namespace events_planner.Services {
                 return new BadRequestObjectResult(ApiErrors.SubscriptionNotPermitted);
             return null;
         }
-        
+
+        public async Task<BadRequestObjectResult> IsBookableWithoutDateAsync(Event @event, User user) {
+            if (@event == null)
+                return new BadRequestObjectResult(ApiErrors.EventNotFound);
+            if (user == null) 
+                return new BadRequestObjectResult(ApiErrors.UserNotFound);
+            if (@event.SubscribedNumber >= @event.SubscribeNumber)
+                return new BadRequestObjectResult(ApiErrors.SubscriptionOverFlow);
+            if (await IsBookedToEvent(user, @event))
+                return new BadRequestObjectResult(ApiErrors.AlreadyBooked);
+            if (!IsAllowedToSubscribe(user, @event))
+                return new BadRequestObjectResult(ApiErrors.SubscriptionNotPermitted);
+            return null;
+        }
+
         #region JuryPoints
 
         public JuryPoint CreateJuryPoint(float points, int userId) {

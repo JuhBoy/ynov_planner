@@ -247,7 +247,7 @@ namespace events_planner.Controllers {
             var @event = await EventServices.GetEventByIdAsync(userToEventDsl.eventId);
             var user = await UserServices.GetUserByIdAsync(userToEventDsl.userId);
 
-            var badObjRslt = await BookingServices.IsBookableAsync(@event, user);
+            var badObjRslt = await BookingServices.IsBookableWithoutDateAsync(@event, user);
             if (badObjRslt != null) return badObjRslt;
 
             try {

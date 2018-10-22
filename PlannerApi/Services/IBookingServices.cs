@@ -18,6 +18,7 @@ namespace events_planner.Services
         Task<Booking> MakeBookingAsync(User user, Event @event);
         void SendEmailForNewBooking(Booking booking);
         Task<BadRequestObjectResult> IsBookableAsync(Event @event, User user);
+        Task<BadRequestObjectResult> IsBookableWithoutDateAsync(Event @event, User user);
         Task SubscribeUserToEvent(Event @event, User user);
 
         /// <summary>
