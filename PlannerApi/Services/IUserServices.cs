@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using events_planner.Deserializers;
 using events_planner.Models;
 using events_planner.Constants.Services;
+using Microsoft.AspNetCore.Hosting;
 
 namespace events_planner.Services
 {
@@ -22,6 +23,7 @@ namespace events_planner.Services
         bool EnsureModerationCapability(User user, int eventId);
 
         Task<User> GetUserByIdAsync(int id, IQueryable<User> bQuery = null);
+        Task<string> ExportUsersCsv(IEnumerable<User> users, IHostingEnvironment env);
 
         #region QUERIES
 

@@ -36,5 +36,15 @@ namespace events_planner.Constants
         /// When Event model is null
         /// </summary>
         public static readonly string EventNotFound = "Event:NotFound";
+
+        /// <summary>
+        /// When Ids sent to csv export are empty
+        /// </summary>
+        public static readonly string CSVEmptySet = "CsvExport:EmptyIds";
+
+        /// <summary>
+        /// Unknown Internal error
+        /// </summary>
+        public static readonly string CsvErrorInternal = "CsvExport:InternalError";
     }
 }

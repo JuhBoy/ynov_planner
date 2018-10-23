@@ -9,13 +9,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using System.Linq;
 using System.Collections.Generic;
-using System.Net;
 using events_planner.PrimitiveExt;
-using CsvHelper;
-using CsvHelper.Configuration;
 using Microsoft.AspNetCore.Hosting;
 using System.Net.Http;
 using System.Xml.Serialization;
+using events_planner.Constants;
 using events_planner.Utils;
 using NLog;
 
@@ -364,45 +362,47 @@ namespace events_planner.Controllers {
         [HttpPost("export/{ids}"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> CsvExport(string ids) {
             int[] iIds = ids.Split(',').Select(arg => int.Parse(arg)).ToArray();
-            string fileName;
+            
             if (iIds.Length <= 0) {
-                return BadRequest("No Ids provided, unable to write the CSV file");
+                return BadRequest(ApiErrors.CSVEmptySet);
             }
-
+            
+            IEnumerable<User> users = Context.User.Include(a => a.JuryPoint)
+                                                  .Include(a => a.Promotion)
+                                                  .Where(arg => iIds.Contains(arg.Id));
+            string csvPathOrData;
+            
             try {
-                IEnumerable<User> users = Context.User.Include(a => a.JuryPoint)
-                                                      .Include(a => a.Promotion)
-                                                      .Where(arg => iIds.Contains(arg.Id));
-                fileName = "export_" + DateTime.Now.ToString("HH_mm_ss") + ".csv";
-                string path = Path.Combine(Env.WebRootPath, "csv", fileName);
-
-                using (var stream = new StreamWriter(path, false)) {
-                    var csvWriter = new CsvWriter(stream);
-                    csvWriter.Configuration.RegisterClassMap<UserDataMap>();
-                    csvWriter.WriteRecords(users);
-                }
-            } catch (ParserException e) {
-                return BadRequest(e);
-            } catch (IOException e) {
-                return BadRequest(e);
+                csvPathOrData = await UserServices.ExportUsersCsv(users, Env);
+            } catch (Exception ex) {
+                return BadRequest(ApiErrors.CsvErrorInternal);
             }
+            
+            return Ok(csvPathOrData);
+        }
 
-            return Ok(fileName);
+        [HttpGet("export-event/{eventId}"), Authorize(Roles = "Admin")]
+        public async Task<IActionResult> CsvExport(int eventId, [FromServices] IEventServices eventServices)
+        {
+            Event @event = await eventServices.GetEventByIdAsync(eventId);
+            if (@event == null) return BadRequest(ApiErrors.EventNotFound);
+
+            Booking[] books = await Context.Booking.Include(b => b.User)
+                .ThenInclude(u => u.JuryPoint)
+                .Include(b => b.User.Promotion)
+                .Where(b => b.EventId == eventId && b.Present)
+                .ToArrayAsync();
+            
+            string csvPathOrData;
+            
+            try {
+                csvPathOrData = await UserServices.ExportUsersCsv(books.Select(b => b.User), Env);
+            } catch (Exception ex) {
+                LogManager.GetCurrentClassLogger().Error(ex);
+                return BadRequest(ApiErrors.CsvErrorInternal);
+            }
+            
+            return Ok(csvPathOrData);
         }
     }
-
-    // =========================================
-    // Used to provide a mapping for CSV export
-    // =========================================
-    public class UserDataMap : ClassMap<User> {
-        public UserDataMap() {
-            Map(m => m.LastName);
-            Map(m => m.FirstName);
-            Map(m => m.Email);
-            Map(m => m.PhoneNumber);
-            Map(m => m.TotalJuryPoints);
-            Map(m => m.Promotion.Name).Name("promotion_name");
-        }
-    }
-
 }

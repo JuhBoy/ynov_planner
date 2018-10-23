@@ -13,6 +13,10 @@ using events_planner.Deserializers;
 using events_planner.Models;
 using events_planner.Services;
 using events_planner.Utils;
+using events_planner.Utils.DataFormatter;
+using events_planner.Utils.DataFormatter.Accessors;
+using events_planner.Utils.DataFormatter.Mappers;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -290,6 +294,14 @@ namespace Microsoft.Extensions.DependencyInjection {
         public async Task<User> GetUserByIdAsync(int id, IQueryable<User> bQuery = null) {
             var query = bQuery ?? Context.User;
             return await query.FirstOrDefaultAsync(user => user.Id == id);
+        }
+
+        public async Task<string> ExportUsersCsv(IEnumerable<User> users, IHostingEnvironment env) {
+            var factory = new DataFormatterFactory(env);
+            IFormatter formatter = factory.GetFormatter(FormatterType.CSV);
+            formatter.Configuration = factory.UseFileConfiguration<UserDataMap>(FormatterType.CSV);
+            
+            return await formatter.FormatMultipleAsync<IEnumerable<User>>(users);
         }
         
         private string GetRoleForCategories(string categories) {
