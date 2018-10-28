@@ -46,5 +46,20 @@ namespace events_planner.Constants
         /// Unknown Internal error
         /// </summary>
         public static readonly string CsvErrorInternal = "CsvExport:InternalError";
+
+        /// <summary>
+        /// Error on saving data to DB
+        /// </summary>
+        public static readonly string JuryPointDbError = "JuryPoint:DatabaseInternalError";
+
+        /// <summary>
+        /// Jury point not found
+        /// </summary>
+        public static readonly string JuryPointNotFound = "JuryPoint:NotFound";
+
+        /// <summary>
+        /// When Deletion has been asked for a JuryPoint that hold an event reference
+        /// </summary>
+        public static readonly string JuryPointInvalidDelete = "JuryPoint:InvalidDeleteRequest";
     }
 }

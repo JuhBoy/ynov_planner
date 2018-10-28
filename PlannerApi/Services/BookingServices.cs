@@ -14,10 +14,13 @@ namespace events_planner.Services {
         
         private PlannerContext Context { get; }
         private IEmailService EmailService { get; }
+        private IJuryPointServices JuryPointServices { get; }
 
-        public BookingServices(PlannerContext context, IEmailService emailService) {
+        public BookingServices(PlannerContext context, IEmailService emailService, IJuryPointServices juryPointServices)
+        {
             Context = context;
             EmailService = emailService;
+            JuryPointServices = juryPointServices;
         }
 
         public Booking GetByIds(int userId, int eventId) {
@@ -99,10 +102,11 @@ namespace events_planner.Services {
             booking.Present = presence;
             
             if (!presence && booking.Event.JuryPoint.HasValue) {
-                var points = GetJuryPoint(booking.UserId, (float) booking.Event.JuryPoint);
-                RemoveJuryPoints(points);
+                JuryPoint points = await JuryPointServices.GetJuryPointAsync(booking.UserId, booking.EventId);
+                JuryPointServices.RemoveJuryPoints(points);
             } else if (booking.Event.JuryPoint.HasValue) {
-                CreateJuryPoint((float) booking.Event.JuryPoint, booking.UserId);
+                await JuryPointServices.CreateJuryPointAsync((float) booking.Event.JuryPoint, "From Event",
+                    booking.UserId, booking.EventId);
                 EmailService.SendFor(booking.User, booking.Event, BookingTemplate.PRESENT);
             }
             
@@ -113,7 +117,8 @@ namespace events_planner.Services {
         public async Task SubscribeUserToEvent(Event @event, User user) {
             var book = await MakeBookingAsync(user, @event);
             book.Validated |= @event.ValidationRequired;
-            await SetBookingConfirmation(false, book);
+            if (book.Validated.HasValue)
+                await SetBookingConfirmation(false, book);
         }
 
         public bool IsAllowedToSubscribe(User user, Event @event) {
@@ -160,29 +165,6 @@ namespace events_planner.Services {
                 return new BadRequestObjectResult(ApiErrors.SubscriptionNotPermitted);
             return null;
         }
-
-        #region JuryPoints
-
-        public JuryPoint CreateJuryPoint(float points, int userId) {
-            JuryPoint juryPoint = new JuryPoint {
-                Points = points,
-                UserId = userId
-            };
-            Context.JuryPoints.Add(juryPoint);
-            return juryPoint;
-        }
-
-        public JuryPoint GetJuryPoint(int userId, float points) {
-            double epsilon = 0.01;
-            return Context.JuryPoints.FirstOrDefault(jp => jp.UserId == userId &&
-                                                           (jp.Points - points) < epsilon);
-        }
-
-        public void RemoveJuryPoints(JuryPoint juryPoint) {
-            Context.Remove(juryPoint);
-        }
-        
-        #endregion
         
         #region Queries
 

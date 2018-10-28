@@ -11,9 +11,10 @@ using System;
 namespace events_planner.Migrations
 {
     [DbContext(typeof(PlannerContext))]
-    partial class PlannerContextModelSnapshot : ModelSnapshot
+    [Migration("20181027145835_JuryPointsLinkedWithEvents")]
+    partial class JuryPointsLinkedWithEvents
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -275,8 +276,7 @@ namespace events_planner.Migrations
                     b.Property<float>("Points")
                         .HasColumnName("points");
 
-                    b.Property<int>("UserId")
-                        .HasColumnName("user_id");
+                    b.Property<int>("UserId");
 
                     b.HasKey("Id");
 

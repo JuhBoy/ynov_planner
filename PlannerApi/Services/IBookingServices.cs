@@ -44,12 +44,6 @@ namespace events_planner.Services
         /// <param name="event">The event model</param>
         /// <returns>True:False</returns>
         Task<bool> IsBookedToEvent(User user, Event @event);
-        
-        #region JuryPoints
-        JuryPoint CreateJuryPoint(float points, int userId);
-        JuryPoint GetJuryPoint(int userId, float points);
-        void RemoveJuryPoints(JuryPoint juryPoint);
-        #endregion
 
         #region Queries
         IQueryable<Booking> WithUser(IQueryable<Booking> query);

@@ -91,19 +91,20 @@ namespace PlannerApi.Tests.IntegrationTests
                 @event.OpenAt = DateTime.Now.AddDays(-1);
                 @event.CloseAt = DateTime.Now.AddDays(1);
                 @event.Status = Status.ONGOING;
+                Context.Event.Update(@event);
                 book = new Booking() { UserId = user.Id, EventId = @event.Id, Present = present };
-                
+
                 // Add Fake JuryPoints
                 if (present) {
                     @event.JuryPoint = 1345.13F;
-                    JuryPoint jp = new JuryPoint() { Points = (float)@event.JuryPoint, UserId = user.Id };
+                    JuryPoint jp = new JuryPoint() { Points = (float)@event.JuryPoint, UserId = user.Id, 
+                        EventId = @event.Id };
                     Context.JuryPoints.Add(jp);
                 }
-                JuryPoint jp2 = new JuryPoint() { Points = 1345.14F, UserId = user.Id };
+                JuryPoint jp2 = new JuryPoint() { Points = 1345.14F, UserId = user.Id, EventId = @event.Id};
                 
                 Context.JuryPoints.Add(jp2);
                 Context.Booking.Add(book);
-                Context.Event.Update(@event);
                 Context.SaveChanges();
             }
 
@@ -144,7 +145,7 @@ namespace PlannerApi.Tests.IntegrationTests
                     Presence = false
                 };
                 MakeRequest(deserializer, user, out var content);
-                HttpResponseMessage body = await HttpClient.PutAsync($"api/booking/change-validation", content);
+                HttpResponseMessage body = await HttpClient.PostAsync($"api/booking/validate", content);
                 
                 Assert.Equal("", body.Content.ReadAsStringAsync().Result);
                 Assert.Equal(HttpStatusCode.NoContent, body.StatusCode);
@@ -164,7 +165,7 @@ namespace PlannerApi.Tests.IntegrationTests
                     Presence = false
                 };
                 MakeRequest(deserializer, user, out var content);
-                HttpResponseMessage body = await HttpClient.PutAsync($"api/booking/change-validation", content);
+                HttpResponseMessage body = await HttpClient.PostAsync($"api/booking/validate", content);
                 
                 Assert.Equal("", body.Content.ReadAsStringAsync().Result);
                 Assert.Equal(HttpStatusCode.NoContent, body.StatusCode);
@@ -183,7 +184,7 @@ namespace PlannerApi.Tests.IntegrationTests
                     Presence = true
                 };
                 MakeRequest(deserializer, user, out var content);
-                HttpResponseMessage body = await HttpClient.PutAsync($"api/booking/change-validation", content);
+                HttpResponseMessage body = await HttpClient.PostAsync($"api/booking/validate", content);
                 
                 Assert.Equal("", body.Content.ReadAsStringAsync().Result);
                 Assert.Equal(HttpStatusCode.NoContent, body.StatusCode);

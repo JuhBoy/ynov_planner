@@ -26,7 +26,7 @@ namespace PlannerApi.Tests.FunctionalTests {
         }
 
         public IBookingServices GetBookingService() {
-            var bs = new BookingServices(Context, (new Mock<IEmailService>()).Object);
+            var bs = new BookingServices(Context, (new Mock<IEmailService>()).Object, new JuryPointServices(Context));
             return bs;
         }
 
@@ -211,6 +211,7 @@ namespace PlannerApi.Tests.FunctionalTests {
             [Fact]
             public async void ShouldSubscribeUser_WhenEventIsFree() {
                 var @event = Context.Event.FirstOrDefault(e => e.Forward() && e.SubscribtionOpen());
+                @event.ValidationRequired = true;
                 @event.ValidatedNumber = 0;
                 @event.SubscribedNumber = 0;
                 var user = Context.User.First();

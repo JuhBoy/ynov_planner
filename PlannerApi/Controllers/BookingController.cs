@@ -19,8 +19,6 @@ namespace events_planner.Controllers {
 
         public IEventServices EventServices;
 
-        public IEmailService EmailServices;
-
         public IBookingServices BookingServices;
 
         public IUserServices UserServices;
@@ -32,7 +30,6 @@ namespace events_planner.Controllers {
                                 IUserServices userServices) {
             Context = context;
             EventServices = eventServices;
-            EmailServices = mailServices;
             BookingServices = bookingServices;
             UserServices = userServices;
         }
@@ -142,35 +139,6 @@ namespace events_planner.Controllers {
                 return BadRequest(e.InnerException.Message);
             }
 
-            return NoContent();
-        }
-
-        [HttpPut("change-validation"), Authorize(Roles = "Admin"), Obsolete]
-        public async Task<IActionResult> ChangeValidation([FromBody] BookingValidationDeserializer bookingValidationDsl) 
-        {
-            Booking booking = await BookingServices.GetByIdsAsync(bookingValidationDsl.UserId,
-                bookingValidationDsl.EventId, BookingServices.WithUserAndEvent(Context.Booking));
-            
-            if (booking == null) { return NotFound("Booking not found"); }
-
-            booking.Present = bookingValidationDsl.Presence;
-
-            if (!bookingValidationDsl.Presence && booking.Event.JuryPoint.HasValue) {
-                BookingServices.RemoveJuryPoints(
-                    BookingServices.GetJuryPoint(bookingValidationDsl.UserId, (float) booking.Event.JuryPoint)
-                );
-            } else if (booking.Event.JuryPoint.HasValue) {
-                BookingServices.CreateJuryPoint((float) booking.Event.JuryPoint, bookingValidationDsl.UserId);
-                EmailServices.SendFor(booking.User, booking.Event, BookingTemplate.PRESENT);
-            }
-
-            try {
-                Context.Booking.Update(booking);
-                await Context.SaveChangesAsync();
-            } catch (DbUpdateException ex) {
-                return BadRequest(ex);
-            }
-            
             return NoContent();
         }
 
