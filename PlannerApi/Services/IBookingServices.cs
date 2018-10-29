@@ -14,7 +14,7 @@ namespace events_planner.Services
         Task<Booking> GetByIdsAsync(int userId, int eventId, IQueryable<Booking> query);
         Task<Booking[]> GetBookedEventForUserAsync(int userId);
 
-        Task SetBookingPresence(Booking booking, bool presence);
+        Task SetBookingPresence(Booking booking, bool? presence);
         Task<Booking> MakeBookingAsync(User user, Event @event);
         void SendEmailForNewBooking(Booking booking);
         Task<BadRequestObjectResult> IsBookableAsync(Event @event, User user);

@@ -9,9 +9,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace events_planner.Services {
-    
+
     public class BookingServices : IBookingServices {
-        
+
         private PlannerContext Context { get; }
         private IEmailService EmailService { get; }
         private IJuryPointServices JuryPointServices { get; }
@@ -26,18 +26,19 @@ namespace events_planner.Services {
         public Booking GetByIds(int userId, int eventId) {
             return Context.Booking.FirstOrDefault(b => b.UserId == userId && b.EventId == eventId);
         }
-        
+
         public async Task<Booking> GetByIdsAsync(int userId, int eventId) {
             return await Context.Booking.FirstOrDefaultAsync(b => b.UserId == userId && b.EventId == eventId);
         }
-        
+
         public async Task<Booking> GetByIdsAsync(int userId, int eventId, IQueryable<Booking> query) {
             return await query.FirstOrDefaultAsync(b => b.UserId == userId && b.EventId == eventId);
         }
 
         public async Task<Booking> MakeBookingAsync(User user, Event @event) {
             Booking book = new Booking() {
-                Present = false,
+                //Present = false,
+                Present = null,
                 User = user,
                 Event = @event
             };
@@ -47,7 +48,7 @@ namespace events_planner.Services {
             Context.Booking.Add(book);
             Context.Event.Update(@event);
             await Context.SaveChangesAsync();
-            
+
             return book;
         }
 
@@ -70,17 +71,17 @@ namespace events_planner.Services {
                 .ThenInclude(tinc => tinc.EventCategory)
                 .ThenInclude(evcat => evcat.Category)
                 .Where(arg => arg.UserId == userId
-                              && !arg.Present)
+                              && ( ( arg.Present.HasValue && !(bool) arg.Present ) || arg.Present == null ))
                 .ToArrayAsync();
         }
 
         public async Task SetBookingConfirmation(bool previsousConfirm, Booking booking) {
             BookingTemplate template;
-            
+
             if (!(bool)booking.Validated) {
                 if (previsousConfirm) {
                     booking.Event.ValidatedNumber--;
-                    await SetBookingPresence(booking, false);
+                    await SetBookingPresence(booking, null);
                 }
                 booking.Event.SubscribedNumber--;
                 Context.Event.Update(booking.Event);
@@ -91,29 +92,34 @@ namespace events_planner.Services {
                 Context.Booking.Update(booking);
                 template = BookingTemplate.SUBSCRIPTION_VALIDATED;
             }
-            
+
             EmailService.SendFor(booking.User, booking.Event, template);
             await Context.SaveChangesAsync();
         }
 
-        public async Task SetBookingPresence(Booking booking, bool presence) {
+        public async Task SetBookingPresence(Booking booking, bool? presence) {
             if (booking.Present == presence) { return; }
 
             booking.Present = presence;
+
+            JuryPoint points = await JuryPointServices.GetJuryPointAsync(booking.UserId, booking.EventId);
+            JuryPointServices.RemoveJuryPoints(points);
             
-            if (!presence && booking.Event.JuryPoint.HasValue) {
-                JuryPoint points = await JuryPointServices.GetJuryPointAsync(booking.UserId, booking.EventId);
-                JuryPointServices.RemoveJuryPoints(points);
+            if (!presence.HasValue) {
+                // Do nothing
+            } else if (!(bool)presence && booking.Event.JuryPoint.HasValue) {
+                await JuryPointServices.CreateJuryPointAsync(-(float) booking.Event.JuryPoint * 3, 
+                    $"Event:Abs:{booking.Event.Id}", booking.UserId, booking.EventId);
             } else if (booking.Event.JuryPoint.HasValue) {
-                await JuryPointServices.CreateJuryPointAsync((float) booking.Event.JuryPoint, "From Event",
-                    booking.UserId, booking.EventId);
+                await JuryPointServices.CreateJuryPointAsync((float) booking.Event.JuryPoint,
+                    $"Event:Present:{booking.Event.Id}", booking.UserId, booking.EventId);
                 EmailService.SendFor(booking.User, booking.Event, BookingTemplate.PRESENT);
             }
-            
+
             Context.Booking.Update(booking);
             await Context.SaveChangesAsync();
         }
-        
+
         public async Task SubscribeUserToEvent(Event @event, User user) {
             var book = await MakeBookingAsync(user, @event);
             book.Validated |= @event.ValidationRequired;
@@ -124,7 +130,7 @@ namespace events_planner.Services {
         public bool IsAllowedToSubscribe(User user, Event @event) {
             int roleId = user.RoleId;
             int eventID = @event.Id;
-            
+
             return !@event.RestrictedEvent || Context.EventRole.Any(ev => ev.RoleId == roleId && ev.EventId == eventID);
         }
 
@@ -137,7 +143,7 @@ namespace events_planner.Services {
         public async Task<BadRequestObjectResult> IsBookableAsync(Event @event, User user) {
             if (@event == null)
                 return new BadRequestObjectResult(ApiErrors.EventNotFound);
-            if (user == null) 
+            if (user == null)
                 return new BadRequestObjectResult(ApiErrors.UserNotFound);
             if (@event.SubscribedNumber >= @event.SubscribeNumber)
                 return new BadRequestObjectResult(ApiErrors.SubscriptionOverFlow);
@@ -155,7 +161,7 @@ namespace events_planner.Services {
         public async Task<BadRequestObjectResult> IsBookableWithoutDateAsync(Event @event, User user) {
             if (@event == null)
                 return new BadRequestObjectResult(ApiErrors.EventNotFound);
-            if (user == null) 
+            if (user == null)
                 return new BadRequestObjectResult(ApiErrors.UserNotFound);
             if (@event.SubscribedNumber >= @event.SubscribeNumber)
                 return new BadRequestObjectResult(ApiErrors.SubscriptionOverFlow);
@@ -165,7 +171,7 @@ namespace events_planner.Services {
                 return new BadRequestObjectResult(ApiErrors.SubscriptionNotPermitted);
             return null;
         }
-        
+
         #region Queries
 
         public IQueryable<Booking> WithUser(IQueryable<Booking> query) {
@@ -179,7 +185,7 @@ namespace events_planner.Services {
         public IQueryable<Booking> WithUserAndEvent(IQueryable<Booking> query = null) {
             return WithEvent(WithUser(query ?? Context.Booking));
         }
-        
+
         #endregion
     }
 }

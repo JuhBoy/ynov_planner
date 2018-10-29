@@ -1,4 +1,8 @@
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using CsvHelper;
 using CsvHelper.Configuration;
+using CsvHelper.TypeConversion;
 using events_planner.Models;
 
 namespace events_planner.Utils.DataFormatter.Mappers
@@ -9,8 +13,9 @@ namespace events_planner.Utils.DataFormatter.Mappers
             Map(m => m.FirstName);
             Map(m => m.Email);
             Map(m => m.PhoneNumber);
-            Map(m => m.TotalJuryPoints);
             Map(m => m.Promotion.Name).Name("promotion_name");
+            Map(m => m.Participations);
+            Map(m => m.TotalJuryPoints);
         }
     }
 }

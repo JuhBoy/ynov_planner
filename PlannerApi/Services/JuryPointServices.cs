@@ -61,7 +61,8 @@ namespace events_planner.Services {
             if (throwIfEventLinked && juryPoint.EventId.HasValue) {
                 throw new ArgumentException("Jury point with event id linked cannot be deleted");
             }
-            Context.Remove(juryPoint);
+            if (juryPoint != null)
+                Context.Remove(juryPoint);
         }
 
         public async Task<int> SaveAsync() {

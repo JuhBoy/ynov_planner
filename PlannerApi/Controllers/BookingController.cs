@@ -80,7 +80,7 @@ namespace events_planner.Controllers {
 
             if (book.Event.ValidationRequired && (bool) book.Validated)
                 book.Event.ValidatedNumber--;
-            if (book.Present)
+            if (book.Present.HasValue && (bool)book.Present)
                 await BookingServices.SetBookingPresence(book, false);
 
             try {

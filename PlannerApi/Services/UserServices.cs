@@ -175,11 +175,11 @@ namespace Microsoft.Extensions.DependencyInjection {
                         PhoneNumber = 0
                     };
             string roleName = GetRoleForCategories(attributes.Categories);
-            
+
             GetPromotion(attributes.Name ?? roleName, out var promotion);
             GetRole(roleName, out var role);
             GeneratePasswordSha256(user.Password, out var password);
-            
+
             if (promotion == null) {
                 promotion = new Promotion() {
                     Name = attributes.Name,
@@ -235,7 +235,7 @@ namespace Microsoft.Extensions.DependencyInjection {
                           .Any((TemporaryRole arg) => arg.EventId == eventId &&
                                                       arg.UserId == userId);
         }
-        
+
         public bool EnsureModerationCapability(User user, int eventId) {
             return !user.Role.Name.Equals("Admin") && !IsModeratorFor(eventId, user.Id);
         }
@@ -296,14 +296,14 @@ namespace Microsoft.Extensions.DependencyInjection {
             return await query.FirstOrDefaultAsync(user => user.Id == id);
         }
 
-        public async Task<string> ExportUsersCsv(IEnumerable<User> users, IHostingEnvironment env) {
+        public async Task<string> ExportUsersCsv<T, E>(IEnumerable<E> users, IHostingEnvironment env) {
             var factory = new DataFormatterFactory(env);
             IFormatter formatter = factory.GetFormatter(FormatterType.CSV);
-            formatter.Configuration = factory.UseFileConfiguration<UserDataMap>(FormatterType.CSV);
-            
-            return await formatter.FormatMultipleAsync<IEnumerable<User>>(users);
+            formatter.Configuration = factory.UseFileConfiguration<T>(FormatterType.CSV);
+
+            return await formatter.FormatMultipleAsync<IEnumerable<E>>(users);
         }
-        
+
         private string GetRoleForCategories(string categories) {
             string roleName = "Student";
             string[] staff = Configuration["UserAsStaffMember:Staff"].Split(',', StringSplitOptions.RemoveEmptyEntries);

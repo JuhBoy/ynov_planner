@@ -129,15 +129,18 @@ namespace PlannerApi.Tests.FunctionalTests {
                 };
 
                 await GetBookingService().SetBookingPresence(book, true);
-                var jPoints = Context.JuryPoints.FirstOrDefault(j => j.Points - @event.JuryPoint < 0.01);
+                var jPoints = Context.JuryPoints.FirstOrDefault(j => j.EventId == @event.Id && j.UserId == user.Id);
 
                 Assert.NotNull(jPoints);
+                Assert.True(jPoints.Points >= 0.5f);
+                MathF.Truncate(0.55f);
                 Assert.True(book.Present);
 
                 await GetBookingService().SetBookingPresence(book, false);
-                var nullPoints = Context.JuryPoints.FirstOrDefault(j => j.Points - @event.JuryPoint < 0.01);
+                var nullPoints = Context.JuryPoints.FirstOrDefault(j => j.EventId == @event.Id && j.UserId == user.Id);
                 
-                Assert.Null(nullPoints);
+                Assert.NotNull(nullPoints);
+                Assert.True(nullPoints.Points <= -1.5f);
                 Assert.False(book.Present);
             }
         }

@@ -23,7 +23,7 @@ namespace events_planner.Services
         bool EnsureModerationCapability(User user, int eventId);
 
         Task<User> GetUserByIdAsync(int id, IQueryable<User> bQuery = null);
-        Task<string> ExportUsersCsv(IEnumerable<User> users, IHostingEnvironment env);
+        Task<string> ExportUsersCsv<T, E>(IEnumerable<E> users, IHostingEnvironment env);
 
         #region QUERIES
 

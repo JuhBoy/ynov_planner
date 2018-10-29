@@ -125,8 +125,8 @@ namespace events_planner.Models
                 if (Bookings == null) return null;
                 int total = 0;
                 foreach (var booking in Bookings) {
-                    if (!booking.Present) continue;
-                    total++;
+                    if (booking.Present.HasValue && (bool)booking.Present)
+                        total++;
                 }
                 return total;
             }

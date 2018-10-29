@@ -11,8 +11,8 @@ namespace events_planner.Models
         [Column("booking_id"), Key]
         public int Id { get; set; }
 
-        [Column("present"), Required]
-        public Boolean Present { get; set; } = false;
+        [Column("present")]
+        public bool? Present { get; set; }
 
         [Column("validated")]
         public bool? Validated { get; set; } = null;

@@ -15,6 +15,7 @@ using System.Net.Http;
 using System.Xml.Serialization;
 using events_planner.Constants;
 using events_planner.Utils;
+using events_planner.Utils.DataFormatter.Mappers;
 using NLog;
 
 namespace events_planner.Controllers {
@@ -177,7 +178,7 @@ namespace events_planner.Controllers {
             string search = HttpContext.Request.Query["search"];
             string range = HttpContext.Request.Query["range"];
             bool withStaff = HttpContext.Request.Query["staff"] == bool.TrueString;
-            
+
             IQueryable<User> query = UserServices.AllForeignKeysQuery();
 
             if (search != null) {
@@ -362,22 +363,24 @@ namespace events_planner.Controllers {
         [HttpPost("export/{ids}"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> CsvExport(string ids) {
             int[] iIds = ids.Split(',').Select(arg => int.Parse(arg)).ToArray();
-            
+
             if (iIds.Length <= 0) {
                 return BadRequest(ApiErrors.CSVEmptySet);
             }
-            
+
             IEnumerable<User> users = Context.User.Include(a => a.JuryPoint)
+                                                  .ThenInclude(a => a.Event)
                                                   .Include(a => a.Promotion)
+                                                  .Include(a => a.Bookings)
                                                   .Where(arg => iIds.Contains(arg.Id));
             string csvPathOrData;
-            
+
             try {
-                csvPathOrData = await UserServices.ExportUsersCsv(users, Env);
+                csvPathOrData = await UserServices.ExportUsersCsv<UserJuryPointsDetailDataMap, User>(users, Env);
             } catch (Exception ex) {
                 return BadRequest(ApiErrors.CsvErrorInternal);
             }
-            
+
             return Ok(csvPathOrData);
         }
 
@@ -390,18 +393,18 @@ namespace events_planner.Controllers {
             Booking[] books = await Context.Booking.Include(b => b.User)
                 .ThenInclude(u => u.JuryPoint)
                 .Include(b => b.User.Promotion)
-                .Where(b => b.EventId == eventId && b.Present)
+                .Where(b => b.EventId == eventId)
                 .ToArrayAsync();
-            
+
             string csvPathOrData;
-            
+
             try {
-                csvPathOrData = await UserServices.ExportUsersCsv(books.Select(b => b.User), Env);
+                csvPathOrData = await UserServices.ExportUsersCsv<BookingDataMap, Booking>(books, Env);
             } catch (Exception ex) {
                 LogManager.GetCurrentClassLogger().Error(ex);
                 return BadRequest(ApiErrors.CsvErrorInternal);
             }
-            
+
             return Ok(csvPathOrData);
         }
     }
