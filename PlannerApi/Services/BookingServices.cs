@@ -123,8 +123,12 @@ namespace events_planner.Services {
         public async Task SubscribeUserToEvent(Event @event, User user) {
             var book = await MakeBookingAsync(user, @event);
             book.Validated |= @event.ValidationRequired;
-            if (book.Validated.HasValue)
+            if (book.Event.SubscribeNumber < book.Event.SubscribedNumber) {
+                book.Event.SubscribeNumber++;
+            }
+            if (book.Validated.HasValue) {
                 await SetBookingConfirmation(false, book);
+            }
         }
 
         public bool IsAllowedToSubscribe(User user, Event @event) {
@@ -153,20 +157,6 @@ namespace events_planner.Services {
                 return new BadRequestObjectResult(ApiErrors.EventExpired);
             if (!@event.SubscribtionOpen())
                 return new BadRequestObjectResult(ApiErrors.SubscriptionNotOpen);
-            if (!IsAllowedToSubscribe(user, @event))
-                return new BadRequestObjectResult(ApiErrors.SubscriptionNotPermitted);
-            return null;
-        }
-
-        public async Task<BadRequestObjectResult> IsBookableWithoutDateAsync(Event @event, User user) {
-            if (@event == null)
-                return new BadRequestObjectResult(ApiErrors.EventNotFound);
-            if (user == null)
-                return new BadRequestObjectResult(ApiErrors.UserNotFound);
-            if (@event.SubscribedNumber >= @event.SubscribeNumber)
-                return new BadRequestObjectResult(ApiErrors.SubscriptionOverFlow);
-            if (await IsBookedToEvent(user, @event))
-                return new BadRequestObjectResult(ApiErrors.AlreadyBooked);
             if (!IsAllowedToSubscribe(user, @event))
                 return new BadRequestObjectResult(ApiErrors.SubscriptionNotPermitted);
             return null;

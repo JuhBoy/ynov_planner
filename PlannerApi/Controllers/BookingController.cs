@@ -210,13 +210,13 @@ namespace events_planner.Controllers {
         /// </summary>
         /// <param name="userToEventDsl">Event to user model</param>
         /// <returns>204 or 400</returns>
-        [HttpPost("user"), AllowAnonymous]
+        [HttpPost("user"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddUserToEvent([FromBody] UserToEventDeserializer userToEventDsl) {
             var @event = await EventServices.GetEventByIdAsync(userToEventDsl.eventId);
             var user = await UserServices.GetUserByIdAsync(userToEventDsl.userId);
 
-            var badObjRslt = await BookingServices.IsBookableWithoutDateAsync(@event, user);
-            if (badObjRslt != null) return badObjRslt;
+            if (user == null) return BadRequest(ApiErrors.UserNotFound);
+            if (@event == null) return BadRequest(ApiErrors.EventNotFound);
 
             try {
                 await BookingServices.SubscribeUserToEvent(@event, user);
