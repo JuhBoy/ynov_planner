@@ -12,7 +12,13 @@ namespace events_planner.Utils.DataFormatter.Mappers {
     
     public class BookingDataMap : ClassMap<Booking> {
         public BookingDataMap() {
-            Map(b => b.Present);
+            Map(b => b.Present).Name("Présence").ConvertUsing(row => {
+                var value = row.Present;
+                if (value.HasValue && (bool) value)
+                    return "Présent";
+               
+                return "Absent";
+            });
             References<UserDataMap>(b => b.User);
         }    
     }
