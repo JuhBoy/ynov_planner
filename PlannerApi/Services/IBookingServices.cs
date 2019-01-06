@@ -19,6 +19,7 @@ namespace events_planner.Services
         void SendEmailForNewBooking(Booking booking);
         Task<BadRequestObjectResult> IsBookableAsync(Event @event, User user);
         Task SubscribeUserToEvent(Event @event, User user);
+        Task UnsubscribeUser(Booking booking);
 
         /// <summary>
         /// Process to Booking confirmation with the booking already updated (in memory)

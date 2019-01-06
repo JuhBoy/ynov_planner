@@ -122,13 +122,28 @@ namespace events_planner.Services {
 
         public async Task SubscribeUserToEvent(Event @event, User user) {
             var book = await MakeBookingAsync(user, @event);
-            book.Validated |= @event.ValidationRequired;
+            book.Validated |= @event.ValidationRequired; // Validate automatically if required
             if (book.Event.SubscribeNumber < book.Event.SubscribedNumber) {
                 book.Event.SubscribeNumber++;
             }
             if (book.Validated.HasValue) {
                 await SetBookingConfirmation(false, book);
             }
+        }
+
+        public async Task UnsubscribeUser(Booking booking) {
+            if (booking.User == null || booking.Event == null) return;
+
+            booking.Event.SubscribedNumber--;
+
+            if (booking.Event.ValidationRequired && (bool)booking.Validated)
+                booking.Event.ValidatedNumber--;
+            if (booking.Present.HasValue && (bool)booking.Present)
+                await SetBookingPresence(booking, false);
+
+            Context.Update(booking.Event);
+            Context.Remove(booking);
+            await Context.SaveChangesAsync();
         }
 
         public bool IsAllowedToSubscribe(User user, Event @event) {

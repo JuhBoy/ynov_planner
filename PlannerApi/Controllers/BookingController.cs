@@ -76,17 +76,8 @@ namespace events_planner.Controllers {
                 return BadRequest("Can't unsubscribe to the event");
             }
 
-            book.Event.SubscribedNumber--;
-
-            if (book.Event.ValidationRequired && (bool) book.Validated)
-                book.Event.ValidatedNumber--;
-            if (book.Present.HasValue && (bool)book.Present)
-                await BookingServices.SetBookingPresence(book, false);
-
             try {
-                Context.Update(book.Event);
-                Context.Remove(book);
-                await Context.SaveChangesAsync();
+                await BookingServices.UnsubscribeUser(book);
             } catch (DbUpdateException e) {
                 return BadRequest(e.InnerException.Message);
             }
@@ -102,8 +93,8 @@ namespace events_planner.Controllers {
         [HttpGet, Authorize(Roles = "Student, Admin, Foreigner, Staff")]
         public async Task<IActionResult> GetBookedEvents() {
             Booking[] events = await BookingServices.GetBookedEventForUserAsync(CurrentUser.Id);
-            Booking[] result = events.Where((arg) => arg.Event.Forward()).ToArray();
-            return Ok(result);
+            Booking[] forwardEvents = events.Where((arg) => arg.Event.Forward()).ToArray();
+            return Ok(forwardEvents);
         }
 
         /// <summary>
@@ -206,22 +197,26 @@ namespace events_planner.Controllers {
         }
         
         /// <summary>
-        /// Subscribe a given user to the specified event
+        /// Subscribe/unsubscribe a given user to the specified event
         /// </summary>
         /// <param name="userToEventDsl">Event to user model</param>
         /// <returns>204 or 400</returns>
         [HttpPost("user"), Authorize(Roles = "Admin")]
-        public async Task<IActionResult> AddUserToEvent([FromBody] UserToEventDeserializer userToEventDsl) {
+        public async Task<IActionResult> ToggleSubscribeUser([FromBody] UserToEventDeserializer userToEventDsl) {
             var @event = await EventServices.GetEventByIdAsync(userToEventDsl.eventId);
             var user = await UserServices.GetUserByIdAsync(userToEventDsl.userId);
 
             if (user == null) return BadRequest(ApiErrors.UserNotFound);
             if (@event == null) return BadRequest(ApiErrors.EventNotFound);
 
+            var booking = await BookingServices.GetByIdsAsync(user.Id, @event.Id, BookingServices.WithUserAndEvent());
+
             try {
-                await BookingServices.SubscribeUserToEvent(@event, user);
-            }
-            catch (DbUpdateException ex) {
+                if (booking == null)
+                    await BookingServices.SubscribeUserToEvent(@event, user);
+                else
+                    await BookingServices.UnsubscribeUser(booking);
+            } catch (DbUpdateException ex) {
                 return BadRequest(ex);
             }
 
