@@ -155,6 +155,21 @@ namespace Microsoft.Extensions.DependencyInjection {
                                 .AnyAsync(prop => prop.EventId == eventId &&
                                           prop.UserId == userId);
         }
+
+        public async Task<bool> HasCategory(int categoryId, Event @event) {
+            int eventID = @event.Id;
+            bool hasCategory = await Context.EventCategory.AnyAsync(cat => cat.EventId == eventID);
+            return hasCategory;
+        }
+
+        public async Task AddCategory(Category category, Event @event) {
+            EventCategory parentCat = new EventCategory()
+            {
+                Category = category,
+                Event = @event
+            };
+            await Context.EventCategory.AddAsync(parentCat);
+        }
     }
 
     #region QUERIES

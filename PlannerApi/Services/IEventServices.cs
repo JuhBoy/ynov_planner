@@ -28,6 +28,10 @@ namespace events_planner.Services {
 
         Task<bool> IsEventBooked(int userId, int eventId);
 
+        Task<bool> HasCategory(int categoryId, Event @event);
+
+        Task AddCategory(Category category, Event @event);
+
         #region QUERIES
 
         void FromDate<T>(ref IQueryable<T> query, string date) where T : Event;

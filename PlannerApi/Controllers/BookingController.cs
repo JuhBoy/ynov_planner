@@ -93,8 +93,7 @@ namespace events_planner.Controllers {
         [HttpGet, Authorize(Roles = "Student, Admin, Foreigner, Staff")]
         public async Task<IActionResult> GetBookedEvents() {
             Booking[] events = await BookingServices.GetBookedEventForUserAsync(CurrentUser.Id);
-            Booking[] forwardEvents = events.Where((arg) => arg.Event.Forward()).ToArray();
-            return Ok(forwardEvents);
+            return Ok(events);
         }
 
         /// <summary>
@@ -121,9 +120,13 @@ namespace events_planner.Controllers {
 
             if (book == null)
                 return NotFound("Booking not found");
-            if (book.Event.ValidationRequired && (bool) !book.Validated)
-                return BadRequest("User must be confirmed to the event");
 
+            if (book.Event.ValidationRequired && (bool)!book.Validated)
+            {
+                book.Validated = true;
+                await BookingServices.SetBookingConfirmation(false, book);
+            }
+                
             try {
                 await BookingServices.SetBookingPresence(book, bookDsl.Presence);
             } catch (DbUpdateException e) {

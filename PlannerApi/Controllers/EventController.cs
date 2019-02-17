@@ -237,25 +237,18 @@ namespace events_planner.Controllers {
                 return BadRequest("Bind already exist");
             }
 
-            Event eventModel  = await Services.GetEventByIdAsync(eventId);
+            Event mEvent = await Services.GetEventByIdAsync(eventId);
             Category category = await CategoryServices.GetByIdAsync(categoryId);
 
-            if (eventModel == null || category == null) { return NotFound(); }
+            if (mEvent == null || category == null) { return NotFound(); }
 
-            if (category.ParentCategory.HasValue) {
-                EventCategory parentCat = new EventCategory() {
-                    Category = await CategoryServices.GetByIdAsync((int)category.ParentCategory),
-                    Event = eventModel
-                };
-                Context.EventCategory.Add(parentCat);
+            if (category.ParentCategory.HasValue && !await Services.HasCategory(category.ParentCategory.Value, mEvent)) {
+                var parentCategory = await CategoryServices.GetByIdAsync((int)category.ParentCategory);
+                await Services.AddCategory(parentCategory, mEvent);
             }
 
-            EventCategory eventCategory = new EventCategory() {
-                Category = category, Event = eventModel
-            };
-
             try {
-                Context.EventCategory.Add(eventCategory);
+                await Services.AddCategory(category, mEvent);
                 await Context.SaveChangesAsync();
             } catch (DbUpdateException e) {
                 return BadRequest(e.InnerException.Message);
