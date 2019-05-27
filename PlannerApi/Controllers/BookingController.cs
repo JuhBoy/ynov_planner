@@ -121,13 +121,12 @@ namespace events_planner.Controllers {
             if (book == null)
                 return NotFound("Booking not found");
 
-            if (book.Event.ValidationRequired && (bool)!book.Validated)
-            {
-                book.Validated = true;
-                await BookingServices.SetBookingConfirmation(false, book);
-            }
-                
             try {
+                if (book.Event.ValidationRequired && (bool)!book.Validated)
+                {
+                    book.Validated = true;
+                    await BookingServices.SetBookingConfirmation(false, book);
+                }
                 await BookingServices.SetBookingPresence(book, bookDsl.Presence);
             } catch (DbUpdateException e) {
                 return BadRequest(e.InnerException.Message);

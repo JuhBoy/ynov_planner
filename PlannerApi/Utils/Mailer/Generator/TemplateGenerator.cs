@@ -6,6 +6,7 @@ using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using System.Collections.Generic;
 using events_planner.Utils.Formatters;
+using System.Text;
 
 namespace events_planner.Utils {
 
@@ -38,17 +39,10 @@ namespace events_planner.Utils {
                                        template.ToString().ToLower() + FILE_EXT);
             string[] templates = new string[users.Length];
 
-            using (var file = File.Open(path, FileMode.Open)) {
-                
-                using (var stream = new StreamReader(file)) {
-                    string fileContent = stream.ReadToEnd();
-                    if (string.IsNullOrEmpty(fileContent)) {
-                        throw new TemplateEmptyException("File content is null or empty");
-                    }
-                    templaseAsUtf8String = fileContent;
-                }
-                
-            }
+            templaseAsUtf8String = File.ReadAllText(path, Encoding.UTF8);
+
+            if (string.IsNullOrEmpty(templaseAsUtf8String))
+                throw new TemplateEmptyException("File Empty");
 
             for (int i = 0; i < users.Length; i++) {
                 templates[i] = Format(fileContent: templaseAsUtf8String,
